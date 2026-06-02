@@ -1,0 +1,323 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    ADMISSIONS SYSTEM - FLOW DIAGRAM                           ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SCENARIO 1: CREATE NEW STUDENT                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Frontend Panel: "Create New Student"
+        │
+        │ User fills form:
+        │ - Full Name
+        │ - Date of Birth
+        │ - Gender
+        │ - Guardian Info
+        │ - etc.
+        │
+        ▼
+    POST /student
+        │
+        ▼
+┌───────────────────────────────────────┐
+│   Student Controller                  │
+│   createStudent()                     │
+│                                       │
+│   Step 1: Validate fields             │
+│   Step 2: Check email uniqueness      │
+│   Step 3: Create student record       │
+│           ↓                           │
+│   ┌─────────────────────┐            │
+│   │  students.json      │            │
+│   │  + New Student      │            │
+│   └─────────────────────┘            │
+│                                       │
+│   Step 4: Create user (if password)  │
+│           ↓                           │
+│   ┌─────────────────────┐            │
+│   │  users.json         │            │
+│   │  + New User         │            │
+│   └─────────────────────┘            │
+│                                       │
+│   Step 5: Create admission            │
+│           ↓                           │
+│   ┌─────────────────────┐            │
+│   │  admissions.json    │            │
+│   │  + New Admission    │            │
+│   └─────────────────────┘            │
+│                                       │
+│   Return: student_id + admission_id  │
+└───────────────────────────────────────┘
+        │
+        ▼
+    Frontend receives:
+    {
+      student_id: "123",
+      admission_id: "456",
+      student: {...},
+      admission: {...}
+    }
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SCENARIO 2: ENROLL EXISTING STUDENT                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Frontend Panel: "Enroll by Key"
+        │
+        │ User searches student by ID
+        │ User fills enrollment details
+        │
+        ▼
+    POST /student/:studentId/enroll
+        │
+        ▼
+┌───────────────────────────────────────┐
+│   Student Controller                  │
+│   enrollExistingStudent()             │
+│                                       │
+│   Step 1: Check if student exists     │
+│           ↓                           │
+│   ┌─────────────────────┐            │
+│   │  students.json      │            │
+│   │  Find student       │            │
+│   └─────────────────────┘            │
+│                                       │
+│   Step 2: Create admission only       │
+│           ↓                           │
+│   ┌─────────────────────┐            │
+│   │  admissions.json    │            │
+│   │  + New Admission    │            │
+│   └─────────────────────┘            │
+│                                       │
+│   Step 3: Update student info         │
+│           (optional)                  │
+│           ↓                           │
+│   ┌─────────────────────┐            │
+│   │  students.json      │            │
+│   │  Update class       │            │
+│   └─────────────────────┘            │
+│                                       │
+│   Return: student + admission_id     │
+└───────────────────────────────────────┘
+        │
+        ▼
+    Frontend receives:
+    {
+      student_id: "123",
+      admission_id: "789",
+      student: {...},
+      admission: {...}
+    }
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      SCENARIO 3: STUDENT LEAVES SCHOOL                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Frontend Action: "Close Admission"
+        │
+        ▼
+    PATCH /admission/:admissionId/close
+        │
+        ▼
+┌───────────────────────────────────────┐
+│   Admission Controller                │
+│   closeAdmission()                    │
+│                                       │
+│   Step 1: Find admission              │
+│           ↓                           │
+│   ┌─────────────────────┐            │
+│   │  admissions.json    │            │
+│   │  Find by ID         │            │
+│   └─────────────────────┘            │
+│                                       │
+│   Step 2: Update admission            │
+│           - close_date = today        │
+│           - active_status = false     │
+│           - remarks = "Graduated"     │
+│           ↓                           │
+│   ┌─────────────────────┐            │
+│   │  admissions.json    │            │
+│   │  Update record      │            │
+│   └─────────────────────┘            │
+│                                       │
+│   Return: success                     │
+└───────────────────────────────────────┘
+        │
+        ▼
+    Frontend receives:
+    {
+      success: true,
+      message: "Admission closed"
+    }
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                            DATA RELATIONSHIPS                                 ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────┐
+│   students.json  │
+│                  │
+│  student_id      │◄─────────┐
+│  full_name       │          │
+│  email           │          │
+│  date_of_birth   │          │
+│  gender          │          │
+│  school_id       │          │
+│  current_class   │          │
+│  ...             │          │
+└──────────────────┘          │
+                              │
+                              │ References
+                              │
+┌──────────────────┐          │
+│ admissions.json  │          │
+│                  │          │
+│  admission_id    │          │
+│  student_id      │──────────┘
+│  school_id       │
+│  admitted_date   │
+│  close_date      │
+│  active_status   │
+│  admission_class │
+│  ...             │
+└──────────────────┘
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                          ADMISSION LIFECYCLE                                  ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+    CREATE STUDENT
+         │
+         ▼
+    ┌─────────────────┐
+    │   ADMISSION     │
+    │   CREATED       │
+    │                 │
+    │ active_status:  │
+    │     true        │
+    │ close_date:     │
+    │     null        │
+    └─────────────────┘
+         │
+         │ Student attends school
+         │
+         ▼
+    ┌─────────────────┐
+    │   ADMISSION     │
+    │   ACTIVE        │
+    │                 │
+    │ active_status:  │
+    │     true        │
+    │ close_date:     │
+    │     null        │
+    └─────────────────┘
+         │
+         │ Student leaves/graduates
+         │
+         ▼
+    ┌─────────────────┐
+    │   ADMISSION     │
+    │   CLOSED        │
+    │                 │
+    │ active_status:  │
+    │     false       │
+    │ close_date:     │
+    │   2025-06-30    │
+    └─────────────────┘
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                            API ENDPOINTS MAP                                  ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+STUDENT ENDPOINTS
+├── POST   /student                      → Create student + admission
+├── POST   /student/:id/enroll           → Enroll existing student
+├── GET    /student/:id                  → Get student details
+├── GET    /student/school/:schoolId     → Get all students in school
+├── PUT    /student/:id                  → Update student
+├── DELETE /student/:id                  → Delete student
+└── PATCH  /student/:id/status           → Update student status
+
+ADMISSION ENDPOINTS
+├── POST   /admission                    → Create admission
+├── GET    /admission/:id                → Get admission details
+├── GET    /admission/student/:id        → Get student's all admissions
+├── GET    /admission/school/:schoolId   → Get school's admissions
+├── PUT    /admission/:id                → Update admission
+├── PATCH  /admission/:id/close          → Close admission
+└── DELETE /admission/:id                → Delete admission
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                          COMMON USE CASES                                     ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+1. GET ALL CURRENTLY ENROLLED STUDENTS
+   GET /admission/school/:schoolId?activeOnly=true
+   → Returns admissions where active_status = true
+
+2. CHECK IF STUDENT IS ENROLLED
+   GET /admission/student/:studentId
+   → Check if any admission has active_status = true
+
+3. VIEW STUDENT'S SCHOOL HISTORY
+   GET /admission/student/:studentId
+   → Returns all admissions (past and present)
+
+4. STUDENT TRANSFERS TO ANOTHER SCHOOL
+   Step 1: PATCH /admission/:oldAdmissionId/close
+   Step 2: POST /student/:studentId/enroll (with new school_id)
+
+5. STUDENT RETURNS AFTER LEAVING
+   POST /student/:studentId/enroll
+   (Creates new admission with admissionType: "returning")
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                              FILE STRUCTURE                                   ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+backend/
+├── data/
+│   ├── students.json          ← Student records
+│   ├── admissions.json         ← Admission records (NEW)
+│   └── users.json              ← User login records
+│
+├── controllers/
+│   ├── student.controller.js   ← Student logic (UPDATED)
+│   └── admission.controller.js ← Admission logic (NEW)
+│
+├── routes/
+│   ├── student.routes.js       ← Student endpoints (UPDATED)
+│   └── admission.routes.js     ← Admission endpoints (NEW)
+│
+├── utils/
+│   └── file.js                 ← File operations
+│
+├── doc/
+│   ├── ADMISSIONS_SYSTEM.md    ← Full documentation (NEW)
+│   ├── API_QUICK_REFERENCE.md  ← Quick reference (NEW)
+│   ├── IMPLEMENTATION_SUMMARY.md ← Summary (NEW)
+│   └── SYSTEM_FLOW.txt         ← This file (NEW)
+│
+└── server.js                   ← Main server (UPDATED)
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                 SUMMARY                                       ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+✅ Backend is complete and ready to use
+✅ Two workflows supported:
+   1. Create new student (creates student + admission)
+   2. Enroll existing student (creates admission only)
+✅ Full admission lifecycle tracking
+✅ Clean, readable, well-documented code
+✅ Ready for frontend integration
+
+Next Step: Update frontend to call these APIs instead of using mock data

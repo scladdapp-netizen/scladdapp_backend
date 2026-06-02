@@ -1,0 +1,40 @@
+[
+  {
+    "template_id": "1773237068876",
+    "school_id": "1773236295692",
+    "name": "temp1",
+    "description": "sdsd",
+    "status": "active",
+    "category": "Fees",
+    "bill_items": "[{\"item_name\":\"p1\",\"amount\":200,\"description\":\"12122\"},{\"item_name\":\"p2\",\"amount\":20,\"description\":\"as\"}]",
+    "total_amount": 220,
+    "currency": "NGN",
+    "due_date_value": "qeqe",
+    "allow_installments": true,
+    "installment_count": 12,
+    "min_payment": 21,
+    "created_by": null,
+    "created_at": "2026-03-11T13:51:08.877Z",
+    "last_modified": "2026-03-11T13:51:08.877Z",
+    "modified_by": null
+  },
+  {
+    "template_id": "1776163903463",
+    "school_id": "1773236295692",
+    "name": "ad",
+    "description": "adad",
+    "status": "active",
+    "category": "Fees",
+    "bill_items": "[{\"item_name\":\"ad\",\"amount\":23,\"description\":\"sd\"}]",
+    "total_amount": 23,
+    "currency": "NGN",
+    "due_date_value": "",
+    "allow_installments": false,
+    "installment_count": 1,
+    "min_payment": 0,
+    "created_by": "1773236295704",
+    "created_at": "2026-04-14T10:51:43.463Z",
+    "last_modified": "2026-04-14T10:51:43.463Z",
+    "modified_by": "1773236295704"
+  }
+]

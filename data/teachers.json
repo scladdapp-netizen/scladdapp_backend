@@ -1,0 +1,74 @@
+[
+  {
+    "teacher_id": "1773236600716",
+    "staff_id": "1773236572875",
+    "school_id": "1773236295692",
+    "teacher_code": "hmmm",
+    "is_active": true,
+    "appointed_by": "1773236295704",
+    "appointed_at": "2026-03-11T13:43:20.716Z",
+    "revoked_at": null,
+    "created_at": "2026-03-11T13:43:20.716Z",
+    "updated_at": "2026-03-11T13:43:20.716Z"
+  },
+  {
+    "teacher_id": "1773236622472",
+    "staff_id": "1775133242946",
+    "school_id": "1773236295692",
+    "teacher_code": "kolo",
+    "is_active": true,
+    "appointed_by": "1773236295704",
+    "appointed_at": "2026-03-11T13:43:42.472Z",
+    "revoked_at": null,
+    "created_at": "2026-03-11T13:43:42.472Z",
+    "updated_at": "2026-04-13T15:14:41.370Z"
+  },
+  {
+    "teacher_id": "1776056186945",
+    "staff_id": "1776055960214",
+    "school_id": "1775733797277",
+    "teacher_code": "t1",
+    "is_active": true,
+    "appointed_by": "1775733797337",
+    "appointed_at": "2026-04-13T04:56:26.945Z",
+    "revoked_at": null,
+    "created_at": "2026-04-13T04:56:26.945Z",
+    "updated_at": "2026-04-13T04:56:26.945Z"
+  },
+  {
+    "teacher_id": "1776056205455",
+    "staff_id": "1776056066200",
+    "school_id": "1775733797277",
+    "teacher_code": "t2",
+    "is_active": true,
+    "appointed_by": "1775733797337",
+    "appointed_at": "2026-04-13T04:56:45.455Z",
+    "revoked_at": null,
+    "created_at": "2026-04-13T04:56:45.455Z",
+    "updated_at": "2026-04-13T04:56:45.455Z"
+  },
+  {
+    "teacher_id": "1776056219044",
+    "staff_id": "1776056141168",
+    "school_id": "1775733797277",
+    "teacher_code": "t3",
+    "is_active": true,
+    "appointed_by": "1775733797337",
+    "appointed_at": "2026-04-13T04:56:59.044Z",
+    "revoked_at": null,
+    "created_at": "2026-04-13T04:56:59.044Z",
+    "updated_at": "2026-04-13T04:56:59.044Z"
+  },
+  {
+    "teacher_id": "1776260528117",
+    "staff_id": "1773236442025",
+    "school_id": "1773236295692",
+    "teacher_code": "mn",
+    "is_active": true,
+    "appointed_by": "1773236295704",
+    "appointed_at": "2026-04-15T13:42:08.117Z",
+    "revoked_at": null,
+    "created_at": "2026-04-15T13:42:08.117Z",
+    "updated_at": "2026-04-15T13:42:08.117Z"
+  }
+]

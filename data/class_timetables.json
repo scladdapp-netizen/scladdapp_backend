@@ -1,0 +1,3093 @@
+[
+  {
+    "timetable_id": "1773900000001",
+    "class_id": "1773236691426",
+    "subsession_id": "1773263496774767",
+    "school_id": "1773236295692",
+    "entries": [
+      {
+        "id": 1,
+        "day": "Monday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Dolp",
+        "teacher": "Mr. Adams",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773977322381",
+            "name": "dolp",
+            "code": "ko",
+            "teacher": "Mr. Adams",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Dolp (General)"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "day": "Monday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 3,
+        "day": "Monday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "Kks",
+        "teacher": "Mr. Black",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197996689",
+            "name": "kks",
+            "code": "ljsd",
+            "teacher": "Mr. Black",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Kks (General)"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "day": "Monday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Czc",
+        "teacher": "Mr. Dawson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197476690",
+            "name": "czc",
+            "code": "zc",
+            "teacher": "Mr. Dawson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Czc (General)"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "day": "Tuesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "SF",
+        "teacher": "Ms. Taylor",
+        "stream": "arts",
+        "streamName": "Arts Stream",
+        "streamColor": "#3b82f6",
+        "subjects": [
+          {
+            "id": "1773977671943",
+            "name": "sf",
+            "code": "xc",
+            "teacher": "Ms. Taylor",
+            "stream": "arts",
+            "streamName": "Arts Stream",
+            "displayName": "SF (Arts)"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "day": "Tuesday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 7,
+        "day": "Tuesday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "AAA",
+        "teacher": "Mrs. Green",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197564663",
+            "name": "AAA",
+            "code": "SF",
+            "teacher": "Mrs. Green",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "AAA (General)"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "day": "Tuesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Dadad",
+        "teacher": "Mr. Brown",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774198048843",
+            "name": "dadad",
+            "code": "900",
+            "teacher": "Mr. Brown",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Dadad (General)"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "day": "Wednesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Dolp",
+        "teacher": "Mr. Adams",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773977322381",
+            "name": "dolp",
+            "code": "ko",
+            "teacher": "Mr. Adams",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Dolp (General)"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "day": "Wednesday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 11,
+        "day": "Wednesday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "Akjdda",
+        "teacher": "Mr. Green",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774246212050",
+            "name": "akjdda",
+            "code": "ad",
+            "teacher": "Mr. Green",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Akjdda (General)"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "day": "Wednesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Dadad",
+        "teacher": "Mr. Brown",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774198048843",
+            "name": "dadad",
+            "code": "900",
+            "teacher": "Mr. Brown",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Dadad (General)"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "day": "Thursday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Czc",
+        "teacher": "Mr. Dawson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197476690",
+            "name": "czc",
+            "code": "zc",
+            "teacher": "Mr. Dawson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Czc (General)"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "day": "Thursday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 15,
+        "day": "Thursday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "Kks",
+        "teacher": "Mr. Black",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197996689",
+            "name": "kks",
+            "code": "ljsd",
+            "teacher": "Mr. Black",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Kks (General)"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "day": "Friday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Dolp",
+        "teacher": "Mr. Adams",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773977322381",
+            "name": "dolp",
+            "code": "ko",
+            "teacher": "Mr. Adams",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Dolp (General)"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "day": "Friday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "AAA",
+        "teacher": "Mrs. Green",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197564663",
+            "name": "AAA",
+            "code": "SF",
+            "teacher": "Mrs. Green",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "AAA (General)"
+          }
+        ]
+      }
+    ],
+    "generated_by": "ai",
+    "generated_at": "2026-04-12T06:59:39.288Z"
+  },
+  {
+    "timetable_id": "1775884059420",
+    "class_id": "1773236664031",
+    "subsession_id": "17745910128068129",
+    "school_id": "1773236295692",
+    "entries": [
+      {
+        "id": 1775978643473,
+        "day": "Tuesday",
+        "start": "08:08",
+        "end": "09:23",
+        "name": "Break",
+        "teacher": "",
+        "stream": "general",
+        "streamName": "Break",
+        "streamColor": "#9ca3af",
+        "subjects": [],
+        "isBreak": true
+      },
+      {
+        "id": 1,
+        "day": "Monday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Mathematics",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773290145628",
+            "name": "matematics",
+            "code": "jumai",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "day": "Monday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 3,
+        "day": "Monday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "Biology",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "day": "Monday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Literature",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848877853",
+            "name": "Lictrature",
+            "code": "lic",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "day": "Monday",
+        "start": "10:20",
+        "end": "11:00",
+        "name": "Menos",
+        "teacher": "Not assigned",
+        "stream": "arts",
+        "streamName": "Arts",
+        "streamColor": "#FFD700",
+        "subjects": [
+          {
+            "id": "1773849329182",
+            "name": "Menos",
+            "code": "apodw",
+            "teacher": "Not assigned",
+            "stream": "arts",
+            "streamName": "Arts"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "day": "Monday",
+        "start": "11:00",
+        "end": "11:40",
+        "name": "Dolp",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773977322381",
+            "name": "dolp",
+            "code": "ko",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "day": "Monday",
+        "start": "11:40",
+        "end": "12:20",
+        "name": "AAA",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197564663",
+            "name": "AAA",
+            "code": "SF",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "day": "Monday",
+        "start": "12:20",
+        "end": "13:00",
+        "name": "CXXC",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774242768180",
+            "name": "cxxc",
+            "code": "cxxc",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      }
+    ],
+    "generated_by": "ai",
+    "generated_at": "2026-04-12T05:04:20.020Z",
+    "updated_at": "2026-04-12T07:24:05.738Z"
+  },
+  {
+    "timetable_id": "1775970157578k4xp",
+    "class_id": "1773236691426",
+    "subsession_id": "17745910128068129",
+    "school_id": "1773236295692",
+    "entries": [
+      {
+        "id": 1,
+        "day": "Tuesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "SF",
+        "teacher": "Not assigned",
+        "stream": "arts",
+        "streamName": "Arts",
+        "streamColor": "#FFD700",
+        "subjects": [
+          {
+            "id": "1773977671943",
+            "name": "sf",
+            "code": "xc",
+            "teacher": "Not assigned",
+            "stream": "arts",
+            "streamName": "Arts"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "day": "Tuesday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 3,
+        "day": "Tuesday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "Dolp",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773977322381",
+            "name": "dolp",
+            "code": "ko",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "day": "Tuesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "CZC",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197476690",
+            "name": "czc",
+            "code": "zc",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "day": "Tuesday",
+        "start": "10:20",
+        "end": "11:00",
+        "name": "KKS",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197996689",
+            "name": "kks",
+            "code": "ljsd",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "day": "Tuesday",
+        "start": "11:00",
+        "end": "11:40",
+        "name": "Dadad",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774198048843",
+            "name": "dadad",
+            "code": "900",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "day": "Tuesday",
+        "start": "11:40",
+        "end": "12:20",
+        "name": "CXXC",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774242768180",
+            "name": "cxxc",
+            "code": "cxxc",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "day": "Tuesday",
+        "start": "12:20",
+        "end": "13:00",
+        "name": "AKJDDA",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774246212050",
+            "name": "akjdda",
+            "code": "ad",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      }
+    ],
+    "generated_by": "ai",
+    "generated_at": "2026-04-12T05:04:20.020Z"
+  },
+  {
+    "timetable_id": "1775970157578sfa8",
+    "class_id": "1773236725672",
+    "subsession_id": "17745910128068129",
+    "school_id": "1773236295692",
+    "entries": [
+      {
+        "id": 1,
+        "day": "Wednesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Biology",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "day": "Wednesday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 3,
+        "day": "Wednesday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "English",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773418933343",
+            "name": "english",
+            "code": ",,n",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "day": "Wednesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Math",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773554050057",
+            "name": "math",
+            "code": "p3",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "day": "Wednesday",
+        "start": "10:20",
+        "end": "11:00",
+        "name": "Menos",
+        "teacher": "Not assigned",
+        "stream": "arts",
+        "streamName": "Arts",
+        "streamColor": "#FFD700",
+        "subjects": [
+          {
+            "id": "1773849329182",
+            "name": "Menos",
+            "code": "apodw",
+            "teacher": "Not assigned",
+            "stream": "arts",
+            "streamName": "Arts"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "day": "Wednesday",
+        "start": "11:00",
+        "end": "11:40",
+        "name": "Maths",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773418955218",
+            "name": "maths",
+            "code": "nm,m",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "day": "Wednesday",
+        "start": "11:40",
+        "end": "12:20",
+        "name": "Kolik",
+        "teacher": "Not assigned",
+        "stream": "commercial",
+        "streamName": "Commercial",
+        "streamColor": "#FF4500",
+        "subjects": [
+          {
+            "id": "1773977293706",
+            "name": "kolik",
+            "code": "kol",
+            "teacher": "Not assigned",
+            "stream": "commercial",
+            "streamName": "Commercial"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "day": "Wednesday",
+        "start": "12:20",
+        "end": "13:00",
+        "name": "Dadad",
+        "teacher": "Not assigned",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774198048843",
+            "name": "dadad",
+            "code": "900",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)"
+          }
+        ]
+      }
+    ],
+    "generated_by": "ai",
+    "generated_at": "2026-04-12T05:04:20.020Z"
+  },
+  {
+    "timetable_id": "1775970939620furr",
+    "class_id": "1773236664031",
+    "subsession_id": "17757926264468069",
+    "school_id": "1773236295692",
+    "entries": [
+      {
+        "id": 1,
+        "day": "Monday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Mathematics",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773290145628",
+            "name": "matematics",
+            "code": "jumai",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Mathematics (General)"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "day": "Monday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Literature",
+        "teacher": "Mr. Jones",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848877853",
+            "name": "Lictrature",
+            "code": "lic",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Lictrature (General)"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "day": "Monday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 4,
+        "day": "Monday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Biology and Dolp",
+        "teacher": "Multiple Teachers",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Biology (General)"
+          },
+          {
+            "id": "1773977322381",
+            "name": "dolp",
+            "code": "ko",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Dolp (General)"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "day": "Tuesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Mathematics",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773290145628",
+            "name": "matematics",
+            "code": "jumai",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Mathematics (General)"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "day": "Tuesday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Menos",
+        "teacher": "Mrs. Williams",
+        "stream": "arts",
+        "streamName": "Arts Stream",
+        "streamColor": "#3b82f6",
+        "subjects": [
+          {
+            "id": "1773849329182",
+            "name": "Menos",
+            "code": "apodw",
+            "teacher": "Not assigned",
+            "stream": "arts",
+            "streamName": "Arts Stream",
+            "displayName": "Menos (Arts)"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "day": "Tuesday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 8,
+        "day": "Tuesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "AAA",
+        "teacher": "Mr. Johnson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197564663",
+            "name": "AAA",
+            "code": "SF",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "AAA (General)"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "day": "Wednesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Literature",
+        "teacher": "Mr. Jones",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848877853",
+            "name": "Lictrature",
+            "code": "lic",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Lictrature (General)"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "day": "Wednesday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Dolp and Biology",
+        "teacher": "Multiple Teachers",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Biology (General)"
+          },
+          {
+            "id": "1773977322381",
+            "name": "dolp",
+            "code": "ko",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Dolp (General)"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "day": "Wednesday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 12,
+        "day": "Wednesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "AAA",
+        "teacher": "Mr. Johnson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197564663",
+            "name": "AAA",
+            "code": "SF",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "AAA (General)"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "day": "Thursday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Mathematics",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773290145628",
+            "name": "matematics",
+            "code": "jumai",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Mathematics (General)"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "day": "Thursday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Menos",
+        "teacher": "Mrs. Williams",
+        "stream": "arts",
+        "streamName": "Arts Stream",
+        "streamColor": "#3b82f6",
+        "subjects": [
+          {
+            "id": "1773849329182",
+            "name": "Menos",
+            "code": "apodw",
+            "teacher": "Not assigned",
+            "stream": "arts",
+            "streamName": "Arts Stream",
+            "displayName": "Menos (Arts)"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "day": "Thursday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 16,
+        "day": "Thursday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Literature",
+        "teacher": "Mr. Jones",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848877853",
+            "name": "Lictrature",
+            "code": "lic",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Lictrature (General)"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "day": "Friday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "AAA",
+        "teacher": "Mr. Johnson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197564663",
+            "name": "AAA",
+            "code": "SF",
+            "teacher": "Not assigned",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "AAA (General)"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "day": "Friday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Menos",
+        "teacher": "Mrs. Williams",
+        "stream": "arts",
+        "streamName": "Arts Stream",
+        "streamColor": "#3b82f6",
+        "subjects": [
+          {
+            "id": "1773849329182",
+            "name": "Menos",
+            "code": "apodw",
+            "teacher": "Not assigned",
+            "stream": "arts",
+            "streamName": "Arts Stream",
+            "displayName": "Menos (Arts)"
+          }
+        ]
+      }
+    ],
+    "generated_by": "ai",
+    "generated_at": "2026-04-12T06:39:30.243Z",
+    "updated_at": "2026-04-12T06:39:41.096Z"
+  },
+  {
+    "timetable_id": "17759709396213t4h",
+    "class_id": "1773236691426",
+    "subsession_id": "17757926264468069",
+    "school_id": "1773236295692",
+    "entries": [
+      {
+        "id": 1,
+        "day": "Monday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "SF",
+        "teacher": "Mr. Williams",
+        "stream": "arts",
+        "streamName": "Arts Stream",
+        "streamColor": "#3b82f6",
+        "subjects": [
+          {
+            "id": "1773977671943",
+            "name": "sf",
+            "code": "xc",
+            "teacher": "Mr. Williams",
+            "stream": "arts",
+            "streamName": "Arts Stream",
+            "displayName": "sf (Arts)"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "day": "Monday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "KKS",
+        "teacher": "Ms. Parker",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197996689",
+            "name": "kks",
+            "code": "ljsd",
+            "teacher": "Ms. Parker",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "kks (General)"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "day": "Monday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 4,
+        "day": "Monday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "CZC",
+        "teacher": "Mr. Adams",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197476690",
+            "name": "czc",
+            "code": "zc",
+            "teacher": "Mr. Adams",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "czc (General)"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "day": "Tuesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Dadad",
+        "teacher": "Mr. Taylor",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774198048843",
+            "name": "dadad",
+            "code": "900",
+            "teacher": "Mr. Taylor",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "dadad (General)"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "day": "Tuesday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "CXXC",
+        "teacher": "Mrs. Roberts",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774242768180",
+            "name": "cxxc",
+            "code": "cxxc",
+            "teacher": "Mrs. Roberts",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "cxxc (General)"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "day": "Tuesday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 8,
+        "day": "Tuesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Dolp",
+        "teacher": "Mr. Black",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773977322381",
+            "name": "dolp",
+            "code": "ko",
+            "teacher": "Mr. Black",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "dolp (General)"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "day": "Wednesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "AKJDDA",
+        "teacher": "Mrs. Evans",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774246212050",
+            "name": "akjdda",
+            "code": "ad",
+            "teacher": "Mrs. Evans",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "akjdda (General)"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "day": "Wednesday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "KKS",
+        "teacher": "Ms. Parker",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197996689",
+            "name": "kks",
+            "code": "ljsd",
+            "teacher": "Ms. Parker",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "kks (General)"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "day": "Wednesday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 12,
+        "day": "Wednesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "CZC",
+        "teacher": "Mr. Adams",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197476690",
+            "name": "czc",
+            "code": "zc",
+            "teacher": "Mr. Adams",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "czc (General)"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "day": "Thursday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Dadad",
+        "teacher": "Mr. Taylor",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774198048843",
+            "name": "dadad",
+            "code": "900",
+            "teacher": "Mr. Taylor",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "dadad (General)"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "day": "Thursday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "CXXC",
+        "teacher": "Mrs. Roberts",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774242768180",
+            "name": "cxxc",
+            "code": "cxxc",
+            "teacher": "Mrs. Roberts",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "cxxc (General)"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "day": "Thursday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 16,
+        "day": "Thursday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "CZC",
+        "teacher": "Mr. Adams",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197476690",
+            "name": "czc",
+            "code": "zc",
+            "teacher": "Mr. Adams",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "czc (General)"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "day": "Friday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Dolp",
+        "teacher": "Mr. Black",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773977322381",
+            "name": "dolp",
+            "code": "ko",
+            "teacher": "Mr. Black",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "dolp (General)"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "day": "Friday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "KKS",
+        "teacher": "Ms. Parker",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197996689",
+            "name": "kks",
+            "code": "ljsd",
+            "teacher": "Ms. Parker",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "kks (General)"
+          }
+        ]
+      }
+    ],
+    "generated_by": "ai",
+    "generated_at": "2026-04-12T05:31:03.863Z"
+  },
+  {
+    "timetable_id": "1775970939621h0xi",
+    "class_id": "1773236725672",
+    "subsession_id": "17757926264468069",
+    "school_id": "1773236295692",
+    "entries": [
+      {
+        "id": 1,
+        "day": "Monday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Biology",
+        "teacher": "Ms. Johnson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Ms. Johnson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "biology (General)"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "day": "Monday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Math",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773554050057",
+            "name": "math",
+            "code": "p3",
+            "teacher": "Mr. Smith",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "math (General)"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "day": "Monday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 4,
+        "day": "Monday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Menos",
+        "teacher": "Mr. Green",
+        "stream": "arts",
+        "streamName": "Arts Stream",
+        "streamColor": "#3b82f6",
+        "subjects": [
+          {
+            "id": "1773849329182",
+            "name": "Menos",
+            "code": "apodw",
+            "teacher": "Mr. Green",
+            "stream": "arts",
+            "streamName": "Arts Stream",
+            "displayName": "Menos (Arts)"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "day": "Tuesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "English",
+        "teacher": "Mrs. Green",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773418933343",
+            "name": "english",
+            "code": ",,n",
+            "teacher": "Mrs. Green",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "english (General)"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "day": "Tuesday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Maths",
+        "teacher": "Mr. Thompson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773418955218",
+            "name": "maths",
+            "code": "nm,m",
+            "teacher": "Mr. Thompson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "maths (General)"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "day": "Tuesday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 8,
+        "day": "Tuesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Kolik",
+        "teacher": "Mr. Adams",
+        "stream": "commercial",
+        "streamName": "Commercial Stream",
+        "streamColor": "#f59e0b",
+        "subjects": [
+          {
+            "id": "1773977293706",
+            "name": "kolik",
+            "code": "kol",
+            "teacher": "Mr. Adams",
+            "stream": "commercial",
+            "streamName": "Commercial Stream",
+            "displayName": "kolik (Commercial)"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "day": "Wednesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Biology",
+        "teacher": "Ms. Johnson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Ms. Johnson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "biology (General)"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "day": "Wednesday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "English",
+        "teacher": "Mrs. Green",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773418933343",
+            "name": "english",
+            "code": ",,n",
+            "teacher": "Mrs. Green",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "english (General)"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "day": "Wednesday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 12,
+        "day": "Wednesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Maths",
+        "teacher": "Mr. Thompson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773418955218",
+            "name": "maths",
+            "code": "nm,m",
+            "teacher": "Mr. Thompson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "maths (General)"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "day": "Thursday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Biology",
+        "teacher": "Ms. Johnson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Ms. Johnson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "biology (General)"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "day": "Thursday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "English",
+        "teacher": "Mrs. Green",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773418933343",
+            "name": "english",
+            "code": ",,n",
+            "teacher": "Mrs. Green",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "english (General)"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "day": "Thursday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 16,
+        "day": "Thursday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Kolik",
+        "teacher": "Mr. Adams",
+        "stream": "commercial",
+        "streamName": "Commercial Stream",
+        "streamColor": "#f59e0b",
+        "subjects": [
+          {
+            "id": "1773977293706",
+            "name": "kolik",
+            "code": "kol",
+            "teacher": "Mr. Adams",
+            "stream": "commercial",
+            "streamName": "Commercial Stream",
+            "displayName": "kolik (Commercial)"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "day": "Friday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Menos",
+        "teacher": "Mr. Green",
+        "stream": "arts",
+        "streamName": "Arts Stream",
+        "streamColor": "#3b82f6",
+        "subjects": [
+          {
+            "id": "1773849329182",
+            "name": "Menos",
+            "code": "apodw",
+            "teacher": "Mr. Green",
+            "stream": "arts",
+            "streamName": "Arts Stream",
+            "displayName": "Menos (Arts)"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "day": "Friday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Math",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773554050057",
+            "name": "math",
+            "code": "p3",
+            "teacher": "Mr. Smith",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "math (General)"
+          }
+        ]
+      }
+    ],
+    "generated_by": "ai",
+    "generated_at": "2026-04-12T05:31:03.863Z"
+  },
+  {
+    "timetable_id": "1775977179287i4k4",
+    "class_id": "1773236664031",
+    "subsession_id": "1773263496774767",
+    "school_id": "1773236295692",
+    "entries": [
+      {
+        "id": 1,
+        "day": "Monday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Mathematics",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773290145628",
+            "name": "matematics",
+            "code": "jumai",
+            "teacher": "Mr. Smith",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Mathematics (General)"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "day": "Monday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 3,
+        "day": "Monday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "Biology",
+        "teacher": "Mrs. Jones",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Mrs. Jones",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Biology (General)"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "day": "Monday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Literature",
+        "teacher": "Mr. Brown",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848877853",
+            "name": "Lictrature",
+            "code": "lic",
+            "teacher": "Mr. Brown",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Literature (General)"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "day": "Tuesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Dolp",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773977322381",
+            "name": "dolp",
+            "code": "ko",
+            "teacher": "Mr. Smith",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Dolp (General)"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "day": "Tuesday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 7,
+        "day": "Tuesday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "AAA",
+        "teacher": "Mrs. Green",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197564663",
+            "name": "AAA",
+            "code": "SF",
+            "teacher": "Mrs. Green",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "AAA (General)"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "day": "Tuesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Cxxc",
+        "teacher": "Mr. Black",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774242768180",
+            "name": "cxxc",
+            "code": "cxxc",
+            "teacher": "Mr. Black",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Cxxc (General)"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "day": "Wednesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Mathematics",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773290145628",
+            "name": "matematics",
+            "code": "jumai",
+            "teacher": "Mr. Smith",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Mathematics (General)"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "day": "Wednesday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 11,
+        "day": "Wednesday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "Biology",
+        "teacher": "Mrs. Jones",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Mrs. Jones",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Biology (General)"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "day": "Wednesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Dolp",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773977322381",
+            "name": "dolp",
+            "code": "ko",
+            "teacher": "Mr. Smith",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Dolp (General)"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "day": "Thursday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "AAA",
+        "teacher": "Mrs. Green",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774197564663",
+            "name": "AAA",
+            "code": "SF",
+            "teacher": "Mrs. Green",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "AAA (General)"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "day": "Thursday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 15,
+        "day": "Thursday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "Cxxc",
+        "teacher": "Mr. Black",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1774242768180",
+            "name": "cxxc",
+            "code": "cxxc",
+            "teacher": "Mr. Black",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Cxxc (General)"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "day": "Friday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Mathematics",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773290145628",
+            "name": "matematics",
+            "code": "jumai",
+            "teacher": "Mr. Smith",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Mathematics (General)"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "day": "Friday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Biology",
+        "teacher": "Mrs. Jones",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Mrs. Jones",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Biology (General)"
+          }
+        ]
+      }
+    ],
+    "generated_by": "ai",
+    "generated_at": "2026-04-12T06:59:39.287Z"
+  },
+  {
+    "timetable_id": "17759771792880ox9",
+    "class_id": "1773236725672",
+    "subsession_id": "1773263496774767",
+    "school_id": "1773236295692",
+    "entries": [
+      {
+        "id": 1,
+        "day": "Monday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Biology",
+        "teacher": "Mrs. Wilson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Mrs. Wilson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Biology (General)"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "day": "Monday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 3,
+        "day": "Monday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "Math",
+        "teacher": "Mr. Carter",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773554050057",
+            "name": "math",
+            "code": "p3",
+            "teacher": "Mr. Carter",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Math (General)"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "day": "Monday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "English",
+        "teacher": "Ms. Thompson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773418933343",
+            "name": "english",
+            "code": ",,n",
+            "teacher": "Ms. Thompson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "English (General)"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "day": "Tuesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Maths",
+        "teacher": "Mr. Carter",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773418955218",
+            "name": "maths",
+            "code": "nm,m",
+            "teacher": "Mr. Carter",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Maths (General)"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "day": "Tuesday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 7,
+        "day": "Tuesday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "Kolik",
+        "teacher": "Mr. Adams",
+        "stream": "commercial",
+        "streamName": "Commercial Stream",
+        "streamColor": "#f59e0b",
+        "subjects": [
+          {
+            "id": "1773977293706",
+            "name": "kolik",
+            "code": "kol",
+            "teacher": "Mr. Adams",
+            "stream": "commercial",
+            "streamName": "Commercial Stream",
+            "displayName": "Kolik (Commercial)"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "day": "Tuesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Menos",
+        "teacher": "Ms. Wilson",
+        "stream": "arts",
+        "streamName": "Arts Stream",
+        "streamColor": "#3b82f6",
+        "subjects": [
+          {
+            "id": "1773849329182",
+            "name": "Menos",
+            "code": "apodw",
+            "teacher": "Ms. Wilson",
+            "stream": "arts",
+            "streamName": "Arts Stream",
+            "displayName": "Menos (Arts)"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "day": "Wednesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Biology",
+        "teacher": "Mrs. Wilson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Mrs. Wilson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Biology (General)"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "day": "Wednesday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 11,
+        "day": "Wednesday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "English",
+        "teacher": "Ms. Thompson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773418933343",
+            "name": "english",
+            "code": ",,n",
+            "teacher": "Ms. Thompson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "English (General)"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "day": "Wednesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Math",
+        "teacher": "Mr. Carter",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773554050057",
+            "name": "math",
+            "code": "p3",
+            "teacher": "Mr. Carter",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Math (General)"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "day": "Thursday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "English",
+        "teacher": "Ms. Thompson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773418933343",
+            "name": "english",
+            "code": ",,n",
+            "teacher": "Ms. Thompson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "English (General)"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "day": "Thursday",
+        "start": "08:40",
+        "end": "09:00",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 15,
+        "day": "Thursday",
+        "start": "09:00",
+        "end": "09:40",
+        "name": "Kolik",
+        "teacher": "Mr. Adams",
+        "stream": "commercial",
+        "streamName": "Commercial Stream",
+        "streamColor": "#f59e0b",
+        "subjects": [
+          {
+            "id": "1773977293706",
+            "name": "kolik",
+            "code": "kol",
+            "teacher": "Mr. Adams",
+            "stream": "commercial",
+            "streamName": "Commercial Stream",
+            "displayName": "Kolik (Commercial)"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "day": "Friday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Math",
+        "teacher": "Mr. Carter",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773554050057",
+            "name": "math",
+            "code": "p3",
+            "teacher": "Mr. Carter",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Math (General)"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "day": "Friday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Biology",
+        "teacher": "Mrs. Wilson",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1773848814657",
+            "name": "biology",
+            "code": "sd",
+            "teacher": "Mrs. Wilson",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Biology (General)"
+          }
+        ]
+      }
+    ],
+    "generated_by": "ai",
+    "generated_at": "2026-04-12T06:59:39.288Z"
+  },
+  {
+    "timetable_id": "1776086390720",
+    "class_id": "1776056264866",
+    "subsession_id": "17760576471505487",
+    "school_id": "1775733797277",
+    "entries": [
+      {
+        "id": 1776086388896,
+        "day": "Tuesday",
+        "start": "06:21",
+        "end": "07:19",
+        "subjects": [
+          {
+            "id": "1776056544419",
+            "name": "english",
+            "code": "eng",
+            "teacher": "dada sule",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "english (General (All Streams))"
+          }
+        ],
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "name": "english (General (All Streams))",
+        "teacher": "dada sule"
+      },
+      {
+        "id": 1776086372746,
+        "day": "Monday",
+        "start": "06:21",
+        "end": "06:26",
+        "subjects": [
+          {
+            "id": "1776056457391",
+            "name": "maths",
+            "code": "mt",
+            "teacher": "ibrahim ahmad",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "maths (General (All Streams))"
+          }
+        ],
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "name": "maths (General (All Streams))",
+        "teacher": "ibrahim ahmad"
+      }
+    ],
+    "created_at": "2026-04-13T13:19:50.720Z",
+    "updated_at": "2026-04-13T13:19:50.720Z"
+  },
+  {
+    "timetable_id": "1777231753265lgpe",
+    "class_id": "1776091555034",
+    "subsession_id": "17757926264468069",
+    "school_id": "1773236295692",
+    "entries": [
+      {
+        "id": 1,
+        "day": "Monday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Mathematics",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1",
+            "name": "Mathematics",
+            "code": "MATH",
+            "teacher": "Mr. Smith",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Mathematics (General)"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "day": "Monday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Science",
+        "teacher": "Ms. Johnson",
+        "stream": "science",
+        "streamName": "Science Stream",
+        "streamColor": "#10b981",
+        "subjects": [
+          {
+            "id": "2",
+            "name": "Science",
+            "code": "SCI",
+            "teacher": "Ms. Johnson",
+            "stream": "science",
+            "streamName": "Science Stream",
+            "displayName": "Science (Science Stream)"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "day": "Monday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 4,
+        "day": "Monday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "English",
+        "teacher": "Mrs. Green",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "3",
+            "name": "English",
+            "code": "ENG",
+            "teacher": "Mrs. Green",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "English (General)"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "day": "Tuesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "History",
+        "teacher": "Mr. Black",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "4",
+            "name": "History",
+            "code": "HIST",
+            "teacher": "Mr. Black",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "History (General)"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "day": "Tuesday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Art",
+        "teacher": "Ms. White",
+        "stream": "arts",
+        "streamName": "Arts Stream",
+        "streamColor": "#3b82f6",
+        "subjects": [
+          {
+            "id": "5",
+            "name": "Art",
+            "code": "ART",
+            "teacher": "Ms. White",
+            "stream": "arts",
+            "streamName": "Arts Stream",
+            "displayName": "Art (Arts Stream)"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "day": "Tuesday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 8,
+        "day": "Tuesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Physical Education",
+        "teacher": "Mr. Brown",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "6",
+            "name": "Physical Education",
+            "code": "PE",
+            "teacher": "Mr. Brown",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Physical Education (General)"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "day": "Wednesday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Computing",
+        "teacher": "Mrs. Adams",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "7",
+            "name": "Computing",
+            "code": "COMP",
+            "teacher": "Mrs. Adams",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Computing (General)"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "day": "Wednesday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Music",
+        "teacher": "Mr. Lee",
+        "stream": "arts",
+        "streamName": "Arts Stream",
+        "streamColor": "#3b82f6",
+        "subjects": [
+          {
+            "id": "8",
+            "name": "Music",
+            "code": "MUSIC",
+            "teacher": "Mr. Lee",
+            "stream": "arts",
+            "streamName": "Arts Stream",
+            "displayName": "Music (Arts Stream)"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "day": "Wednesday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 12,
+        "day": "Wednesday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Geography",
+        "teacher": "Mr. Hill",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "9",
+            "name": "Geography",
+            "code": "GEO",
+            "teacher": "Mr. Hill",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Geography (General)"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "day": "Thursday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "Mathematics",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1",
+            "name": "Mathematics",
+            "code": "MATH",
+            "teacher": "Mr. Smith",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Mathematics (General)"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "day": "Thursday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Art",
+        "teacher": "Ms. White",
+        "stream": "arts",
+        "streamName": "Arts Stream",
+        "streamColor": "#3b82f6",
+        "subjects": [
+          {
+            "id": "5",
+            "name": "Art",
+            "code": "ART",
+            "teacher": "Ms. White",
+            "stream": "arts",
+            "streamName": "Arts Stream",
+            "displayName": "Art (Arts Stream)"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "day": "Thursday",
+        "start": "09:20",
+        "end": "09:40",
+        "name": "Morning Break",
+        "teacher": "",
+        "stream": "",
+        "streamName": "",
+        "streamColor": "",
+        "subjects": []
+      },
+      {
+        "id": 16,
+        "day": "Thursday",
+        "start": "09:40",
+        "end": "10:20",
+        "name": "Physical Education",
+        "teacher": "Mr. Brown",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "6",
+            "name": "Physical Education",
+            "code": "PE",
+            "teacher": "Mr. Brown",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Physical Education (General)"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "day": "Friday",
+        "start": "08:00",
+        "end": "08:40",
+        "name": "English",
+        "teacher": "Mrs. Green",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "3",
+            "name": "English",
+            "code": "ENG",
+            "teacher": "Mrs. Green",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "English (General)"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "day": "Friday",
+        "start": "08:40",
+        "end": "09:20",
+        "name": "Mathematics",
+        "teacher": "Mr. Smith",
+        "stream": "general",
+        "streamName": "General (All Streams)",
+        "streamColor": "#6b7280",
+        "subjects": [
+          {
+            "id": "1",
+            "name": "Mathematics",
+            "code": "MATH",
+            "teacher": "Mr. Smith",
+            "stream": "general",
+            "streamName": "General (All Streams)",
+            "displayName": "Mathematics (General)"
+          }
+        ]
+      }
+    ],
+    "generated_by": "ai",
+    "generated_at": "2026-04-26T19:29:13.265Z",
+    "updated_at": "2026-04-26T19:29:33.490Z"
+  }
+]

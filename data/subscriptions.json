@@ -1,0 +1,134 @@
+[
+  {
+    "subscription_id": "1773236295715",
+    "school_id": "1773236295692",
+    "plan_id": 1237,
+    "subscription_type": "free",
+    "subscription_status": "cancelled",
+    "start_date": "2026-03-11T13:38:15.710Z",
+    "end_date": "2026-04-11T13:38:15.710Z",
+    "canceled_at": "2026-04-01T04:58:37.308Z",
+    "created_at": "2026-03-11T13:38:15.713Z"
+  },
+  {
+    "subscription_id": "1775019517309",
+    "school_id": "1773236295692",
+    "plan_id": 1236,
+    "subscription_type": "paid",
+    "subscription_status": "cancelled",
+    "start_date": "2026-04-01T04:58:37.308Z",
+    "end_date": "2026-05-02T04:58:37.308Z",
+    "canceled_at": "2026-04-01T04:58:51.834Z",
+    "created_at": "2026-04-01T04:58:37.308Z"
+  },
+  {
+    "subscription_id": "1775019531834",
+    "school_id": "1773236295692",
+    "plan_id": 1235,
+    "subscription_type": "paid",
+    "subscription_status": "cancelled",
+    "start_date": "2026-04-01T04:58:51.834Z",
+    "end_date": "2026-05-02T04:58:51.834Z",
+    "canceled_at": "2026-04-01T04:59:08.868Z",
+    "created_at": "2026-04-01T04:58:51.834Z"
+  },
+  {
+    "subscription_id": "1775019548868",
+    "school_id": "1773236295692",
+    "plan_id": 1236,
+    "subscription_type": "paid",
+    "subscription_status": "cancelled",
+    "start_date": "2026-04-01T04:59:08.868Z",
+    "end_date": "2026-05-02T04:59:08.868Z",
+    "canceled_at": "2026-04-01T05:14:19.369Z",
+    "created_at": "2026-04-01T04:59:08.868Z"
+  },
+  {
+    "subscription_id": "1775020459369",
+    "school_id": "1773236295692",
+    "plan_id": 1235,
+    "subscription_type": "paid",
+    "subscription_status": "cancelled",
+    "start_date": "2026-04-01T05:14:19.369Z",
+    "end_date": "2026-07-02T05:14:19.369Z",
+    "canceled_at": "2026-04-01T05:14:45.578Z",
+    "created_at": "2026-04-01T05:14:19.369Z"
+  },
+  {
+    "subscription_id": "1775020485578",
+    "school_id": "1773236295692",
+    "plan_id": 1234,
+    "subscription_type": "paid",
+    "subscription_status": "cancelled",
+    "start_date": "2026-04-01T05:14:45.578Z",
+    "end_date": "2026-05-02T05:14:45.578Z",
+    "canceled_at": "2026-04-01T05:15:38.991Z",
+    "created_at": "2026-04-01T05:14:45.578Z"
+  },
+  {
+    "subscription_id": "1775020538991",
+    "school_id": "1773236295692",
+    "plan_id": 1236,
+    "subscription_type": "paid",
+    "subscription_status": "cancelled",
+    "start_date": "2026-04-01T05:15:38.991Z",
+    "end_date": "2026-03-01T05:15:38.991Z",
+    "canceled_at": "2026-04-02T06:30:23.230Z",
+    "created_at": "2026-04-01T05:15:38.991Z"
+  },
+  {
+    "subscription_id": "1775111423230",
+    "school_id": "1773236295692",
+    "plan_id": 1236,
+    "subscription_type": "paid",
+    "subscription_status": "cancelled",
+    "start_date": "2026-04-02T06:30:23.230Z",
+    "end_date": "2026-05-02T06:30:23.230Z",
+    "canceled_at": "2026-04-12T07:16:17.346Z",
+    "created_at": "2026-04-02T06:30:23.230Z"
+  },
+  {
+    "subscription_id": "1775733797420",
+    "school_id": "1775733797277",
+    "plan_id": 1235,
+    "subscription_type": "paid",
+    "subscription_status": "active",
+    "start_date": "2026-04-09T11:23:17.358Z",
+    "end_date": "2026-05-09T11:23:17.358Z",
+    "canceled_at": null,
+    "created_at": "2026-04-09T11:23:17.418Z"
+  },
+  {
+    "subscription_id": "1775978177346",
+    "school_id": "1773236295692",
+    "plan_id": 1235,
+    "subscription_type": "paid",
+    "subscription_status": "cancelled",
+    "start_date": "2026-04-12T07:16:17.346Z",
+    "end_date": "2026-05-12T07:16:17.346Z",
+    "canceled_at": "2026-04-12T07:53:05.181Z",
+    "created_at": "2026-04-12T07:16:17.346Z"
+  },
+  {
+    "subscription_id": "1775980385182",
+    "school_id": "1773236295692",
+    "plan_id": 1236,
+    "subscription_type": "paid",
+    "subscription_status": "cancelled",
+    "start_date": "2026-04-12T07:53:05.181Z",
+    "end_date": "2026-05-12T07:53:05.181Z",
+    "canceled_at": "2026-04-19T07:11:12.602Z",
+    "created_at": "2026-04-12T07:53:05.181Z"
+  },
+  {
+    "subscription_id": "1776582672619",
+    "school_id": "1773236295692",
+    "plan_id": 1235,
+    "subscription_type": "paid",
+    "subscription_status": "active",
+    "start_date": "2026-04-19T07:11:12.602Z",
+    "end_date": "2026-05-19T07:11:12.602Z",
+    "canceled_at": null,
+    "created_at": "2026-04-19T07:11:12.602Z"
+  }
+]

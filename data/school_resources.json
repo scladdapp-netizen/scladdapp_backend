@@ -1,0 +1,61 @@
+[
+  {
+    "resource_id": "1775050898774",
+    "school_id": "1773236295692",
+    "name": "download (1)",
+    "description": "",
+    "category": "General",
+    "file_name": "download (1).jpg",
+    "file_type": "jpg",
+    "file_url": "/uploads/1775050898749_download_(1).jpg",
+    "file_public_id": "1775050898749_download_(1).jpg",
+    "file_size": 94867,
+    "download_count": 0,
+    "created_at": "2026-04-01T13:41:38.774Z"
+  },
+  {
+    "resource_id": "1776581520229",
+    "school_id": "1775733797277",
+    "name": "13dda85aaffe3c9dd6f37f4278371789bb9e4e1a",
+    "description": "jkjkj",
+    "category": "General",
+    "visibility": "public",
+    "file_name": "13dda85aaffe3c9dd6f37f4278371789bb9e4e1a.jpg",
+    "file_type": "jpg",
+    "file_url": "/uploads/1776581520187_13dda85aaffe3c9dd6f37f4278371789bb9e4e1a.jpg",
+    "file_public_id": "1776581520187_13dda85aaffe3c9dd6f37f4278371789bb9e4e1a.jpg",
+    "file_size": 69480,
+    "download_count": 0,
+    "created_at": "2026-04-19T06:52:00.229Z"
+  },
+  {
+    "resource_id": "1776581552234",
+    "school_id": "1775733797277",
+    "name": "pioi hhkhk",
+    "description": "khkhkhk j hj jg jgj jhjhjhh jjh khkhkhk j hj jg jgj jhjhjhh jjh khkhkhk j hj jg jgj jhjhjhh jjh khkhkhk j hj jg jgj jhjhjhh jjh",
+    "category": "General",
+    "visibility": "private",
+    "file_name": "14f6c51a159f65861f2efa7e8f66bd0fe3d3aef0.jpg",
+    "file_type": "jpg",
+    "file_url": "/uploads/1776581552231_14f6c51a159f65861f2efa7e8f66bd0fe3d3aef0.jpg",
+    "file_public_id": "1776581552231_14f6c51a159f65861f2efa7e8f66bd0fe3d3aef0.jpg",
+    "file_size": 97648,
+    "download_count": 0,
+    "created_at": "2026-04-19T06:52:32.234Z"
+  },
+  {
+    "resource_id": "1776582721111",
+    "school_id": "1773236295692",
+    "name": "61d4d477e3b135cfa9c9f66053c4011d95213cd8",
+    "description": "khhkhk",
+    "category": "General",
+    "visibility": "private",
+    "file_name": "61d4d477e3b135cfa9c9f66053c4011d95213cd8.jpg",
+    "file_type": "jpg",
+    "file_url": "/uploads/1776582721108_61d4d477e3b135cfa9c9f66053c4011d95213cd8.jpg",
+    "file_public_id": "1776582721108_61d4d477e3b135cfa9c9f66053c4011d95213cd8.jpg",
+    "file_size": 40685,
+    "download_count": 0,
+    "created_at": "2026-04-19T07:12:01.111Z"
+  }
+]

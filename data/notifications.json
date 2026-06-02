@@ -1,0 +1,59 @@
+[
+  {
+    "notification_id": "1774768784245",
+    "school_id": "1773236295692",
+    "title": ",jsljfs<span style=\"background:#dbeafe;color:#1e40af;padding:1px 5px;border-radius:4px;font-weight:600\">as</span>",
+    "resolved_content": "slfjljf lskf f<span class=\"placeholder-tag\" style=\"background: rgb(219, 234, 254) !important; color: rgb(30, 64, 175) !important; padding: 2px 6px !important; border-radius: 4px !important; font-weight: 600 !important; margin: 0px 2px !important; display: inline-block !important;\"><span style=\"background:#dbeafe;color:#1e40af;padding:1px 5px;border-radius:4px;font-weight:600\">as</span></span>&nbsp;sfsf sf<span class=\"placeholder-tag\" style=\"background: rgb(219, 234, 254) !important; color: rgb(30, 64, 175) !important; padding: 2px 6px !important; border-radius: 4px !important; font-weight: 600 !important; margin: 0px 2px !important; display: inline-block !important;\"><span style=\"background:#dbeafe;color:#1e40af;padding:1px 5px;border-radius:4px;font-weight:600\">as</span></span>&nbsp;fsfsf",
+    "template_id": "1774626301112",
+    "placeholder_values": {
+      "{section}": "as",
+      "{teacher_name}": "as"
+    },
+    "delivery_channels": [
+      "Email"
+    ],
+    "target_type": "specific_alumni",
+    "created_by_id": "1773236295704",
+    "created_by_name": "sfsfs",
+    "created_at": "2026-03-29T07:19:44.245Z"
+  },
+  {
+    "notification_id": "1774769860992",
+    "school_id": "1773236295692",
+    "title": ",jsljfstest",
+    "resolved_content": "slfjljf lskf f<span class=\"placeholder-tag\" style=\"background: rgb(219, 234, 254) !important; color: rgb(30, 64, 175) !important; padding: 2px 6px !important; border-radius: 4px !important; font-weight: 600 !important; margin: 0px 2px !important; display: inline-block !important;\"><span style=\"background:#dbeafe;color:#1e40af;padding:1px 5px;border-radius:4px;font-weight:600\">test</span></span>&nbsp;sfsf sf<span class=\"placeholder-tag\" style=\"background: rgb(219, 234, 254) !important; color: rgb(30, 64, 175) !important; padding: 2px 6px !important; border-radius: 4px !important; font-weight: 600 !important; margin: 0px 2px !important; display: inline-block !important;\"><span style=\"background:#dbeafe;color:#1e40af;padding:1px 5px;border-radius:4px;font-weight:600\">jkjkjj</span></span>&nbsp;fsfsf",
+    "template_id": "1774626301112",
+    "placeholder_values": {
+      "{section}": "test",
+      "{teacher_name}": "jkjkjj"
+    },
+    "delivery_channels": [
+      "App Push"
+    ],
+    "target_type": "whole_school",
+    "created_by_id": "1773236295704",
+    "created_by_name": "sfsfs",
+    "created_at": "2026-03-29T07:37:40.992Z"
+  },
+  {
+    "notification_id": "1774786246203",
+    "school_id": "1773236295692",
+    "title": "this is for this school jamahatul",
+    "resolved_content": "this is to inform all the student of&nbsp;<span class=\"placeholder-tag\" style=\"background: rgb(219, 234, 254) !important; color: rgb(30, 64, 175) !important; padding: 2px 6px !important; border-radius: 4px !important; font-weight: 600 !important; margin: 0px 2px !important; display: inline-block !important;\"><span style=\"background:#dbeafe;color:#1e40af;padding:1px 5px;border-radius:4px;font-weight:600\">primary 5</span></span>&nbsp;that if u dont do better <i>u will die</i><br><b>from all of the dieses in the world</b><br><ul><li><span style=\"background-color: white; font-family: inherit;\">go fuc</span><span class=\"placeholder-tag\" style=\"font-family: inherit;\"><span style=\"background:#dbeafe;color:#1e40af;padding:1px 5px;border-radius:4px;font-weight:600\">jamahatul</span></span><span style=\"background-color: white; font-family: inherit;\">&nbsp;</span></li><li><span style=\"background-color: white; font-family: inherit;\">this is it at&nbsp;<span class=\"placeholder-tag\"><span style=\"background:#dbeafe;color:#1e40af;padding:1px 5px;border-radius:4px;font-weight:600\">20-23-2003</span></span>&nbsp;</span></li><li><span style=\"background-color: white; font-family: inherit;\">for all&nbsp;</span><span class=\"placeholder-tag\" style=\"font-family: inherit;\"><span style=\"background:#dbeafe;color:#1e40af;padding:1px 5px;border-radius:4px;font-weight:600\">first term</span></span><span style=\"background-color: white; font-family: inherit;\">&nbsp;</span></li><li><span style=\"background-color: white; font-family: inherit;\">u ate a mad&nbsp;</span><span class=\"placeholder-tag\" style=\"font-family: inherit;\"><span style=\"background:#dbeafe;color:#1e40af;padding:1px 5px;border-radius:4px;font-weight:600\">mumin</span></span><span style=\"background-color: white; font-family: inherit;\">&nbsp;</span></li></ul>",
+    "template_id": "1774786170051",
+    "placeholder_values": {
+      "{school_name}": "jamahatul",
+      "{date}": "20-23-2003",
+      "{subsession}": "first term",
+      "{madboy}": "mumin",
+      "{class}": "primary 5"
+    },
+    "delivery_channels": [
+      "Email"
+    ],
+    "target_type": "whole_school",
+    "created_by_id": "1773236295704",
+    "created_by_name": "sfsfs",
+    "created_at": "2026-03-29T12:10:46.203Z"
+  }
+]

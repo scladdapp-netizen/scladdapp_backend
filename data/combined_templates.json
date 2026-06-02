@@ -1,0 +1,242 @@
+[
+  {
+    "template_id": "1773236992912",
+    "school_id": "1773236295692",
+    "name": "temp112",
+    "description": "Standard grading template with First Test, Second Test, and Exam",
+    "status": "active",
+    "grading_fields": [
+      {
+        "field_name": "ft",
+        "weight": 20,
+        "max_score": 20
+      },
+      {
+        "field_name": "st",
+        "weight": 30,
+        "max_score": 30
+      },
+      {
+        "field_name": "ex",
+        "weight": 50,
+        "max_score": 50
+      }
+    ],
+    "grading_scheme": [
+      {
+        "grade_letter": "A",
+        "min_range": 80,
+        "max_range": 100,
+        "grade_point": 4,
+        "pass_fail": "Pass"
+      },
+      {
+        "grade_letter": "B",
+        "min_range": 70,
+        "max_range": 79,
+        "grade_point": 3,
+        "pass_fail": "Pass"
+      },
+      {
+        "grade_letter": "C",
+        "min_range": 60,
+        "max_range": 69,
+        "grade_point": 2,
+        "pass_fail": "Pass"
+      },
+      {
+        "grade_letter": "D",
+        "min_range": 50,
+        "max_range": 59,
+        "grade_point": 1,
+        "pass_fail": "Pass"
+      },
+      {
+        "grade_letter": "F",
+        "min_range": 0,
+        "max_range": 49,
+        "grade_point": 0,
+        "pass_fail": "Fail"
+      }
+    ],
+    "total_weight": 100,
+    "level": "Elementary",
+    "layout": "Landscape",
+    "grade_display": "percentage",
+    "behavioral_traits": [
+      "Self-Control",
+      "Time Management",
+      "Problem Solving",
+      "Responsibility"
+    ],
+    "styling": {
+      "theme_id": "THEME-0000000003",
+      "theme_name": "Modern Minimal",
+      "primaryColor": "#78b083"
+    },
+    "created_by": "1773236295704",
+    "created_at": "2026-03-11T13:53:58.092Z",
+    "last_modified": "2026-03-17T12:21:06.710Z",
+    "modified_by": "1773236295704"
+  },
+  {
+    "template_id": "1773517903109",
+    "school_id": "1773236295692",
+    "name": "polopolo",
+    "description": "polo",
+    "status": "active",
+    "grading_fields": [
+      {
+        "field_name": "fftt",
+        "weight": 50,
+        "max_score": "50"
+      },
+      {
+        "field_name": "ppooppoo",
+        "weight": 50,
+        "max_score": "50"
+      }
+    ],
+    "grading_scheme": [
+      {
+        "grade_letter": "A",
+        "min_range": "80",
+        "max_range": "100",
+        "grade_point": "12",
+        "pass_fail": "Fail"
+      },
+      {
+        "grade_letter": "B",
+        "min_range": "0",
+        "max_range": "79",
+        "grade_point": "",
+        "pass_fail": "Pass"
+      }
+    ],
+    "total_weight": 100,
+    "level": "Secondary",
+    "layout": "Landscape",
+    "grade_display": "letter",
+    "behavioral_traits": [
+      "Time Management",
+      "Self-Control",
+      "Perseverance"
+    ],
+    "styling": {
+      "theme_id": "THEME-0000000003",
+      "theme_name": "Modern Minimal",
+      "primaryColor": "#3bf773"
+    },
+    "created_by": null,
+    "created_at": "2026-03-14T19:51:43.109Z",
+    "last_modified": "2026-03-15T10:02:45.336Z",
+    "modified_by": null
+  },
+  {
+    "template_id": "1773662117313",
+    "school_id": "1773236295692",
+    "name": "sd",
+    "description": "ds",
+    "status": "active",
+    "grading_fields": [
+      {
+        "field_name": "ft",
+        "weight": 30,
+        "max_score": "30"
+      },
+      {
+        "field_name": "tre",
+        "weight": 70,
+        "max_score": "56"
+      }
+    ],
+    "grading_scheme": [
+      {
+        "grade_letter": "a",
+        "min_range": "0",
+        "max_range": "100",
+        "grade_point": "4.0",
+        "pass_fail": "Pass"
+      }
+    ],
+    "total_weight": 100,
+    "level": "All Levels",
+    "layout": "Portrait",
+    "grade_display": "letter",
+    "behavioral_traits": [
+      "Self-Control",
+      "Cooperation"
+    ],
+    "styling": {
+      "theme_id": "THEME-0000000003",
+      "theme_name": "Modern Minimal",
+      "primaryColor": "#2e4260"
+    },
+    "created_by": null,
+    "created_at": "2026-03-16T11:55:17.313Z",
+    "last_modified": "2026-03-16T11:55:17.313Z",
+    "modified_by": null
+  },
+  {
+    "template_id": "1776057534414",
+    "school_id": "1775733797277",
+    "name": "grade_temp_1",
+    "description": "",
+    "status": "active",
+    "grading_fields": [
+      {
+        "field_name": "ft",
+        "weight": 20,
+        "max_score": "20"
+      },
+      {
+        "field_name": "ex",
+        "weight": 30,
+        "max_score": "29"
+      },
+      {
+        "field_name": "ex",
+        "weight": 50,
+        "max_score": "50"
+      }
+    ],
+    "grading_scheme": [
+      {
+        "grade_letter": "A",
+        "min_range": "80",
+        "max_range": "100",
+        "grade_point": "",
+        "pass_fail": "Pass"
+      },
+      {
+        "grade_letter": "B",
+        "min_range": "30",
+        "max_range": "79",
+        "grade_point": "",
+        "pass_fail": "Pass"
+      },
+      {
+        "grade_letter": "F",
+        "min_range": "0",
+        "max_range": "29",
+        "grade_point": "",
+        "pass_fail": "Fail"
+      }
+    ],
+    "total_weight": 100,
+    "behavioral_traits": [
+      "Teamwork",
+      "Respect for Others",
+      "Politeness"
+    ],
+    "styling": {
+      "theme_id": "THEME-0000000003",
+      "theme_name": "Modern Minimal",
+      "primaryColor": "#f73bde"
+    },
+    "created_by": null,
+    "created_at": "2026-04-13T05:18:54.414Z",
+    "last_modified": "2026-04-13T05:18:54.414Z",
+    "modified_by": null
+  }
+]

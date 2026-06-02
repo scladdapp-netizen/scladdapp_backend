@@ -1,0 +1,419 @@
+[
+  {
+    "admin_id": "1773236295704",
+    "staff_id": null,
+    "school_id": "1773236295692",
+    "username": "sfsfs",
+    "email": "ibrahim2562003@gmail.com",
+    "password": "Aaaa111@",
+    "admin_role": "Super Admin",
+    "access_scope": "full",
+    "permissions": [
+      "ALL"
+    ],
+    "is_active": true,
+    "assigned_by": null,
+    "assigned_at": "2026-03-11T13:38:15.703Z",
+    "revoked_at": null,
+    "created_at": "2026-03-11T13:38:15.703Z",
+    "two_fac_auth": false
+  },
+  {
+    "admin_id": "1774540277560",
+    "staff_id": "1773236572875",
+    "school_id": "1773236295692",
+    "username": "uma",
+    "email": "uma@gmail.com",
+    "password": "ChangeMe@123",
+    "admin_role": "mik",
+    "access_scope": "limited",
+    "permissions": {
+      "academic_sessions": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "school_event": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "school_calendar": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "student_report": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": false
+      },
+      "students": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "classes": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "teachers": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "staff": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "subject": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "communication": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "bill_income_expense": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "school_account": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "report_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "fee_billing_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "timetable_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "announcement_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "class_promotion_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "graduate": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      }
+    },
+    "is_active": true,
+    "assigned_by": null,
+    "assigned_at": "2026-03-26T15:51:17.560Z",
+    "revoked_at": null,
+    "created_at": "2026-03-26T15:51:17.560Z",
+    "two_fac_auth": false,
+    "updated_at": "2026-04-02T12:28:13.884Z"
+  },
+  {
+    "admin_id": "1775133279928",
+    "staff_id": "1775133242946",
+    "school_id": "1773236295692",
+    "username": "ibrahim ahmad",
+    "email": "staff@gmail.com",
+    "password": "ChangeMe@123",
+    "admin_role": "admin",
+    "access_scope": "limited",
+    "permissions": {
+      "academic_sessions": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "school_event": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "school_calendar": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "student_report": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "students": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "classes": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "teachers": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "staff": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "subject": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "communication": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "bill_income_expense": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "school_account": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "report_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "fee_billing_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "timetable_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "announcement_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "class_promotion_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "graduate": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      }
+    },
+    "is_active": true,
+    "assigned_by": null,
+    "assigned_at": "2026-04-02T12:34:39.928Z",
+    "revoked_at": null,
+    "created_at": "2026-04-02T12:34:39.928Z",
+    "two_fac_auth": false
+  },
+  {
+    "admin_id": "1775733797337",
+    "staff_id": null,
+    "school_id": "1775733797277",
+    "username": "usama",
+    "email": "ibrahim2562003@gmail.co",
+    "password": "Aaaa111@",
+    "admin_role": "Super Admin",
+    "access_scope": "full",
+    "permissions": [
+      "ALL"
+    ],
+    "is_active": true,
+    "assigned_by": null,
+    "assigned_at": "2026-04-09T11:23:17.336Z",
+    "created_at": "2026-04-09T11:23:17.336Z",
+    "two_fac_auth": true
+  },
+  {
+    "admin_id": "1776008322953",
+    "staff_id": "1773236442025",
+    "school_id": "1773236295692",
+    "username": "sani",
+    "email": "sani@gmail.com",
+    "password": "ChangeMe@123",
+    "admin_role": "f",
+    "access_scope": "limited",
+    "permissions": {
+      "academic_sessions": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "school_event": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "school_calendar": {
+        "read": true,
+        "create": true,
+        "edit": true,
+        "delete": true
+      },
+      "student_report": {
+        "read": true,
+        "create": false,
+        "edit": false,
+        "delete": true
+      },
+      "students": {
+        "read": true,
+        "create": false,
+        "edit": false,
+        "delete": true
+      },
+      "classes": {
+        "read": true,
+        "create": false,
+        "edit": false,
+        "delete": true
+      },
+      "teachers": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "staff": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "subject": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "communication": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "bill_income_expense": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "school_account": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "report_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "fee_billing_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "timetable_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "announcement_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "class_promotion_template": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      },
+      "graduate": {
+        "read": false,
+        "create": false,
+        "edit": false,
+        "delete": false
+      }
+    },
+    "is_active": true,
+    "assigned_by": null,
+    "assigned_at": "2026-04-12T15:38:42.953Z",
+    "revoked_at": null,
+    "created_at": "2026-04-12T15:38:42.953Z",
+    "two_fac_auth": true,
+    "updated_at": "2026-04-30T05:51:30.297Z"
+  }
+]

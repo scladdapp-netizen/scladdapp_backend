@@ -1,0 +1,871 @@
+[
+  {
+    "report_card_id": "RC-1774193481806",
+    "student_id": "1773239204058",
+    "school_id": "1773236295692",
+    "session_id": "1773564885753",
+    "subsession_id": "17735648857723770",
+    "class_id": "1773236725672",
+    "subjects": [
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "subject_code": "—"
+      }
+    ],
+    "teacher_remark": null,
+    "principal_remark": null,
+    "is_published": false,
+    "created_at": "2026-03-22T15:31:21.806Z",
+    "updated_at": "2026-03-22T15:40:16.289Z"
+  },
+  {
+    "report_card_id": "RC-1775198808538",
+    "student_id": "1773239204058",
+    "school_id": "1773236295692",
+    "session_id": "1774591012793",
+    "subsession_id": "17745910128068129",
+    "class_id": "1773236725672",
+    "subjects": [
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "sd"
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "subject_code": ",,n"
+      },
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "subject_code": "p3"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "apodw"
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "subject_code": "nm,m"
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "subject_code": "kol"
+      },
+      {
+        "subject_id": "1774198048843",
+        "subject_name": "dadad",
+        "subject_code": "900"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjdda",
+        "subject_code": "ad"
+      }
+    ],
+    "teacher_remark": "hola jgj",
+    "principal_remark": "mola",
+    "is_published": true,
+    "created_at": "2026-04-03T06:46:48.538Z",
+    "updated_at": "2026-04-17T15:52:05.441Z",
+    "published_subjects": [
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "sd"
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "subject_code": ",,n"
+      },
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "subject_code": "p3"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "apodw"
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "subject_code": "nm,m"
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "subject_code": "kol"
+      },
+      {
+        "subject_id": "1774198048843",
+        "subject_name": "dadad",
+        "subject_code": "900"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "subject_code": "ad"
+      }
+    ]
+  },
+  {
+    "report_card_id": "RC-1776085564685",
+    "student_id": "1773242746198",
+    "school_id": "1775733797277",
+    "session_id": "1776057647127",
+    "subsession_id": "17760576471505487",
+    "class_id": "1776056356998",
+    "subjects": [
+      {
+        "subject_id": "1776056457391",
+        "subject_name": "maths",
+        "subject_code": "mt"
+      },
+      {
+        "subject_id": "1776056544419",
+        "subject_name": "english",
+        "subject_code": "eng"
+      },
+      {
+        "subject_id": "1776056597080",
+        "subject_name": "quantitative",
+        "subject_code": "qtt"
+      },
+      {
+        "subject_id": "1776056648846",
+        "subject_name": "verbal",
+        "subject_code": "vb"
+      },
+      {
+        "subject_id": "1776056708780",
+        "subject_name": "basic sciencs",
+        "subject_code": "bsc"
+      },
+      {
+        "subject_id": "1776056777743",
+        "subject_name": "phe",
+        "subject_code": "phe"
+      },
+      {
+        "subject_id": "1776056846000",
+        "subject_name": "biology",
+        "subject_code": "bio"
+      },
+      {
+        "subject_id": "1776056902749",
+        "subject_name": "commersial",
+        "subject_code": "com"
+      },
+      {
+        "subject_id": "1776056942848",
+        "subject_name": "commics",
+        "subject_code": "comm"
+      }
+    ],
+    "teacher_remark": "as",
+    "principal_remark": "as",
+    "is_published": true,
+    "created_at": "2026-04-13T13:06:04.685Z",
+    "updated_at": "2026-04-13T13:07:31.513Z",
+    "published_subjects": [
+      {
+        "subject_id": "1776056457391",
+        "subject_name": "maths",
+        "subject_code": "mt"
+      },
+      {
+        "subject_id": "1776056544419",
+        "subject_name": "english",
+        "subject_code": "eng"
+      },
+      {
+        "subject_id": "1776056597080",
+        "subject_name": "quantitative",
+        "subject_code": "qtt"
+      },
+      {
+        "subject_id": "1776056648846",
+        "subject_name": "verbal",
+        "subject_code": "vb"
+      },
+      {
+        "subject_id": "1776056708780",
+        "subject_name": "basic sciencs",
+        "subject_code": "bsc"
+      },
+      {
+        "subject_id": "1776056777743",
+        "subject_name": "phe",
+        "subject_code": "phe"
+      },
+      {
+        "subject_id": "1776056846000",
+        "subject_name": "biology",
+        "subject_code": "bio"
+      },
+      {
+        "subject_id": "1776056902749",
+        "subject_name": "commersial",
+        "subject_code": "com"
+      },
+      {
+        "subject_id": "1776056942848",
+        "subject_name": "commics",
+        "subject_code": "comm"
+      }
+    ]
+  },
+  {
+    "report_card_id": "RC-1776349694241",
+    "student_id": "1773242746197",
+    "school_id": "1773236295692",
+    "session_id": "1774591012793",
+    "subsession_id": "17745910128068129",
+    "class_id": "1773236725672",
+    "subjects": [
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "sd"
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "subject_code": ",,n"
+      },
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "subject_code": "p3"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "apodw"
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "subject_code": "nm,m"
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "subject_code": "kol"
+      },
+      {
+        "subject_id": "1774198048843",
+        "subject_name": "dadad",
+        "subject_code": "900"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "subject_code": "ad"
+      }
+    ],
+    "teacher_remark": "xcx",
+    "principal_remark": null,
+    "is_published": false,
+    "created_at": "2026-04-16T14:28:14.241Z",
+    "updated_at": "2026-04-16T14:28:14.241Z"
+  },
+  {
+    "report_card_id": "RC-1777207718465",
+    "student_id": "1773239204058",
+    "school_id": "1773236295692",
+    "session_id": "1774591012793",
+    "subsession_id": "17757926264468069",
+    "class_id": "1773236725672",
+    "subjects": [
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "sd"
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "subject_code": ",,n"
+      },
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "subject_code": "p3"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "apodw"
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "subject_code": "nm,m"
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "subject_code": "kol"
+      },
+      {
+        "subject_id": "1774198048843",
+        "subject_name": "dadad",
+        "subject_code": "900"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "subject_code": "ad"
+      }
+    ],
+    "teacher_remark": "kjklj",
+    "principal_remark": "khkj",
+    "is_published": true,
+    "created_at": "2026-04-26T12:48:38.465Z",
+    "updated_at": "2026-04-26T12:49:29.032Z",
+    "published_subjects": [
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "sd"
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "subject_code": ",,n"
+      },
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "subject_code": "p3"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "apodw"
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "subject_code": "nm,m"
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "subject_code": "kol"
+      },
+      {
+        "subject_id": "1774198048843",
+        "subject_name": "dadad",
+        "subject_code": "900"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "subject_code": "ad"
+      }
+    ]
+  },
+  {
+    "report_card_id": "RC-1777207718526",
+    "student_id": "1777179476264",
+    "school_id": "1773236295692",
+    "session_id": "1774591012793",
+    "subsession_id": "17757926264468069",
+    "class_id": "1773236664031",
+    "subjects": [
+      {
+        "subject_id": "1773290145628",
+        "subject_name": "matematics",
+        "subject_code": "jumai"
+      },
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "sd"
+      },
+      {
+        "subject_id": "1773848877853",
+        "subject_name": "Lictrature",
+        "subject_code": "lic"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "apodw"
+      },
+      {
+        "subject_id": "1773977322381",
+        "subject_name": "dolp",
+        "subject_code": "ko"
+      },
+      {
+        "subject_id": "1774197564663",
+        "subject_name": "AAA",
+        "subject_code": "SF"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1776261482109",
+        "subject_name": "ewew",
+        "subject_code": "we"
+      }
+    ],
+    "teacher_remark": "kjklj",
+    "principal_remark": "khkj",
+    "is_published": true,
+    "created_at": "2026-04-26T12:48:38.526Z",
+    "updated_at": "2026-04-26T12:49:29.104Z",
+    "published_subjects": [
+      {
+        "subject_id": "1773290145628",
+        "subject_name": "matematics",
+        "subject_code": "jumai"
+      },
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "sd"
+      },
+      {
+        "subject_id": "1773848877853",
+        "subject_name": "Lictrature",
+        "subject_code": "lic"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "apodw"
+      },
+      {
+        "subject_id": "1773977322381",
+        "subject_name": "dolp",
+        "subject_code": "ko"
+      },
+      {
+        "subject_id": "1774197564663",
+        "subject_name": "AAA",
+        "subject_code": "SF"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1776261482109",
+        "subject_name": "ewew",
+        "subject_code": "we"
+      }
+    ]
+  },
+  {
+    "report_card_id": "RC-1777207718588",
+    "student_id": "1773242746197",
+    "school_id": "1773236295692",
+    "session_id": "1774591012793",
+    "subsession_id": "17757926264468069",
+    "class_id": "1773236725672",
+    "subjects": [
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "sd"
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "subject_code": ",,n"
+      },
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "subject_code": "p3"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "apodw"
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "subject_code": "nm,m"
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "subject_code": "kol"
+      },
+      {
+        "subject_id": "1774198048843",
+        "subject_name": "dadad",
+        "subject_code": "900"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "subject_code": "ad"
+      }
+    ],
+    "teacher_remark": "kjklj",
+    "principal_remark": "khkj",
+    "is_published": true,
+    "created_at": "2026-04-26T12:48:38.588Z",
+    "updated_at": "2026-04-26T12:49:29.131Z",
+    "published_subjects": [
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "sd"
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "subject_code": ",,n"
+      },
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "subject_code": "p3"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "apodw"
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "subject_code": "nm,m"
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "subject_code": "kol"
+      },
+      {
+        "subject_id": "1774198048843",
+        "subject_name": "dadad",
+        "subject_code": "900"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "subject_code": "ad"
+      }
+    ]
+  },
+  {
+    "report_card_id": "RC-1777207718610",
+    "student_id": "1773242746199",
+    "school_id": "1773236295692",
+    "session_id": "1774591012793",
+    "subsession_id": "17757926264468069",
+    "class_id": "1773236725672",
+    "subjects": [
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "sd"
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "subject_code": ",,n"
+      },
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "subject_code": "p3"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "apodw"
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "subject_code": "nm,m"
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "subject_code": "kol"
+      },
+      {
+        "subject_id": "1774198048843",
+        "subject_name": "dadad",
+        "subject_code": "900"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "subject_code": "ad"
+      }
+    ],
+    "teacher_remark": "kjklj",
+    "principal_remark": "khkj",
+    "is_published": true,
+    "created_at": "2026-04-26T12:48:38.610Z",
+    "updated_at": "2026-04-26T12:49:29.173Z",
+    "published_subjects": [
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "sd"
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "subject_code": ",,n"
+      },
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "subject_code": "p3"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "apodw"
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "subject_code": "nm,m"
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "subject_code": "kol"
+      },
+      {
+        "subject_id": "1774198048843",
+        "subject_name": "dadad",
+        "subject_code": "900"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "subject_code": "ad"
+      }
+    ]
+  },
+  {
+    "report_card_id": "RC-1777395243715",
+    "student_id": "1773242746199",
+    "school_id": "1773236295692",
+    "session_id": "1774591012793",
+    "subsession_id": "17745910128068129",
+    "class_id": "1773236725672",
+    "subjects": [
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1774198048843",
+        "subject_name": "dadad",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "subject_code": "—"
+      }
+    ],
+    "teacher_remark": null,
+    "principal_remark": null,
+    "is_published": false,
+    "created_at": "2026-04-28T16:54:03.715Z",
+    "updated_at": "2026-04-28T16:54:03.715Z"
+  },
+  {
+    "report_card_id": "RC-1778235748266",
+    "student_id": "1778235340063",
+    "school_id": "1773236295692",
+    "session_id": "1777992474085",
+    "subsession_id": "17779924741462396",
+    "class_id": "1773236691426",
+    "subjects": [
+      {
+        "subject_id": "1773977671943",
+        "subject_name": "sf",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1773977322381",
+        "subject_name": "dolp",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1774197476690",
+        "subject_name": "czc",
+        "subject_code": "—"
+      },
+      {
+        "subject_id": "1774197996689",
+        "subject_name": "kks",
+        "subject_code": "—"
+      }
+    ],
+    "teacher_remark": "s.dm",
+    "principal_remark": "sd",
+    "is_published": true,
+    "created_at": "2026-05-08T10:22:28.266Z",
+    "updated_at": "2026-05-08T10:28:12.659Z",
+    "published_subjects": [
+      {
+        "subject_id": "1773977671943",
+        "subject_name": "sf",
+        "subject_code": "xc"
+      },
+      {
+        "subject_id": "1773977322381",
+        "subject_name": "dolp",
+        "subject_code": "ko"
+      },
+      {
+        "subject_id": "1774197476690",
+        "subject_name": "czc",
+        "subject_code": "zc"
+      },
+      {
+        "subject_id": "1774197996689",
+        "subject_name": "kks",
+        "subject_code": "ljsd"
+      },
+      {
+        "subject_id": "1774198048843",
+        "subject_name": "dadad",
+        "subject_code": "900"
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "subject_code": "cxxc"
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "subject_code": "ad"
+      }
+    ]
+  }
+]

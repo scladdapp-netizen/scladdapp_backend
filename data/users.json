@@ -1,0 +1,126 @@
+[
+  {
+    "user_id": "1773236295718",
+    "user_type": "admin",
+    "reference_id": "1773236295704",
+    "is_active": true,
+    "email": "ibrahim2562003@gmail.com",
+    "created_at": "2026-03-11T13:38:15.708Z"
+  },
+  {
+    "user_id": "1773236442033",
+    "user_type": "staff",
+    "reference_id": "1773236442025",
+    "email": "sani@gmail.com",
+    "password": "Aaaa111@",
+    "is_active": true,
+    "created_at": "2026-03-11T13:40:42.032Z"
+  },
+  {
+    "user_id": "1773236572894",
+    "user_type": "staff",
+    "reference_id": "1773236572875",
+    "email": "uma@gmail.com",
+    "password": "Aaaa111@",
+    "is_active": true,
+    "created_at": "2026-03-11T13:42:52.893Z"
+  },
+  {
+    "user_id": "1773239204083",
+    "user_type": "student",
+    "reference_id": "1773239204058",
+    "email": "ibrahimn2562003@gmail.com",
+    "password": "Student@123",
+    "is_active": true,
+    "created_at": "2026-03-11T14:26:44.082Z"
+  },
+  {
+    "user_id": "1773977452002",
+    "user_type": "student",
+    "reference_id": "1773977451998",
+    "email": "ibrahkkim2562003@gmail.com",
+    "password": "Student@123",
+    "is_active": true,
+    "created_at": "2026-03-20T03:30:52.001Z"
+  },
+  {
+    "user_id": "1775133243184",
+    "user_type": "staff",
+    "reference_id": "1775133242946",
+    "email": "staff@gmail.com",
+    "password": "Aaaa111@",
+    "is_active": true,
+    "created_at": "2026-04-02T12:34:03.183Z"
+  },
+  {
+    "user_id": "1775733797367",
+    "user_type": "admin",
+    "reference_id": "1775733797337",
+    "is_active": true,
+    "email": "ibrahim2562003@gmail.co",
+    "created_at": "2026-04-09T11:23:17.357Z"
+  },
+  {
+    "user_id": "1776055960239",
+    "user_type": "staff",
+    "reference_id": "1776055960214",
+    "email": "usman@gmail.com",
+    "password": "Aaaa111@",
+    "is_active": true,
+    "created_at": "2026-04-13T04:52:40.238Z"
+  },
+  {
+    "user_id": "1776056066212",
+    "user_type": "staff",
+    "reference_id": "1776056066200",
+    "email": "sumalia@gmail.com",
+    "password": "Aaaa111@",
+    "is_active": true,
+    "created_at": "2026-04-13T04:54:26.211Z"
+  },
+  {
+    "user_id": "1776056141175",
+    "user_type": "staff",
+    "reference_id": "1776056141168",
+    "email": "sule@gmail.com",
+    "password": "Aaaa111@",
+    "is_active": true,
+    "created_at": "2026-04-13T04:55:41.174Z"
+  },
+  {
+    "user_id": "1777179476579",
+    "user_type": "student",
+    "reference_id": "1777179476264",
+    "email": "ibrahim256200333@gmail.com",
+    "password": "Student@123",
+    "is_active": true,
+    "created_at": "2026-04-26T04:57:56.578Z"
+  },
+  {
+    "user_id": "1778235340077",
+    "user_type": "student",
+    "reference_id": "1778235340063",
+    "email": "saminu@gmail.com",
+    "password": "Student@123",
+    "is_active": true,
+    "created_at": "2026-05-08T10:15:40.076Z"
+  },
+  {
+    "user_id": "1778586135368",
+    "user_type": "student",
+    "reference_id": "1778586135345",
+    "email": "alima2562003@gmail.com",
+    "password": "Student@123",
+    "is_active": true,
+    "created_at": "2026-05-12T11:42:15.367Z"
+  },
+  {
+    "user_id": "1778586686235",
+    "user_type": "student",
+    "reference_id": "1778586686064",
+    "email": "amina2562003@gmail.com",
+    "password": "Student@123",
+    "is_active": true,
+    "created_at": "2026-05-12T11:51:26.234Z"
+  }
+]

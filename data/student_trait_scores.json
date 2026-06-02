@@ -1,0 +1,64 @@
+[
+  {
+    "score_id": "TSCORE-1773519836001",
+    "student_id": "1773239204058",
+    "student_name": "Ibrahim Ahmad",
+    "school_id": "1773236295692",
+    "session_id": "1773263399917",
+    "subsession_id": "1773263496774767",
+    "class_id": "1773236691426",
+    "traits": {
+      "Self-Control": "Excellent",
+      "Time Management": "Excellent",
+      "Problem Solving": "Excellent",
+      "Responsibility": "Excellent"
+    },
+    "created_at": "2026-03-14T10:00:00.000Z",
+    "updated_at": "2026-03-15T04:23:13.100Z"
+  },
+  {
+    "score_id": "TSCORE-1773548493507",
+    "student_id": "1773242746199",
+    "student_name": "",
+    "school_id": null,
+    "session_id": null,
+    "subsession_id": "1773263496774767",
+    "class_id": null,
+    "traits": {
+      "Self-Control": "Very Good",
+      "Time Management": "Very Good",
+      "Problem Solving": "Needs Improvement",
+      "Responsibility": "Good"
+    },
+    "created_at": "2026-03-15T04:21:33.507Z",
+    "updated_at": "2026-03-15T09:00:00.234Z"
+  },
+  {
+    "score_id": "TSCORE-1773729007840",
+    "student_id": "1773242746199",
+    "student_name": "",
+    "school_id": null,
+    "session_id": null,
+    "subsession_id": "17735648857723770",
+    "class_id": null,
+    "traits": {
+      "Self-Control": "Excellent"
+    },
+    "created_at": "2026-03-17T06:30:07.840Z",
+    "updated_at": "2026-03-17T06:30:07.840Z"
+  },
+  {
+    "score_id": "TSCORE-1774193694448",
+    "student_id": "1773239204058",
+    "student_name": "",
+    "school_id": null,
+    "session_id": null,
+    "subsession_id": "17735648857723770",
+    "class_id": null,
+    "traits": {
+      "Self-Control": "Very Good"
+    },
+    "created_at": "2026-03-22T15:34:54.448Z",
+    "updated_at": "2026-03-22T15:34:54.448Z"
+  }
+]

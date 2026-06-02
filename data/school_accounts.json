@@ -1,0 +1,53 @@
+[
+  {
+    "account_id": "1774800497665",
+    "school_id": "1773236295692",
+    "account_name": "fsfsfs",
+    "account_number": "fsfsfsfsf",
+    "bank_name": "GTBank",
+    "account_type": "Current",
+    "balance": "0",
+    "currency": "NGN",
+    "is_default": false,
+    "status": "Active",
+    "description": "safffs",
+    "created_by": null,
+    "created_at": "2026-03-29T16:08:17.665Z",
+    "last_modified": "2026-04-08T10:24:31.401Z",
+    "modified_by": null
+  },
+  {
+    "account_id": "1774800512857",
+    "school_id": "1773236295692",
+    "account_name": "sf",
+    "account_number": "sf",
+    "bank_name": "Access Bank",
+    "account_type": "Current",
+    "balance": "0",
+    "currency": "NGN",
+    "is_default": true,
+    "status": "Active",
+    "description": "sf",
+    "created_by": null,
+    "created_at": "2026-03-29T16:08:32.857Z",
+    "last_modified": "2026-04-08T10:24:38.387Z",
+    "modified_by": null
+  },
+  {
+    "account_id": "1776161985613",
+    "school_id": "1773236295692",
+    "account_name": "dgdgd",
+    "account_number": "656565643533",
+    "bank_name": "First Bank Nigeria",
+    "account_type": "Savings",
+    "balance": "0",
+    "currency": "NGN",
+    "is_default": false,
+    "status": "Active",
+    "description": "",
+    "created_by": "1773236295704",
+    "created_at": "2026-04-14T10:19:45.613Z",
+    "last_modified": "2026-04-14T10:19:45.613Z",
+    "modified_by": "1773236295704"
+  }
+]

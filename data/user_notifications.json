@@ -1,0 +1,211 @@
+[
+  {
+    "user_notification_id": "1774768784247",
+    "notification_id": "1774768784245",
+    "school_id": "1773236295692",
+    "user_id": "1774591012951",
+    "user_name": "Aisha Mohammed",
+    "user_type": "alumni",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T07:19:44.246Z"
+  },
+  {
+    "user_notification_id": "1774769860995",
+    "notification_id": "1774769860992",
+    "school_id": "1773236295692",
+    "user_id": "1773977451998",
+    "user_name": "ibrahim ahmadbh",
+    "user_type": "student",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T07:37:40.993Z"
+  },
+  {
+    "user_notification_id": "1774769860996",
+    "notification_id": "1774769860992",
+    "school_id": "1773236295692",
+    "user_id": "1773242746199",
+    "user_name": "Usman Aliyu",
+    "user_type": "student",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T07:37:40.993Z"
+  },
+  {
+    "user_notification_id": "1774769860997",
+    "notification_id": "1774769860992",
+    "school_id": "1773236295692",
+    "user_id": "1773242746197",
+    "user_name": "Musa Abdullahi",
+    "user_type": "student",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T07:37:40.993Z"
+  },
+  {
+    "user_notification_id": "1774769860998",
+    "notification_id": "1774769860992",
+    "school_id": "1773236295692",
+    "user_id": "1773239204058",
+    "user_name": "ibrahim ahmad",
+    "user_type": "student",
+    "is_read": true,
+    "read_at": "2026-04-19T07:27:50.411Z",
+    "delivered_at": "2026-03-29T07:37:40.993Z"
+  },
+  {
+    "user_notification_id": "1774769860999",
+    "notification_id": "1774769860992",
+    "school_id": "1773236295692",
+    "user_id": "1773236442025",
+    "user_name": "sani",
+    "user_type": "staff",
+    "is_read": true,
+    "read_at": "2026-04-16T16:36:56.036Z",
+    "delivered_at": "2026-03-29T07:37:40.993Z"
+  },
+  {
+    "user_notification_id": "1774769861000",
+    "notification_id": "1774769860992",
+    "school_id": "1773236295692",
+    "user_id": "1773236572875",
+    "user_name": "uma",
+    "user_type": "staff",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T07:37:40.993Z"
+  },
+  {
+    "user_notification_id": "1774769861001",
+    "notification_id": "1774769860992",
+    "school_id": "1773236295692",
+    "user_id": "1774591012951",
+    "user_name": "Aisha Mohammed",
+    "user_type": "alumni",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T07:37:40.993Z"
+  },
+  {
+    "user_notification_id": "1774769861002",
+    "notification_id": "1774769860992",
+    "school_id": "1773236295692",
+    "user_id": "1774591013123",
+    "user_name": "Fatima Yusuf",
+    "user_type": "alumni",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T07:37:40.993Z"
+  },
+  {
+    "user_notification_id": "1774769861003",
+    "notification_id": "1774769860992",
+    "school_id": "1773236295692",
+    "user_id": "1774591013200",
+    "user_name": "Zainab Suleiman",
+    "user_type": "alumni",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T07:37:40.993Z"
+  },
+  {
+    "user_notification_id": "1774786246206",
+    "notification_id": "1774786246203",
+    "school_id": "1773236295692",
+    "user_id": "1773977451998",
+    "user_name": "ibrahim ahmadbh",
+    "user_type": "student",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T12:10:46.205Z"
+  },
+  {
+    "user_notification_id": "1774786246207",
+    "notification_id": "1774786246203",
+    "school_id": "1773236295692",
+    "user_id": "1773242746199",
+    "user_name": "Usman Aliyu",
+    "user_type": "student",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T12:10:46.205Z"
+  },
+  {
+    "user_notification_id": "1774786246208",
+    "notification_id": "1774786246203",
+    "school_id": "1773236295692",
+    "user_id": "1773242746197",
+    "user_name": "Musa Abdullahi",
+    "user_type": "student",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T12:10:46.205Z"
+  },
+  {
+    "user_notification_id": "1774786246209",
+    "notification_id": "1774786246203",
+    "school_id": "1773236295692",
+    "user_id": "1773239204058",
+    "user_name": "ibrahim ahmad",
+    "user_type": "student",
+    "is_read": true,
+    "read_at": "2026-04-17T16:28:19.428Z",
+    "delivered_at": "2026-03-29T12:10:46.205Z"
+  },
+  {
+    "user_notification_id": "1774786246210",
+    "notification_id": "1774786246203",
+    "school_id": "1773236295692",
+    "user_id": "1773236442025",
+    "user_name": "sani",
+    "user_type": "staff",
+    "is_read": true,
+    "read_at": "2026-04-16T16:36:50.643Z",
+    "delivered_at": "2026-03-29T12:10:46.205Z"
+  },
+  {
+    "user_notification_id": "1774786246211",
+    "notification_id": "1774786246203",
+    "school_id": "1773236295692",
+    "user_id": "1773236572875",
+    "user_name": "uma",
+    "user_type": "staff",
+    "is_read": true,
+    "read_at": "2026-04-19T09:36:48.627Z",
+    "delivered_at": "2026-03-29T12:10:46.205Z"
+  },
+  {
+    "user_notification_id": "1774786246212",
+    "notification_id": "1774786246203",
+    "school_id": "1773236295692",
+    "user_id": "1774591012951",
+    "user_name": "Aisha Mohammed",
+    "user_type": "alumni",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T12:10:46.205Z"
+  },
+  {
+    "user_notification_id": "1774786246213",
+    "notification_id": "1774786246203",
+    "school_id": "1773236295692",
+    "user_id": "1774591013123",
+    "user_name": "Fatima Yusuf",
+    "user_type": "alumni",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T12:10:46.205Z"
+  },
+  {
+    "user_notification_id": "1774786246214",
+    "notification_id": "1774786246203",
+    "school_id": "1773236295692",
+    "user_id": "1774591013200",
+    "user_name": "Zainab Suleiman",
+    "user_type": "alumni",
+    "is_read": false,
+    "read_at": null,
+    "delivered_at": "2026-03-29T12:10:46.205Z"
+  }
+]

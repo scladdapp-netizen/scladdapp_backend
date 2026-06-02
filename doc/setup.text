@@ -1,0 +1,66 @@
+User
+    user_id (PK)
+    user_type (student / staff / admin)
+    reference_id
+    is_active
+
+- Admin
+    admin_id
+    staff_id
+    school_id
+    admin_role
+    access_scope
+    permissions (JSON / array)
+    is_active
+    assigned_by
+    assigned_at
+    revoked_at
+
+- school
+    school_id
+    school_name
+    motto
+    logo_url
+    website_url
+    email
+    phone_number
+    alternate_phone
+    school_code / registration_number
+    school_type (primary / secondary / tertiary)
+    ownership (private / public / government)
+    address
+    city
+    state
+    country
+    year_established
+    postal_code
+    is_active
+
+- Subscription Payment
+    payment_id
+    subscription_id
+    school_id
+    payment_provider (Stripe / Paystack / Flutterwave / PayPal)
+    provider_transaction_id
+    payment_method (card / bank / wallet)
+    amount_paid
+    currency
+    tax_amount
+    discount_amount
+    total_amount
+    billing_period_start
+    billing_period_end
+
+- Subscription
+    subscription_id
+    school_id
+    plan_id
+    subscription_type (free, paid)
+    subscription_status (active / canceled / expired)
+    start_date
+    end_date
+    canceled_at
+
+
+- in the create student add admit to what class
+- for template when delet can not delet if the template is in use

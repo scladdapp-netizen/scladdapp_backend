@@ -1,0 +1,335 @@
+[
+  {
+    "evaluation_id": "1774200000001",
+    "staff_id": "1773236572875",
+    "school_id": "1773236295692",
+    "evaluation_type": "Annual Review",
+    "evaluation_period": "2024-2025 Academic Year",
+    "evaluator": "Dr. Michael Roberts",
+    "evaluator_role": "Superintendent",
+    "evaluation_date": "2025-01-10",
+    "status": "Completed",
+    "overall_rating": "Excellent",
+    "overall_score": 4.4,
+    "max_score": 5,
+    "categories": {
+      "leadership": {
+        "score": 4.5,
+        "rating": "Excellent",
+        "comments": "Strong leadership presence with clear vision for school direction."
+      },
+      "administration": {
+        "score": 4.3,
+        "rating": "Very Good",
+        "comments": "Efficient administrative processes with room for streamlining some procedures."
+      },
+      "staffManagement": {
+        "score": 4.6,
+        "rating": "Excellent",
+        "comments": "Excellent rapport with staff and effective performance management."
+      },
+      "communication": {
+        "score": 4.4,
+        "rating": "Very Good",
+        "comments": "Good communication skills, could increase frequency of updates to stakeholders."
+      },
+      "budgetManagement": {
+        "score": 4.2,
+        "rating": "Very Good",
+        "comments": "Sound financial management with opportunities for cost optimization."
+      },
+      "innovation": {
+        "score": 4.4,
+        "rating": "Very Good",
+        "comments": "Implements new initiatives effectively, could explore more creative solutions."
+      }
+    },
+    "strengths": [
+      "Strong organizational skills",
+      "Effective team building",
+      "Good problem-solving abilities",
+      "Commitment to professional development"
+    ],
+    "areas_for_improvement": [
+      "Increase stakeholder communication frequency",
+      "Streamline administrative processes"
+    ],
+    "goals": [
+      "Implement monthly stakeholder newsletters",
+      "Automate routine administrative tasks",
+      "Attend innovation in education conference"
+    ],
+    "comments": "Solid performance with clear potential for continued growth. Recommended for advanced leadership training opportunities.",
+    "entered_by_id": "admin_001",
+    "entered_by_name": "Super Admin",
+    "created_at": "2025-01-10T10:00:00.000Z",
+    "updated_at": "2025-01-10T10:00:00.000Z"
+  },
+  {
+    "evaluation_id": "1774200000002",
+    "staff_id": "1773236572875",
+    "school_id": "1773236295692",
+    "evaluation_type": "Mid-Year Review",
+    "evaluation_period": "2024-2025 First Semester",
+    "evaluator": "Dr. Sarah Johnson",
+    "evaluator_role": "Assistant Superintendent",
+    "evaluation_date": "2024-08-15",
+    "status": "Completed",
+    "overall_rating": "Outstanding",
+    "overall_score": 4.8,
+    "max_score": 5,
+    "categories": {
+      "leadership": {
+        "score": 4.9,
+        "rating": "Outstanding",
+        "comments": "Exceptional leadership skills and strategic vision for school improvement."
+      },
+      "administration": {
+        "score": 4.7,
+        "rating": "Excellent",
+        "comments": "Highly effective in managing school operations and administrative tasks."
+      },
+      "staffManagement": {
+        "score": 4.8,
+        "rating": "Outstanding",
+        "comments": "Outstanding ability to lead, motivate, and develop staff members."
+      },
+      "communication": {
+        "score": 4.9,
+        "rating": "Outstanding",
+        "comments": "Excellent communication with all stakeholders including parents and community."
+      },
+      "budgetManagement": {
+        "score": 4.6,
+        "rating": "Excellent",
+        "comments": "Demonstrates strong financial management and resource allocation skills."
+      },
+      "innovation": {
+        "score": 4.8,
+        "rating": "Outstanding",
+        "comments": "Consistently introduces innovative programs and improvement initiatives."
+      }
+    },
+    "strengths": [
+      "Visionary leadership and strategic planning",
+      "Exceptional staff development and mentoring",
+      "Strong community engagement",
+      "Data-driven decision making"
+    ],
+    "areas_for_improvement": [
+      "Could delegate more routine tasks to focus on strategic initiatives"
+    ],
+    "goals": [
+      "Implement comprehensive school improvement plan",
+      "Establish mentorship program for new administrators",
+      "Increase parent and community engagement by 25%"
+    ],
+    "comments": "Exceptional performance. Demonstrates outstanding leadership, vision, and commitment to educational excellence.",
+    "entered_by_id": "admin_001",
+    "entered_by_name": "Super Admin",
+    "created_at": "2024-08-15T09:00:00.000Z",
+    "updated_at": "2024-08-15T09:00:00.000Z"
+  },
+  {
+    "evaluation_id": "1774200000003",
+    "staff_id": "1773236572875",
+    "school_id": "1773236295692",
+    "evaluation_type": "Probationary Review",
+    "evaluation_period": "2023-2024 Academic Year",
+    "evaluator": "Dr. Michael Roberts",
+    "evaluator_role": "Superintendent",
+    "evaluation_date": "2024-03-20",
+    "status": "Completed",
+    "overall_rating": "Good",
+    "overall_score": 3.9,
+    "max_score": 5,
+    "categories": {
+      "leadership": {
+        "score": 4,
+        "rating": "Good",
+        "comments": "Shows good leadership potential, developing confidence in decision-making."
+      },
+      "administration": {
+        "score": 3.8,
+        "rating": "Good",
+        "comments": "Learning administrative procedures, needs more experience with complex situations."
+      },
+      "staffManagement": {
+        "score": 4.1,
+        "rating": "Good",
+        "comments": "Building positive relationships with staff, working on performance management skills."
+      },
+      "communication": {
+        "score": 3.9,
+        "rating": "Good",
+        "comments": "Good communication skills, needs to develop confidence in public speaking."
+      },
+      "budgetManagement": {
+        "score": 3.6,
+        "rating": "Satisfactory",
+        "comments": "Learning budget processes, requires continued mentoring in financial management."
+      },
+      "innovation": {
+        "score": 3.8,
+        "rating": "Good",
+        "comments": "Open to new ideas, encouraged to take more initiative in implementing changes."
+      }
+    },
+    "strengths": [
+      "Eager to learn and improve",
+      "Good interpersonal skills",
+      "Strong work ethic",
+      "Receptive to feedback and coaching"
+    ],
+    "areas_for_improvement": [
+      "Build confidence in decision-making",
+      "Develop financial management expertise",
+      "Improve public speaking skills"
+    ],
+    "goals": [
+      "Complete administrative leadership training program",
+      "Shadow experienced principals",
+      "Attend budget management workshop"
+    ],
+    "comments": "Shows strong potential as a new administrator. With continued mentoring and professional development, expected to become an effective educational leader.",
+    "entered_by_id": "admin_001",
+    "entered_by_name": "Super Admin",
+    "created_at": "2024-03-20T08:30:00.000Z",
+    "updated_at": "2024-03-20T08:30:00.000Z"
+  },
+  {
+    "evaluation_id": "1774161698752",
+    "staff_id": "1773236572875",
+    "school_id": "1773236295692",
+    "evaluation_type": "Probationary Review",
+    "evaluation_period": "sds",
+    "evaluator": "sd",
+    "evaluator_role": "sd",
+    "evaluation_date": "2026-03-21",
+    "status": "Overdue",
+    "overall_rating": "Excellent",
+    "overall_score": 434,
+    "max_score": 5,
+    "categories": {
+      "leadership": {
+        "score": 0,
+        "rating": "Not Rated",
+        "comments": ""
+      },
+      "administration": {
+        "score": 0,
+        "rating": "Not Rated",
+        "comments": ""
+      },
+      "staffManagement": {
+        "score": 0,
+        "rating": "Not Rated",
+        "comments": ""
+      },
+      "communication": {
+        "score": 0,
+        "rating": "Not Rated",
+        "comments": ""
+      },
+      "budgetManagement": {
+        "score": 0,
+        "rating": "Not Rated",
+        "comments": ""
+      },
+      "innovation": {
+        "score": 0,
+        "rating": "Not Rated",
+        "comments": ""
+      }
+    },
+    "strengths": [],
+    "areas_for_improvement": [],
+    "goals": [],
+    "comments": "dfdfd f dfdfdf dfdf dfd fdfd fdf dfdf",
+    "entered_by_id": "1773236295704",
+    "entered_by_name": "sfsfs",
+    "created_at": "2026-03-22T06:41:38.752Z",
+    "updated_at": "2026-03-22T06:41:38.752Z"
+  },
+  {
+    "evaluation_id": "1774162519756",
+    "staff_id": "1773236572875",
+    "school_id": "1773236295692",
+    "evaluation_type": "Annual corp",
+    "evaluation_period": "sdldsjdc",
+    "evaluator": "sdsd",
+    "evaluator_role": "sdsd",
+    "evaluation_date": "2026-03-20",
+    "status": "Completed",
+    "overall_rating": "Excellent",
+    "overall_score": 0,
+    "max_score": 5,
+    "categories": {
+      "sldld": {
+        "score": 3232,
+        "rating": "Excellent",
+        "comments": "323"
+      },
+      "leadership": {
+        "score": 4343,
+        "rating": "Good",
+        "comments": "oiud"
+      }
+    },
+    "strengths": [
+      "kljdd",
+      "sdjlj"
+    ],
+    "areas_for_improvement": [
+      "kjsdkj",
+      "sdlj"
+    ],
+    "goals": [
+      "kjskjd",
+      "sdj"
+    ],
+    "comments": "sdkjdj",
+    "entered_by_id": "1773236295704",
+    "entered_by_name": "sfsfs",
+    "created_at": "2026-03-22T06:55:19.756Z",
+    "updated_at": "2026-03-22T06:55:19.756Z"
+  },
+  {
+    "evaluation_id": "1775535211799",
+    "staff_id": "1775133242946",
+    "school_id": "1773236295692",
+    "evaluation_type": ",mn,mb",
+    "evaluation_period": "nb,m",
+    "evaluator": ",mn,",
+    "evaluator_role": "mbmb",
+    "evaluation_date": "2026-04-13",
+    "status": "In Progress",
+    "overall_rating": "Very Good",
+    "categories": {
+      "n,n,n": {
+        "score": 79,
+        "rating": "Good",
+        "comments": "kjljljlj"
+      },
+      "kjkjk": {
+        "score": 97,
+        "rating": "Very Good",
+        "comments": ""
+      }
+    },
+    "strengths": [
+      "jkhk"
+    ],
+    "areas_for_improvement": [
+      "mmnm"
+    ],
+    "goals": [
+      ",khkhk"
+    ],
+    "comments": "mn",
+    "entered_by_id": "1774539861709",
+    "entered_by_name": "sani",
+    "created_at": "2026-04-07T04:13:31.799Z",
+    "updated_at": "2026-04-07T04:13:31.799Z"
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "history_id": "1776093281364",
+    "teacher_id": "1773236622472",
+    "teacher_code": "kolo",
+    "school_id": "1773236295692",
+    "old_staff_id": "1773236442025",
+    "old_staff_name": "sani",
+    "old_staff_email": "sani@gmail.com",
+    "new_staff_id": "1775133242946",
+    "new_staff_name": "ibrahim ahmad",
+    "new_staff_email": "staff@gmail.com",
+    "changed_by": "1773236295704",
+    "changed_at": "2026-04-13T15:14:41.365Z",
+    "reason": "Staff reassignment"
+  }
+]

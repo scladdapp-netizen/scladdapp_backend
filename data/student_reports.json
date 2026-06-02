@@ -1,0 +1,1216 @@
+[
+  {
+    "report_id": "REPORT-17734200000001",
+    "student_id": "1773239204058",
+    "student_name": "Ibrahim Ahmad",
+    "school_id": "1773236295692",
+    "class_id": "1773236691426",
+    "session_id": "1773263399917",
+    "subsession_id": "1773263496774767",
+    "term_name": "da",
+    "template_id": "1773236992912",
+    "generated_at": "2026-03-14T06:10:53.200Z",
+    "subjects": [
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "teacher_id": "1773236622472",
+        "teacher_name": "sani",
+        "scores": {
+          "ft": {
+            "score": 10,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 10,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 10,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "teacher_id": "1773236622472",
+        "teacher_name": "sani",
+        "scores": {
+          "ft": {
+            "score": 18,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 22,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 10,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1773468615023",
+        "subject_name": "asa",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 10,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 11,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": "Excellent"
+      },
+      {
+        "trait": "Time Management",
+        "rating": "Very Good"
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": "Needs Improvement"
+      },
+      {
+        "trait": "Responsibility",
+        "rating": "Good"
+      }
+    ],
+    "teacher_comment": "sllsf slkf sfk fs f",
+    "principal_comment": "lksfl kf ffk"
+  },
+  {
+    "report_id": "REPORT-1773519543243",
+    "student_id": "1773242746197",
+    "student_name": "",
+    "school_id": "1773236295692",
+    "class_id": null,
+    "session_id": "1773263399917",
+    "subsession_id": "1773263496774767",
+    "term_name": "da",
+    "template_id": "1773236992912",
+    "generated_at": "2026-03-14T20:37:21.390Z",
+    "subjects": [
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 10,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 8,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 10,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1773468615023",
+        "subject_name": "asa",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 10,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": null,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1773547652341",
+    "student_id": "1773242746199",
+    "student_name": "",
+    "school_id": "1773236295692",
+    "class_id": null,
+    "session_id": "1773263399917",
+    "subsession_id": "1773263496774767",
+    "term_name": "da",
+    "template_id": "1773236992912",
+    "generated_at": "2026-03-15T06:23:22.797Z",
+    "subjects": [
+      {
+        "subject_id": "1773418933343",
+        "subject_name": "english",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 8,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 45,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1773418955218",
+        "subject_name": "maths",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 20,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1773554076748",
+    "student_id": "1773242746198",
+    "student_name": "",
+    "school_id": "1773236295692",
+    "class_id": null,
+    "session_id": "1773263399917",
+    "subsession_id": "1773263496774767",
+    "term_name": "da",
+    "template_id": "1773236992912",
+    "generated_at": "2026-03-15T05:54:36.748Z",
+    "subjects": [
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 13,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 10,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1773554117495",
+    "student_id": "1773242746196",
+    "student_name": "",
+    "school_id": "1773236295692",
+    "class_id": null,
+    "session_id": "1773263399917",
+    "subsession_id": "1773263496774767",
+    "term_name": "da",
+    "template_id": "1773236992912",
+    "generated_at": "2026-03-15T05:55:17.495Z",
+    "subjects": [
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1773554175655",
+    "student_id": "1773242746200",
+    "student_name": "",
+    "school_id": "1773236295692",
+    "class_id": "1773236725672",
+    "session_id": "1773263399917",
+    "subsession_id": "1773263496774767",
+    "term_name": "da",
+    "template_id": "1773236992912",
+    "generated_at": "2026-03-15T06:01:46.691Z",
+    "subjects": [
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 2,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 27,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1773585094160",
+    "student_id": "1773242746199",
+    "student_name": "",
+    "school_id": "1773236295692",
+    "class_id": "1773236725672",
+    "session_id": "1773564885753",
+    "subsession_id": "17735648857723770",
+    "term_name": "First Term",
+    "template_id": "1773236992912",
+    "generated_at": "2026-03-25T05:06:31.528Z",
+    "subjects": [
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 10,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 10,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjdda",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 20,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 20,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1773637722018",
+    "student_id": "1773239204058",
+    "student_name": "Ibrahim Ahmad",
+    "school_id": "1773236295692",
+    "class_id": "1773236725672",
+    "session_id": "1773564885753",
+    "subsession_id": "17735648857723770",
+    "term_name": "First Term",
+    "template_id": "1773236992912",
+    "generated_at": "2026-03-25T05:05:36.116Z",
+    "subjects": [
+      {
+        "subject_id": "1773554050057",
+        "subject_name": "math",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 10,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 10,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 10,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 20,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1773977322381",
+        "subject_name": "dolp",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1773849329182",
+        "subject_name": "Menos",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjdda",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1773977520107",
+    "student_id": "1773977451998",
+    "student_name": "",
+    "school_id": "1773236295692",
+    "class_id": "1773236691426",
+    "session_id": "1773564885753",
+    "subsession_id": "17735648857723770",
+    "term_name": "First Term",
+    "template_id": "1773236992912",
+    "generated_at": "2026-03-25T05:06:03.949Z",
+    "subjects": [
+      {
+        "subject_id": "1773977322381",
+        "subject_name": "dolp",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 6,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 30,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1773977293706",
+        "subject_name": "kolik",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 2,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 40,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjdda",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1774415176768",
+    "student_id": "1773242746197",
+    "student_name": "",
+    "school_id": "1773236295692",
+    "class_id": "1773236725672",
+    "session_id": "1773564885753",
+    "subsession_id": "17735648857723770",
+    "term_name": "First Term",
+    "template_id": "1773236992912",
+    "generated_at": "2026-03-25T05:06:16.768Z",
+    "subjects": [
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjdda",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1775542390290",
+    "student_id": "1773242746199",
+    "student_name": "",
+    "school_id": "1773236295692",
+    "class_id": "1773236725672",
+    "session_id": "1774591012793",
+    "subsession_id": "17745910128068129",
+    "term_name": "First Term",
+    "template_id": "1773236992912",
+    "generated_at": "2026-04-15T15:53:43.205Z",
+    "subjects": [
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjdda",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1776085608652",
+    "student_id": "1773242746198",
+    "student_name": "",
+    "school_id": "1775733797277",
+    "class_id": "1776056356998",
+    "session_id": "1776057647127",
+    "subsession_id": "17760576471505487",
+    "term_name": "First Term",
+    "template_id": "1776057534414",
+    "generated_at": "2026-04-13T13:07:12.883Z",
+    "subjects": [
+      {
+        "subject_id": "1776056457391",
+        "subject_name": "maths",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "ex": {
+            "score": 20,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Teamwork",
+        "rating": null
+      },
+      {
+        "trait": "Respect for Others",
+        "rating": null
+      },
+      {
+        "trait": "Politeness",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1776267830106",
+    "student_id": "1773242746197",
+    "student_name": "",
+    "school_id": "1773236295692",
+    "class_id": "1773236725672",
+    "session_id": "1774591012793",
+    "subsession_id": "17745910128068129",
+    "term_name": "First Term",
+    "template_id": "1773236992912",
+    "generated_at": "2026-04-15T15:43:50.107Z",
+    "subjects": [
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 20,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 30,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1776268770630",
+    "student_id": "1773239204058",
+    "student_name": "Ibrahim Ahmad",
+    "school_id": "1773236295692",
+    "class_id": "1773236725672",
+    "session_id": "1774591012793",
+    "subsession_id": "17745910128068129",
+    "term_name": "First Term",
+    "template_id": "1773236992912",
+    "generated_at": "2026-04-19T09:35:27.450Z",
+    "subjects": [
+      {
+        "subject_id": "1774246212050",
+        "subject_name": "akjddaj",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 22,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 33,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1773848814657",
+        "subject_name": "biology",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 10,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 10,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 20,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1774242768180",
+        "subject_name": "cxxc",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 20,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 50,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  },
+  {
+    "report_id": "REPORT-1778235692162",
+    "student_id": "1778235340063",
+    "student_name": "",
+    "school_id": "1773236295692",
+    "class_id": "1773236691426",
+    "session_id": "1777992474085",
+    "subsession_id": "17779924741462396",
+    "term_name": "First Term",
+    "template_id": "1773236992912",
+    "generated_at": "2026-05-08T10:22:04.795Z",
+    "subjects": [
+      {
+        "subject_id": "1773977671943",
+        "subject_name": "sf",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 20,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 20,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1773977322381",
+        "subject_name": "dolp",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 10,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 10,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 10,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      },
+      {
+        "subject_id": "1774197476690",
+        "subject_name": "czc",
+        "teacher_id": null,
+        "teacher_name": null,
+        "scores": {
+          "ft": {
+            "score": 20,
+            "weight": 20,
+            "max_score": 20
+          },
+          "st": {
+            "score": 30,
+            "weight": 30,
+            "max_score": 30
+          },
+          "ex": {
+            "score": 40,
+            "weight": 50,
+            "max_score": 50
+          }
+        }
+      }
+    ],
+    "behavioral_traits": [
+      {
+        "trait": "Self-Control",
+        "rating": null
+      },
+      {
+        "trait": "Time Management",
+        "rating": null
+      },
+      {
+        "trait": "Problem Solving",
+        "rating": null
+      },
+      {
+        "trait": "Responsibility",
+        "rating": null
+      }
+    ],
+    "teacher_comment": null,
+    "principal_comment": null
+  }
+]
