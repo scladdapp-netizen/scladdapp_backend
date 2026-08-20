@@ -4,10 +4,25 @@ const {
   createGuardian,
   getGuardianById,
   getGuardiansByStudentId,
+  getGuardiansBySchoolId,
   updateGuardian,
   deleteGuardian,
   setPrimaryGuardian,
 } = require("../controllers/guardian.controller");
+
+// Get all guardians for a school (with student names, primary-guardian logic applied)
+router.get("/school/:schoolId", async (req, res) => {
+  try {
+    const result = await getGuardiansBySchoolId(req.params.schoolId);
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(400).json(result);
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Server error", message: error.message });
+  }
+});
 
 // Create guardian
 router.post("/", async (req, res) => {

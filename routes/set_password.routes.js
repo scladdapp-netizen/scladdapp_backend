@@ -4,6 +4,7 @@ const PasswordResetToken = require("../models/PasswordResetToken.model");
 const User    = require("../models/User.model");
 const Staff   = require("../models/Staff.model");
 const Student = require("../models/Student.model");
+const School  = require("../models/School.model");
 
 const router = express.Router();
 
@@ -13,21 +14,41 @@ router.get("/", async (req, res) => {
   if (!token) return res.status(400).send(errorPage("Invalid link", "No token provided."));
 
   const record = await PasswordResetToken.findOne({ token, used: false });
-  if (!record)                    return res.status(400).send(errorPage("Link expired or already used", "Please ask your administrator to resend the invitation."));
+  if (!record)                        return res.status(400).send(errorPage("Link expired or already used", "Please ask your administrator to resend the invitation."));
   if (new Date() > record.expires_at) return res.status(400).send(errorPage("Link expired", "This link has expired. Please ask your administrator to resend the invitation."));
 
-  let displayName = "Staff Member";
+  let displayName = "Member";
+  let schoolId    = null;
+
   try {
     if (record.user_type === "staff") {
       const s = await Staff.findOne({ staff_id: record.user_id }).lean();
-      if (s) displayName = s.full_name;
+      if (s) { displayName = s.full_name; schoolId = s.school_id; }
     } else if (record.user_type === "student") {
       const s = await Student.findOne({ student_id: record.user_id }).lean();
-      if (s) displayName = s.full_name;
+      if (s) { displayName = s.full_name; schoolId = s.school_id; }
     }
-  } catch { /* use default */ }
+  } catch { /* use defaults */ }
 
-  return res.send(setPasswordPage(token, displayName));
+  // Fetch school branding
+  let schoolName   = null;
+  let schoolSlogan = null;
+  let schoolLogo   = null;
+  try {
+    if (schoolId) {
+      const school = await School.findOne({ school_id: schoolId }).lean();
+      if (school) {
+        schoolName   = school.school_name   || null;
+        schoolSlogan = school.motto         || null;
+        const raw    = school.logo_url;
+        schoolLogo   = typeof raw === "string" ? raw : raw?.url || raw?.secure_url || null;
+      }
+    }
+  } catch { /* use defaults */ }
+
+  return res.send(setPasswordPage(token, displayName, record.purpose || "invite", {
+    schoolName, schoolSlogan, schoolLogo,
+  }));
 });
 
 // ── POST /set-password ────────────────────────────────────────────────────────
@@ -131,24 +152,56 @@ button:disabled{opacity:.3;cursor:not-allowed}
 
 // ── HTML templates ────────────────────────────────────────────────────────────
 
-const setPasswordPage = (token, name) => `<!DOCTYPE html>
+const setPasswordPage = (token, name, purpose = "invite", school = {}) => {
+  const isReset  = purpose === "reset";
+  const heading  = isReset ? "Reset your password"  : "Set your password";
+  const subtext  = isReset
+    ? "Choose a new password for your account. You'll use it every time you log in."
+    : "Choose a strong password to activate your account. You'll use it every time you log in.";
+  const btnLabel = isReset ? "Reset Password"       : "Activate Account";
+  const expiry   = isReset ? "1 hour"               : "48 hours";
+
+  const { schoolName, schoolSlogan, schoolLogo } = school;
+  const hasHeader = !isReset && !!schoolName;
+
+  const schoolHeaderHtml = hasHeader ? `
+  <div class="school-header">
+    <span class="scladapp-badge">Powered by ScladApp</span>
+    ${schoolLogo
+      ? `<img src="${escapeHtml(schoolLogo)}" alt="${escapeHtml(schoolName)}" class="school-logo"/>`
+      : `<div class="school-logo-placeholder"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>`}
+    <div class="school-name">${escapeHtml(schoolName)}</div>
+    ${schoolSlogan ? `<div class="school-slogan">${escapeHtml(schoolSlogan)}</div>` : ""}
+  </div>` : "";
+
+  const extraCss = hasHeader ? `
+.school-header{background:#111;border-radius:16px 16px 0 0;padding:32px 36px 26px;text-align:center}
+.school-logo{width:72px;height:72px;object-fit:cover;margin:0 auto 12px;display:block}
+.school-logo-placeholder{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.12);border:3px solid rgba(255,255,255,0.2);margin:0 auto 12px;display:flex;align-items:center;justify-content:center}
+.school-name{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:5px}
+.school-slogan{font-size:12px;color:rgba(255,255,255,0.5);font-style:italic;letter-spacing:.02em}
+.scladapp-badge{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;display:block}
+.card{border-radius:0 0 16px 16px !important;border-top:none !important}` : "";
+
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Set Your Password — ScladApp</title>
-<style>${css}</style>
+<title>${isReset ? "Reset Password" : "Set Your Password"}${schoolName ? ` — ${escapeHtml(schoolName)}` : " — ScladApp"}</title>
+<style>${css}${extraCss}</style>
 </head>
 <body>
 <div class="wrap">
   <span class="dc"></span>
   <span class="db"></span>
+  ${schoolHeaderHtml}
   <div class="card">
     <div class="icon-wrap">${lockSvg}</div>
-    <div class="brand">ScladApp</div>
+    ${!hasHeader ? `<div class="brand">ScladApp</div>` : ""}
     <div class="name-tag">Hello, ${escapeHtml(name)}</div>
-    <h1>Set your password</h1>
-    <p class="sub">Choose a strong password to activate your ScladApp account. You'll use it every time you log in.</p>
+    <h1>${heading}</h1>
+    <p class="sub">${subtext}</p>
 
     <form method="POST" action="/set-password" id="frm">
       <input type="hidden" name="token" value="${escapeHtml(token)}"/>
@@ -173,11 +226,11 @@ const setPasswordPage = (token, name) => `<!DOCTYPE html>
         <div class="mhint" id="mh"></div>
       </div>
 
-      <button type="submit" id="btn" disabled>Activate Account</button>
+      <button type="submit" id="btn" disabled>${btnLabel}</button>
     </form>
 
     <div class="divider"></div>
-    <p class="fnote">This link expires in 48 hours &nbsp;·&nbsp; ScladApp School Management</p>
+    <p class="fnote">This link expires in ${expiry} &nbsp;·&nbsp; ScladApp School Management</p>
   </div>
 </div>
 <script>
@@ -197,13 +250,14 @@ function chk(){
   const cpw=document.getElementById("cpw").value;
   const s=R.filter(r=>r.test(pw)).length;
   const mh=document.getElementById("mh");
-  if(cpw.length){mh.textContent=pw===cpw?"✓ Passwords match":"✗ Passwords don't match";mh.style.color=pw===cpw?"#111":"#888";}
+  if(cpw.length){mh.textContent=pw===cpw?"✓ Passwords match":"✗ Passwords don\'t match";mh.style.color=pw===cpw?"#111":"#888";}
   else mh.textContent="";
   document.getElementById("btn").disabled=!(s===5&&pw===cpw&&cpw.length>0);
 }
 </script>
 </body>
 </html>`;
+};
 
 const successPage = () => `<!DOCTYPE html>
 <html lang="en">

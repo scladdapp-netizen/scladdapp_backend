@@ -35,4 +35,10 @@ router.patch("/:schoolId/profile", upload.single("school_logo"), async (req, res
 router.get("/:schoolId/bio",   ctrl.getBio);
 router.patch("/:schoolId/bio", ctrl.updateBio);
 
+// School website
+router.get("/:schoolId/website",             ctrl.getWebsite);
+router.patch("/:schoolId/website",           ctrl.updateWebsite);
+router.post("/:schoolId/website/request",    ctrl.requestWebsite);
+router.delete("/:schoolId/website/request",  ctrl.cancelWebsiteRequest);
+
 module.exports = router;

@@ -44,6 +44,8 @@ const combinedTemplateSchema = new mongoose.Schema(
     grade_display: { type: String, default: null },
     behavioral_traits: { type: [String], default: [] },
     styling: { type: stylingSchema, default: null },
+    html_template: { type: String, default: null },
+    html_template_draft: { type: String, default: null },
     created_by: { type: String, default: null },
     last_modified: { type: Date, default: Date.now },
     modified_by: { type: String, default: null },

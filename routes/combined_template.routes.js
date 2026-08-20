@@ -95,4 +95,21 @@ router.patch("/:templateId/status", (req, res, next) => {
   ctrl.updateTemplateStatus(req, res, next);
 });
 
+// Auto-save draft — no validation, no publish side effects
+router.patch("/:templateId/html-draft", ctrl.saveDraft);
+
+// Publish draft → html_template
+router.post("/:templateId/publish-draft", (req, res, next) => {
+  const template = readTemplate(req.params.templateId);
+  const originalJson = res.json.bind(res);
+  res.json = (body) => {
+    if (body?.success) {
+      logActivity(req.body.modified_by || "system", template?.school_id, "PUBLISH_TEMPLATE_DRAFT", "Grading Template",
+        `Published HTML draft for template "${template?.name}"`, "success", "admin");
+    }
+    return originalJson(body);
+  };
+  ctrl.publishDraft(req, res, next);
+});
+
 module.exports = router;

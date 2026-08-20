@@ -16,6 +16,9 @@ const announcementTemplateSchema = new mongoose.Schema(
     // stored as JSON strings in the original data
     channels: { type: String, default: "[]" },
     placeholders: { type: String, default: "[]" },
+    // HTML email layout template (top + bottom wrapper around content)
+    html_template:       { type: String, default: null },
+    html_template_draft: { type: String, default: null },
   },
   { timestamps: { createdAt: "created_at", updatedAt: false } }
 );

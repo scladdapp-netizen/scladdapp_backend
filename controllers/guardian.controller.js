@@ -1,6 +1,57 @@
 const StudentGuardian = require("../models/StudentGuardian.model");
 const Student = require("../models/Student.model");
 
+/**
+ * Get guardians for all students in a school.
+ * Primary guardian logic:
+ *   - If a student has at least one primary guardian → return only primary guardians.
+ *   - If a student has NO primary guardian → return all of their guardians.
+ * Each guardian is enriched with student_name from the Student collection.
+ */
+const getGuardiansBySchoolId = async (schoolId) => {
+  try {
+    // 1. Fetch all students in this school
+    const students = await Student.find({ school_id: schoolId }).lean();
+    if (!students.length) return { success: true, data: [], message: "No students found" };
+
+    const studentIds = students.map((s) => s.student_id);
+
+    // Build a quick id→name map
+    const studentNameMap = {};
+    students.forEach((s) => { studentNameMap[s.student_id] = s.full_name || s.student_id; });
+
+    // 2. Fetch all active guardians for those students
+    const allGuardians = await StudentGuardian.find({
+      student_id: { $in: studentIds },
+      is_active: true,
+    }).lean();
+
+    // 3. Group by student
+    const byStudent = {};
+    allGuardians.forEach((g) => {
+      if (!byStudent[g.student_id]) byStudent[g.student_id] = [];
+      byStudent[g.student_id].push(g);
+    });
+
+    // 4. Apply primary-guardian logic per student
+    const result = [];
+    Object.entries(byStudent).forEach(([sid, guardians]) => {
+      const primaries = guardians.filter((g) => g.is_primary);
+      const chosen = primaries.length > 0 ? primaries : guardians;
+      chosen.forEach((g) => {
+        result.push({
+          ...g,
+          student_name: studentNameMap[sid] || sid,
+        });
+      });
+    });
+
+    return { success: true, data: result, message: "School guardians retrieved successfully" };
+  } catch (error) {
+    return { success: false, error: "Get school guardians failed", message: error.message };
+  }
+};
+
 const createGuardian = async (guardianData) => {
   try {
     if (!guardianData.student_id || !guardianData.guardian_name || !guardianData.guardian_phone) {
@@ -94,4 +145,4 @@ const setPrimaryGuardian = async (guardianId, studentId) => {
   }
 };
 
-module.exports = { createGuardian, getGuardianById, getGuardiansByStudentId, updateGuardian, deleteGuardian, setPrimaryGuardian };
+module.exports = { createGuardian, getGuardianById, getGuardiansByStudentId, getGuardiansBySchoolId, updateGuardian, deleteGuardian, setPrimaryGuardian };

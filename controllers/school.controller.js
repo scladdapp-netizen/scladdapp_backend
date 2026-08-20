@@ -53,6 +53,51 @@ exports.updateBio = async (req, res) => {
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 };
 
+// ── Website ────────────────────────────────────────────────────────────────
+
+exports.getWebsite = async (req, res) => {
+  try {
+    const school = await School.findOne({ school_id: req.params.schoolId })
+      .select("school_id school_name website website_requested logo_url")
+      .lean();
+    if (!school) return res.status(404).json({ success: false, message: "School not found" });
+    res.json({ success: true, data: school });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};
+
+exports.updateWebsite = async (req, res) => {
+  try {
+    const school = await School.findOne({ school_id: req.params.schoolId });
+    if (!school) return res.status(404).json({ success: false, message: "School not found" });
+    if (req.body.website !== undefined) school.website = req.body.website || null;
+    school.updated_at = new Date();
+    await school.save();
+    res.json({ success: true, data: { website: school.website }, message: "Website saved" });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};
+
+exports.requestWebsite = async (req, res) => {
+  try {
+    const school = await School.findOne({ school_id: req.params.schoolId });
+    if (!school) return res.status(404).json({ success: false, message: "School not found" });
+    school.website_requested = true;
+    school.updated_at = new Date();
+    await school.save();
+    res.json({ success: true, message: "Website request submitted. We'll be in touch soon!" });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};
+
+exports.cancelWebsiteRequest = async (req, res) => {
+  try {
+    const school = await School.findOne({ school_id: req.params.schoolId });
+    if (!school) return res.status(404).json({ success: false, message: "School not found" });
+    school.website_requested = false;
+    school.updated_at = new Date();
+    await school.save();
+    res.json({ success: true, message: "Website request cancelled." });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};
+
 exports.getStats = async (req, res) => {
   try {
     const { schoolId } = req.params;

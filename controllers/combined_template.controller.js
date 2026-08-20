@@ -40,6 +40,7 @@ exports.createTemplate = async (req, res) => {
       total_weight:     totalWeight,
       behavioral_traits: behavioral_traits || [],
       styling:          styling || { theme_id: "", theme_name: "", primaryColor: "#3b82f6" },
+      html_template:    req.body.html_template || null,
       created_by:       req.body.created_by || null,
       last_modified:    new Date(),
       modified_by:      req.body.created_by || null,
@@ -116,6 +117,7 @@ exports.updateTemplate = async (req, res) => {
     if (grading_scheme !== undefined)       template.grading_scheme   = grading_scheme;
     if (behavioral_traits !== undefined)    template.behavioral_traits = behavioral_traits;
     if (styling !== undefined)              template.styling          = styling;
+    if (req.body.html_template !== undefined) template.html_template  = req.body.html_template;
     template.total_weight  = totalWeight;
     template.last_modified = new Date();
     template.modified_by   = req.body.modified_by || template.modified_by;
@@ -124,6 +126,48 @@ exports.updateTemplate = async (req, res) => {
     res.json({ success: true, message: "Template updated successfully", data: template });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to update template", error: error.message });
+  }
+};
+
+// PATCH /grading-template/:templateId/html-draft
+// Auto-save: persist editor changes to html_template_draft without touching
+// the published html_template or triggering full validation.
+exports.saveDraft = async (req, res) => {
+  try {
+    const template = await CombinedTemplate.findOne({ template_id: req.params.templateId });
+    if (!template) return res.status(404).json({ success: false, message: "Template not found" });
+
+    template.html_template_draft = req.body.html_template_draft ?? template.html_template_draft;
+    template.last_modified = new Date();
+    template.modified_by   = req.body.modified_by || template.modified_by;
+    await template.save();
+
+    res.json({ success: true, message: "Draft saved", data: { html_template_draft: template.html_template_draft } });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to save draft", error: error.message });
+  }
+};
+
+// POST /grading-template/:templateId/publish-draft
+// Copies html_template_draft → html_template and clears the draft.
+exports.publishDraft = async (req, res) => {
+  try {
+    const template = await CombinedTemplate.findOne({ template_id: req.params.templateId });
+    if (!template) return res.status(404).json({ success: false, message: "Template not found" });
+
+    if (!template.html_template_draft) {
+      return res.status(400).json({ success: false, message: "No draft to publish" });
+    }
+
+    template.html_template       = template.html_template_draft;
+    template.html_template_draft = null;
+    template.last_modified       = new Date();
+    template.modified_by         = req.body.modified_by || template.modified_by;
+    await template.save();
+
+    res.json({ success: true, message: "Draft published", data: template });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to publish draft", error: error.message });
   }
 };
 

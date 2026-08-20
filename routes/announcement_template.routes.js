@@ -1,6 +1,10 @@
 const router = require("express").Router();
+const multer = require("multer");
 const announcementTemplateController = require("../controllers/announcement_template.controller");
 const { logActivity } = require("../controllers/staff_activity.controller");
+const { uploadToCloudinary } = require("../utils/cloudinary");
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 const readTemplate = (templateId) => {
   const { readData } = require("../utils/file");
@@ -80,6 +84,29 @@ router.patch("/:templateId/status", (req, res, next) => {
     return originalJson(body);
   };
   announcementTemplateController.updateTemplateStatus(req, res, next);
+});
+
+// Save HTML draft
+router.patch("/:templateId/html-draft", announcementTemplateController.saveHtmlDraft);
+
+// Publish HTML draft → html_template
+router.post("/:templateId/publish-draft", announcementTemplateController.publishHtmlDraft);
+
+// Upload an image to Cloudinary (for the email layout editor)
+router.post("/upload-image", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: "No image file provided" });
+    const { url, public_id } = await uploadToCloudinary(
+      req.file.buffer,
+      "scladapp/announcement_templates",
+      "image",
+      req.file.originalname
+    );
+    res.json({ success: true, url, public_id });
+  } catch (err) {
+    console.error("Upload image error:", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 module.exports = router;

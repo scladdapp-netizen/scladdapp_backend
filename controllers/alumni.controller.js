@@ -92,6 +92,7 @@ const getAlumniById = async (alumniId) => {
         student_name:     student?.full_name || null,
         gender:           student?.gender || null,
         admission_number: student?.admission_number || null,
+        student_photo:    student?.student_photo || null,
       },
       message: "Alumni retrieved successfully",
     };

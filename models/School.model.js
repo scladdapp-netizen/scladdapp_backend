@@ -12,6 +12,8 @@ const schoolSchema = new mongoose.Schema(
     email: { type: String, default: null },
     logo_url: { type: mongoose.Schema.Types.Mixed, default: null }, // can be string or object
     bio: { type: String, default: null },
+    website: { type: String, default: null },           // school's own website URL
+    website_requested: { type: Boolean, default: false }, // requested a Scladapp-hosted site
     is_active: { type: Boolean, default: true },
     created_by: { type: String, default: null },
     updated_at: { type: Date, default: Date.now },

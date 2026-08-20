@@ -23,6 +23,40 @@ const validate = (data) => {
   return errors;
 };
 
+/**
+ * Generates a default email HTML layout for announcement templates.
+ * The {{announcement_content}} placeholder marks the locked body zone.
+ */
+const generateDefaultAnnouncementHtml = ({ name = "", subject = "", schoolName = "" } = {}) => `
+<div data-hle-id="email-root" style="max-width:600px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
+
+  <!-- HEADER — editable -->
+  <div data-hle-id="email-header" style="background:#111111;padding:24px 32px;text-align:center">
+    <p data-hle-id="email-school-name" style="margin:0;font-size:18px;font-weight:800;color:#ffffff;text-transform:uppercase;letter-spacing:1px">${schoolName || "{{school_name}}"}</p>
+    <p data-hle-id="email-tagline" style="margin:6px 0 0;font-size:12px;color:#9ca3af;letter-spacing:0.5px">Official School Communication</p>
+  </div>
+
+  <!-- SUBJECT BANNER — editable -->
+  <div data-hle-id="email-subject-banner" style="background:#f9fafb;padding:16px 32px;border-bottom:1px solid #e5e7eb">
+    <p data-hle-id="email-subject-label" style="margin:0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af">Subject</p>
+    <p data-hle-id="email-subject-text" style="margin:4px 0 0;font-size:15px;font-weight:600;color:#111111">{{subject}}</p>
+  </div>
+
+  <!-- ANNOUNCEMENT CONTENT — LOCKED, do not edit -->
+  <div data-hle-id="email-content-locked" data-locked="true" style="padding:28px 32px;background:#ffffff;border-bottom:1px solid #e5e7eb">
+    {{announcement_content}}
+  </div>
+
+  <!-- FOOTER — editable -->
+  <div data-hle-id="email-footer" style="background:#f9fafb;padding:20px 32px;text-align:center">
+    <p data-hle-id="email-footer-regards" style="margin:0 0 6px;font-size:13px;color:#374151;font-weight:600">Warm regards,</p>
+    <p data-hle-id="email-footer-school" style="margin:0 0 12px;font-size:13px;color:#374151">${schoolName || "{{school_name}}"} Administration</p>
+    <div data-hle-id="email-footer-divider" style="height:1px;background:#e5e7eb;margin:12px 0"></div>
+    <p data-hle-id="email-footer-notice" style="margin:0;font-size:10px;color:#9ca3af;line-height:1.6">This is an official communication from ${schoolName || "{{school_name}}"}.<br/>Please do not reply to this email directly.</p>
+  </div>
+
+</div>`.trim();
+
 // POST /announcement-template
 exports.createAnnouncementTemplate = async (req, res) => {
   try {
@@ -32,6 +66,20 @@ exports.createAnnouncementTemplate = async (req, res) => {
 
     const errors = validate(req.body);
     if (errors.length) return res.status(400).json({ success: false, message: "Validation failed", errors });
+
+    // Look up school name for the default HTML template
+    let schoolName = "";
+    try {
+      const School = require("../models/School.model");
+      const school = await School.findOne({ school_id }).lean();
+      schoolName = school?.school_name || "";
+    } catch (_) {}
+
+    const defaultHtml = generateDefaultAnnouncementHtml({
+      name:       name.trim(),
+      subject:    subject.trim(),
+      schoolName,
+    });
 
     const template = await AnnouncementTemplate.create({
       template_id:   Date.now().toString(),
@@ -47,6 +95,7 @@ exports.createAnnouncementTemplate = async (req, res) => {
       modified_by:   created_by || null,
       channels:      JSON.stringify(channels || []),
       placeholders:  JSON.stringify(placeholders || []),
+      html_template: defaultHtml,
     });
 
     console.log("Announcement template created:", template.template_id);
@@ -167,6 +216,51 @@ exports.duplicateAnnouncementTemplate = async (req, res) => {
   } catch (error) {
     console.error("Duplicate announcement template error:", error);
     res.status(500).json({ success: false, message: "Failed to duplicate announcement template", error: error.message });
+  }
+};
+
+// PATCH /announcement-template/:templateId/html-draft
+exports.saveHtmlDraft = async (req, res) => {
+  try {
+    const { templateId } = req.params;
+    const { html_template_draft } = req.body;
+    if (!templateId) return res.status(400).json({ success: false, message: "Template ID is required" });
+
+    const template = await AnnouncementTemplate.findOne({ template_id: templateId });
+    if (!template) return res.status(404).json({ success: false, message: "Announcement template not found" });
+
+    template.html_template_draft = html_template_draft || null;
+    template.last_modified = new Date();
+    await template.save();
+
+    res.json({ success: true, message: "Draft saved", data: template });
+  } catch (error) {
+    console.error("Save html draft error:", error);
+    res.status(500).json({ success: false, message: "Failed to save draft", error: error.message });
+  }
+};
+
+// POST /announcement-template/:templateId/publish-draft
+exports.publishHtmlDraft = async (req, res) => {
+  try {
+    const { templateId } = req.params;
+    if (!templateId) return res.status(400).json({ success: false, message: "Template ID is required" });
+
+    const template = await AnnouncementTemplate.findOne({ template_id: templateId });
+    if (!template) return res.status(404).json({ success: false, message: "Announcement template not found" });
+
+    if (template.html_template_draft) {
+      template.html_template = template.html_template_draft;
+      template.html_template_draft = null;
+    }
+    template.last_modified = new Date();
+    template.modified_by = req.body.modified_by || template.modified_by;
+    await template.save();
+
+    res.json({ success: true, message: "Template published", data: template });
+  } catch (error) {
+    console.error("Publish html draft error:", error);
+    res.status(500).json({ success: false, message: "Failed to publish draft", error: error.message });
   }
 };
 

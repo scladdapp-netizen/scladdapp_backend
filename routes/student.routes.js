@@ -18,9 +18,10 @@ const {
 } = require("../controllers/student.controller.paginated");
 const { logActivity } = require("../controllers/staff_activity.controller");
 const { uploadToCloudinary } = require("../utils/cloudinary");
-const { sendEmail } = require("../utils/sendEmail");
+const { sendEmailFromTemplate } = require("../utils/sendEmail");
 const PasswordResetToken = require("../models/PasswordResetToken.model");
 const User = require("../models/User.model");
+const School = require("../models/School.model");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -76,86 +77,25 @@ router.post("/", upload.single("profile_photo"), async (req, res) => {
 
     const setPasswordUrl = `${process.env.APP_URL}/set-password?token=${token}`;
 
-    // Send invite email
-    try {
-      await sendEmail({
-        to:      body.email,
-      subject: "Welcome to ScladApp — Set your password",
-      html: `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Welcome to ScladApp</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;padding:40px 20px}
-.wrap{max-width:520px;margin:0 auto;position:relative}
-.wrap::before{content:"";position:absolute;width:160px;height:160px;border-radius:50%;border:20px solid rgba(0,0,0,0.04);top:-50px;right:-40px;pointer-events:none}
-.wrap::after{content:"";position:absolute;width:60px;height:60px;border-radius:10px;border:2px solid rgba(0,0,0,0.05);bottom:20px;right:50px;transform:rotate(22deg);pointer-events:none}
-.dc{position:absolute;width:100px;height:100px;border-radius:50%;border:12px solid rgba(0,0,0,0.03);bottom:-30px;left:-20px;pointer-events:none}
-.db{position:absolute;width:36px;height:36px;border-radius:7px;border:1.5px solid rgba(0,0,0,0.06);top:16px;left:160px;transform:rotate(14deg);pointer-events:none}
-.card{position:relative;z-index:1;background:#fff;border-radius:16px;padding:40px 36px;border:1px solid #e8e8e8;overflow:hidden}
-.card::before{content:"";position:absolute;width:110px;height:110px;border-radius:50%;border:14px solid rgba(0,0,0,0.03);top:-35px;right:-25px;pointer-events:none}
-.icon-wrap{width:48px;height:48px;border-radius:12px;background:#111;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
-.brand{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#888;margin-bottom:8px}
-h1{font-size:22px;font-weight:800;color:#111;letter-spacing:-.03em;line-height:1.15;margin-bottom:12px}
-p{font-size:14px;color:#666;line-height:1.6;margin-bottom:0}
-.name-tag{display:inline-block;background:#111;color:#fff;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:16px;letter-spacing:.02em}
-.btn-wrap{margin:28px 0}
-.btn{display:inline-block;padding:13px 32px;background:#111;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700;letter-spacing:.02em}
-.divider{height:1px;background:#e8e8e8;margin:24px 0}
-.note{font-size:12px;color:#bbb;line-height:1.5}
-.detail-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f5f5f5;border-radius:10px;margin-bottom:10px}
-.detail-icon{width:32px;height:32px;border-radius:8px;background:#111;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.detail-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#888;margin-bottom:2px}
-.detail-val{font-size:13px;font-weight:600;color:#111}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <span class="dc"></span><span class="db"></span>
-  <div class="card">
-    <div class="icon-wrap">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-    </div>
-    <div class="brand">ScladApp</div>
-    <div class="name-tag">Welcome, ${body.fullName}</div>
-    <h1>Your student account is ready</h1>
-    <p>You've been enrolled at your school on ScladApp. Click the button below to set your password and activate your account.</p>
-    <div class="btn-wrap">
-      <a href="${setPasswordUrl}" class="btn">Set My Password &rarr;</a>
-    </div>
-    <div class="detail-row">
-      <div class="detail-icon">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-      </div>
-      <div>
-        <div class="detail-label">Email</div>
-        <div class="detail-val">${body.email}</div>
-      </div>
-    </div>
-    <div class="detail-row">
-      <div class="detail-icon">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      </div>
-      <div>
-        <div class="detail-label">Link expires</div>
-        <div class="detail-val">48 hours from now</div>
-      </div>
-    </div>
-    <div class="divider"></div>
-    <p class="note">If you didn't expect this email, you can safely ignore it. This link can only be used once.</p>
-    <p class="note" style="margin-top:8px">ScladApp &nbsp;·&nbsp; School Management Platform</p>
-  </div>
-</div>
-</body>
-</html>`,
-      });
-      console.log(`Student invite email sent to ${body.email}`);
-    } catch (emailErr) {
-      console.error("Failed to send student invite email:", emailErr.message);
-    }
+    // Fetch school info for the invite email (non-blocking)
+    const school = await School.findOne({ school_id: body.school_id }).lean().catch(() => null);
+    const schoolLogoRaw = school?.logo_url;
+    const schoolLogo = typeof schoolLogoRaw === "string"
+      ? schoolLogoRaw
+      : schoolLogoRaw?.url || schoolLogoRaw?.secure_url || "";
+
+    // Send invite email (non-blocking)
+    sendEmailFromTemplate(
+      "student_invite",
+      {
+        fullName:     body.fullName,
+        setPasswordUrl,
+        schoolName:   school?.school_name || "Your School",
+        schoolSlogan: school?.motto       || "",
+        schoolLogo,
+      },
+      { to: body.email, displayName: school?.school_name || "ScladApp" }
+    ).catch((err) => console.error("Failed to send student invite email:", err.message));
 
     logActivity(
       body.created_by || "system",
@@ -316,6 +256,63 @@ router.post("/:studentId/enroll", async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ success: false, error: "Server error", message: error.message });
+  }
+});
+
+// POST /student/:studentId/resend-invite — regenerate token and resend password setup email
+router.post("/:studentId/resend-invite", async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const Student = require("../models/Student.model");
+
+    const student = await Student.findOne({ student_id: studentId }).lean();
+    if (!student) return res.status(404).json({ success: false, message: "Student not found" });
+    if (!student.email) return res.status(400).json({ success: false, message: "Student has no email address" });
+
+    // Invalidate existing unused tokens
+    await PasswordResetToken.updateMany(
+      { user_id: studentId, user_type: "student", used: false },
+      { $set: { used: true } }
+    );
+
+    // Generate new token (48h)
+    const token     = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
+
+    await PasswordResetToken.create({
+      token,
+      user_id:   studentId,
+      user_type: "student",
+      email:     student.email,
+      expires_at: expiresAt,
+    });
+
+    const setPasswordUrl = `${process.env.APP_URL}/set-password?token=${token}`;
+
+    // Fetch school info for the invite email
+    const school = await School.findOne({ school_id: student.school_id }).lean().catch(() => null);
+    const schoolLogoRaw = school?.logo_url;
+    const schoolLogo = typeof schoolLogoRaw === "string"
+      ? schoolLogoRaw
+      : schoolLogoRaw?.url || schoolLogoRaw?.secure_url || "";
+
+    // Send invite email (non-blocking)
+    sendEmailFromTemplate(
+      "student_invite",
+      {
+        fullName:     student.full_name,
+        setPasswordUrl,
+        schoolName:   school?.school_name || "Your School",
+        schoolSlogan: school?.motto       || "",
+        schoolLogo,
+      },
+      { to: student.email, displayName: school?.school_name || "ScladApp" }
+    ).catch((err) => console.error("Failed to send student resend invite email:", err.message));
+
+    return res.json({ success: true, message: `Invite link sent to ${student.email}` });
+  } catch (error) {
+    console.error("Student resend invite error:", error);
+    return res.status(500).json({ success: false, message: error.message || "Failed to resend invite" });
   }
 });
 
