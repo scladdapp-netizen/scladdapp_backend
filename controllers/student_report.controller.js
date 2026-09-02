@@ -12,6 +12,9 @@ const Student = require("../models/Student.model");
 const School = require("../models/School.model");
 const Session = require("../models/Session.model");
 const Class = require("../models/Class.model");
+const StudentGuardian = require("../models/StudentGuardian.model");
+const { queueEmail, getEmailQuota } = require("../utils/emailQueue");
+const jwt = require("jsonwebtoken");
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -309,6 +312,7 @@ const getStudentsWithReportCardsBySubsession = async (subsessionId, params = {})
         class_name:       a.class_name || "N/A",
         has_report:       !!reportCard,
         is_published:     reportCard?.is_published ?? null,
+        email:            student?.email || null,
         report_card_id:   reportCard?.report_card_id || null,
         teacher_remark:   reportCard?.teacher_remark || null,
         principal_remark: reportCard?.principal_remark || null,
@@ -637,10 +641,251 @@ const getScoresBySubjectSubsession = async (subjectId, subsessionId, params = {}
   }
 };
 
+// ── Email: send published result ─────────────────────────────────────────────
+const REPORT_PDF_TOKEN_PURPOSE = "report_pdf_download";
+
+const createReportPdfDownloadToken = (studentId, subsessionId, schoolId) =>
+  jwt.sign(
+    {
+      purpose: REPORT_PDF_TOKEN_PURPOSE,
+      student_id: studentId,
+      subsession_id: subsessionId,
+      school_id: schoolId,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "90d" }
+  );
+
+const getReportDownloadPayload = async (token) => {
+  try {
+    if (!token) return { success: false, message: "Download token is required" };
+
+    let payload;
+    try {
+      payload = jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+      return { success: false, message: "This download link is invalid or has expired" };
+    }
+
+    if (payload?.purpose !== REPORT_PDF_TOKEN_PURPOSE) {
+      return { success: false, message: "Invalid download token" };
+    }
+
+    const studentId = payload.student_id;
+    const subsessionId = payload.subsession_id;
+    if (!studentId || !subsessionId) {
+      return { success: false, message: "Invalid download token payload" };
+    }
+
+    const reportCard = await StudentReportCard.findOne({
+      student_id: studentId,
+      subsession_id: subsessionId,
+    }).lean();
+    if (!reportCard) return { success: false, message: "Report card not found" };
+    if (!reportCard.is_published) {
+      return { success: false, message: "This report is no longer published" };
+    }
+
+    const preview = await getPreviewData(studentId, subsessionId);
+    if (!preview?.success) {
+      return { success: false, message: preview?.message || "Failed to load report data" };
+    }
+
+    let schoolDoc = null;
+    if (payload.school_id) {
+      schoolDoc = await School.findOne({ school_id: payload.school_id }).lean();
+    }
+    if (!schoolDoc) {
+      const subsession = await Subsession.findOne({ term_id: subsessionId }).lean();
+      if (subsession?.school_id) {
+        schoolDoc = await School.findOne({ school_id: subsession.school_id }).lean();
+      }
+    }
+
+    const student = preview.data.student;
+    return {
+      success: true,
+      data: {
+        student,
+        template: preview.data.template,
+        school: {
+          school_id: schoolDoc?.school_id || payload.school_id || null,
+          school_name: schoolDoc?.school_name || student?.schoolName || "School",
+          address: schoolDoc?.address || student?.schoolAddress || "",
+          phone_number: schoolDoc?.phone_number || student?.schoolPhone || "",
+          email: schoolDoc?.email || student?.schoolEmail || "",
+          logo_url: schoolDoc?.logo_url || student?.schoolLogo || null,
+        },
+        report_card: {
+          teacher_remark: reportCard.teacher_remark || "",
+          principal_remark: reportCard.principal_remark || "",
+          is_published: true,
+        },
+      },
+    };
+  } catch (err) {
+    console.error("getReportDownloadPayload error:", err);
+    return { success: false, message: err.message || "Failed to load download data" };
+  }
+};
+
+const buildResultEmailHtml = ({
+  studentName,
+  sessionName,
+  termName,
+  downloadUrl,
+  loginUrl,
+}) => `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>Academic Result</title></head>
+<body style="margin:0;padding:32px 16px;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#111">
+  <div style="max-width:520px;margin:0 auto;background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:28px 24px">
+    <p style="font-size:16px;font-weight:700;margin:0 0 8px;line-height:1.3">Hello ${studentName || "Student"},</p>
+    <p style="font-size:14px;color:#555;line-height:1.6;margin:0 0 22px">
+      Your academic result for <strong>${termName || "this term"}</strong>
+      (${sessionName || "current session"}) is now available on ScladApp.
+    </p>
+    <p style="margin:0 0 12px">
+      <a href="${downloadUrl}" style="display:inline-block;padding:13px 22px;background:#111;color:#fff;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700">Download Report PDF &rarr;</a>
+    </p>
+    ${loginUrl ? `<p style="margin:0"><a href="${loginUrl}" style="display:inline-block;padding:12px 22px;background:#fff;color:#111;border:1px solid #111;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700">View Dashboard &rarr;</a></p>` : ""}
+  </div>
+</body></html>`;
+
+const resolveRecipientEmail = async (student) => {
+  if (student?.email && String(student.email).includes("@")) {
+    return { email: student.email.trim().toLowerCase(), source: "student" };
+  }
+  const guardians = await StudentGuardian.find({ student_id: student.student_id }).lean();
+  const primary = guardians.find((g) => g.is_primary) || guardians[0];
+  if (primary?.guardian_email && String(primary.guardian_email).includes("@")) {
+    return { email: primary.guardian_email.trim().toLowerCase(), source: "guardian" };
+  }
+  return null;
+};
+
+const sendReportResultEmail = async (studentId, subsessionId) => {
+  try {
+    const subsession = await Subsession.findOne({ term_id: subsessionId }).lean();
+    if (!subsession) return { success: false, message: "Subsession not found" };
+
+    const reportCard = await StudentReportCard.findOne({ student_id: studentId, subsession_id: subsessionId }).lean();
+    if (!reportCard) return { success: false, message: "Report card not found", code: "no_report" };
+    if (!reportCard.is_published) {
+      return { success: false, message: "Report card is not published", code: "not_published" };
+    }
+
+    const [student, school, session] = await Promise.all([
+      Student.findOne({ student_id: studentId }).lean(),
+      School.findOne({ school_id: subsession.school_id }).lean(),
+      Session.findOne({ session_id: subsession.session_id }).lean(),
+    ]);
+    if (!student) return { success: false, message: "Student not found" };
+
+    const recipient = await resolveRecipientEmail(student);
+    if (!recipient) {
+      return { success: false, message: "No email address found for student or guardian", code: "no_email" };
+    }
+
+    const frontendBase = String(
+      process.env.FRONTEND_URL || process.env.APP_URL || "http://localhost:5174"
+    ).replace(/\/$/, "");
+    const schoolId = school?.school_id || subsession.school_id;
+    const loginUrl = `${frontendBase}/school/${schoolId}/login`;
+    const schoolName = school?.school_name || "School";
+
+    const downloadToken = createReportPdfDownloadToken(studentId, subsessionId, schoolId);
+    const downloadUrl = `${frontendBase}/report-download?token=${encodeURIComponent(downloadToken)}`;
+
+    const html = buildResultEmailHtml({
+      studentName: student.full_name,
+      sessionName: session?.session_name || "—",
+      termName: subsession.term_name || "—",
+      downloadUrl,
+      loginUrl,
+    });
+
+    const result = await queueEmail({
+      to: recipient.email,
+      subject: `${schoolName} — ${subsession.term_name || "Term"} result for ${student.full_name}`,
+      html,
+      displayName: schoolName,
+      replyTo: school?.email || undefined,
+    });
+
+    return {
+      success: true,
+      data: {
+        student_id: studentId,
+        email: recipient.email,
+        recipient_source: recipient.source,
+        sent: !!result.sent,
+        queued: !!result.queued,
+        quota: getEmailQuota(),
+        download_url: downloadUrl,
+      },
+      message: result.sent
+        ? "Result email sent successfully"
+        : "Daily email limit reached — result email was queued and will send later",
+    };
+  } catch (err) {
+    console.error("sendReportResultEmail error:", err);
+    return { success: false, message: err.message || "Failed to send result email" };
+  }
+};
+
+const sendReportResultEmailsBulk = async (subsessionId, studentIds = []) => {
+  try {
+    if (!Array.isArray(studentIds) || studentIds.length === 0) {
+      return { success: false, message: "student_ids array is required" };
+    }
+
+    const summary = {
+      sent: 0,
+      queued: 0,
+      skipped_not_published: 0,
+      skipped_no_report: 0,
+      skipped_no_email: 0,
+      failed: 0,
+      results: [],
+    };
+
+    for (const studentId of studentIds) {
+      const res = await sendReportResultEmail(studentId, subsessionId);
+      if (res.success) {
+        if (res.data?.sent) summary.sent++;
+        else if (res.data?.queued) summary.queued++;
+        summary.results.push({ student_id: studentId, status: res.data?.sent ? "sent" : "queued", email: res.data?.email });
+      } else if (res.code === "not_published") {
+        summary.skipped_not_published++;
+        summary.results.push({ student_id: studentId, status: "skipped_not_published" });
+      } else if (res.code === "no_report") {
+        summary.skipped_no_report++;
+        summary.results.push({ student_id: studentId, status: "skipped_no_report" });
+      } else if (res.code === "no_email") {
+        summary.skipped_no_email++;
+        summary.results.push({ student_id: studentId, status: "skipped_no_email" });
+      } else {
+        summary.failed++;
+        summary.results.push({ student_id: studentId, status: "failed", message: res.message });
+      }
+    }
+
+    summary.quota = getEmailQuota();
+    return {
+      success: true,
+      data: summary,
+      message: `Sent ${summary.sent}, queued ${summary.queued}. Skipped ${summary.skipped_not_published} not published, ${summary.skipped_no_email} without email.`,
+    };
+  } catch (err) {
+    return { success: false, message: err.message || "Failed to send result emails" };
+  }
+};
+
 module.exports = {
   getScoresByStudentSubsession, getSubjectPositions, getClassAverage,
   generateReport, getReport, getReportsByStudent, updateComments,
   updateSubjectScore, addSubjectScore, deleteReport,
   getReportCard, getStudentsWithReportCardsBySubsession, saveReportCard,
   getPreviewData, getScoresBySubjectSubsession,
+  sendReportResultEmail, sendReportResultEmailsBulk, getEmailQuota,
+  getReportDownloadPayload,
 };

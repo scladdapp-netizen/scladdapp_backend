@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 /**
  * AIConfig — stores OpenRouter API keys and model settings.
- * One document per "use" (website_editor | timetable_generator).
+ * One document per "use" (website_editor | timetable_generator | both).
  * Only one active config per use is enforced in the route logic.
  *
  * The apiKey is stored as-is. In production you'd encrypt it at rest,
@@ -19,7 +19,7 @@ const aiConfigSchema = new mongoose.Schema(
     use:         {
       type:     String,
       required: true,
-      enum:     ["website_editor", "timetable_generator"],
+      enum:     ["website_editor", "timetable_generator", "both"],
     },
 
     // OpenRouter API key — NEVER returned to frontend

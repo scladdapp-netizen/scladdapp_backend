@@ -13,6 +13,7 @@
 const express   = require("express");
 const jwt       = require("jsonwebtoken");
 const AIConfig  = require("../models/AIConfig.model");
+const { VALID_USES, conflictingUses } = require("../utils/aiConfigUse");
 
 const router = express.Router();
 
@@ -103,7 +104,7 @@ router.post("/", verifyToken, async (req, res) => {
       });
     }
 
-    const validUses = ["website_editor", "timetable_generator"];
+    const validUses = VALID_USES;
     if (!validUses.includes(use)) {
       return res.status(400).json({
         success: false,
@@ -111,10 +112,13 @@ router.post("/", verifyToken, async (req, res) => {
       });
     }
 
-    // if this new config is active, deactivate others for the same use
+    // if this new config is active, deactivate others that share the same feature(s)
     if (is_active !== false) {
-      await AIConfig.updateMany({ use, is_active: true }, { $set: { is_active: false } });
-      console.log(`${tag} Deactivated existing active configs for use: ${use}`);
+      await AIConfig.updateMany(
+        { use: { $in: conflictingUses(use) }, is_active: true },
+        { $set: { is_active: false } }
+      );
+      console.log(`${tag} Deactivated conflicting active configs for use: ${use}`);
     }
 
     const config = await AIConfig.create({
@@ -161,7 +165,7 @@ router.patch("/:configId", verifyToken, async (req, res) => {
 
     // validate use if changing it
     if (use !== undefined) {
-      const validUses = ["website_editor", "timetable_generator"];
+      const validUses = VALID_USES;
       if (!validUses.includes(use)) {
         return res.status(400).json({
           success: false,
@@ -171,14 +175,14 @@ router.patch("/:configId", verifyToken, async (req, res) => {
       config.use = use;
     }
 
-    // if activating, deactivate other configs for the same use
+    // if activating, deactivate other configs that share the same feature(s)
     if (is_active === true) {
       const targetUse = use || config.use;
       await AIConfig.updateMany(
-        { use: targetUse, is_active: true, config_id: { $ne: configId } },
+        { use: { $in: conflictingUses(targetUse) }, is_active: true, config_id: { $ne: configId } },
         { $set: { is_active: false } }
       );
-      console.log(`${tag} Deactivated other active configs for use: ${targetUse}`);
+      console.log(`${tag} Deactivated conflicting active configs for use: ${targetUse}`);
       config.is_active = true;
     } else if (is_active === false) {
       config.is_active = false;
@@ -312,7 +316,8 @@ module.exports = router;
  * @returns {Promise<import("../models/AIConfig.model")|null>}
  */
 async function getActiveConfig(use) {
-  return AIConfig.findOne({ use, is_active: true });
+  const { usesForFeature } = require("../utils/aiConfigUse");
+  return AIConfig.findOne({ use: usesForFeature(use), is_active: true });
 }
 
 module.exports.getActiveConfig = getActiveConfig;

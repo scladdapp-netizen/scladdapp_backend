@@ -17,6 +17,7 @@ const app = express();
 // Middlewares
 app.use(cors()); // allow frontend requests
 app.use(express.json({ limit: "50mb" })); // parse JSON body
+app.use(require("./middleware/blockExpiredSubscriptionWrites").blockExpiredSubscriptionWrites);
 
 // Routes
 app.use("/setup", require("./routes/setup.routes"));
@@ -80,9 +81,11 @@ app.use("/api/bills", require("./routes/bill.routes"));
 app.use("/api/transactions", require("./routes/transaction.routes"));
 app.use("/api/alumni-certificates", require("./routes/alumni_certificate.routes"));
 app.use("/api/subscription", require("./routes/subscription.routes"));
+app.use("/api/plans", require("./routes/plans.routes"));
 app.use("/api/school-resources", require("./routes/school_resource.routes"));
 app.use("/api/school-gallery", require("./routes/school_gallery.routes"));
 app.use("/api/schools", require("./routes/school.routes"));
+app.use("/api/schools/:schoolId/application-form", require("./routes/applicationForm.routes"));
 app.use("/api/schools", require("./routes/websiteRequest.routes"));
 app.use("/api/schools", require("./routes/aiWebsiteEdit.routes"));
 app.use("/api/schools", require("./routes/aiTokenPurchase.routes"));
@@ -90,6 +93,7 @@ app.use("/api/ai-timetable", require("./routes/ai_timetable.routes"));
 app.use("/api/ai-config",    require("./routes/ai_config.routes"));
 app.use("/api/website-templates", require("./routes/websiteTemplate.routes"));
 app.use("/api/contact", require("./routes/contact.routes"));
+app.use("/api/docs", require("./routes/docs.routes"));
 app.use("/api/otp", require("./routes/otp.routes"));
 app.use("/api/gmail", require("./routes/gmail_auth.routes"));
 

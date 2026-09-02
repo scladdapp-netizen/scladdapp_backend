@@ -1,6 +1,9 @@
 const router = require("express").Router();
-const { generateTimetables } = require("../controllers/ai_timetable.controller");
+const { generateTimetables, getAvailableModels } = require("../controllers/ai_timetable.controller");
 const { logActivity } = require("../controllers/staff_activity.controller");
+
+// GET /api/ai-timetable/models
+router.get("/models", getAvailableModels);
 
 // POST /api/ai-timetable/generate
 router.post("/generate", async (req, res, next) => {

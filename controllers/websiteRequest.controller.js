@@ -192,7 +192,7 @@ exports.publish = async (req, res) => {
     // Update School.website so it appears everywhere website is shown
     await School.updateOne(
       { school_id: schoolId },
-      { $set: { website: siteUrl, updated_at: new Date() } }
+      { $set: { website: siteUrl, website_requested: true, updated_at: new Date() } }
     );
 
     res.json({ success: true, data: doc, message: "Website published.", site_url: siteUrl });

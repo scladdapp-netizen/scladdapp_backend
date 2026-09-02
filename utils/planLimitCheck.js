@@ -1,13 +1,13 @@
 const Subscription = require("../models/Subscription.model");
 const Plan = require("../models/Plan.model");
-const Admission = require("../models/Admission.model");
-const Staff = require("../models/Staff.model");
 const Admin = require("../models/Admin.model");
 
 const getPlan = async (schoolId) => {
+  const now = new Date();
   const activeSub = await Subscription.findOne({
     school_id: schoolId,
     subscription_status: { $in: ["active", "trialing"] },
+    end_date: { $gt: now },
   }).sort({ end_date: -1 });
 
   if (!activeSub) return null;
@@ -15,47 +15,14 @@ const getPlan = async (schoolId) => {
 };
 
 /**
- * Check if school can admit/create a new student.
+ * Student counts are unlimited on all plans.
  */
-const checkStudentLimit = async (schoolId) => {
-  const plan = await getPlan(schoolId);
-  const limit = plan ? parseInt(plan.max_students) : 10;
-
-  const activeStudents = await Admission.distinct("student_id", {
-    school_id: schoolId,
-    active_status: true,
-    is_graduated: { $ne: true },
-  });
-
-  if (activeStudents.length >= limit) {
-    return {
-      allowed: false,
-      message: `Student limit reached. Your ${plan?.plan_name || "current"} plan allows up to ${limit} active students. You currently have ${activeStudents.length}.`,
-    };
-  }
-  return { allowed: true };
-};
+const checkStudentLimit = async () => ({ allowed: true });
 
 /**
- * Check if school can create a new staff member.
+ * Staff counts are unlimited on all plans.
  */
-const checkStaffLimit = async (schoolId) => {
-  const plan = await getPlan(schoolId);
-  const limit = plan ? parseInt(plan.max_staff) : 10;
-
-  const currentStaff = await Staff.countDocuments({
-    school_id: schoolId,
-    is_active: { $ne: false },
-  });
-
-  if (currentStaff >= limit) {
-    return {
-      allowed: false,
-      message: `Staff limit reached. Your ${plan?.plan_name || "current"} plan allows up to ${limit} staff members. You currently have ${currentStaff}.`,
-    };
-  }
-  return { allowed: true };
-};
+const checkStaffLimit = async () => ({ allowed: true });
 
 /**
  * Check if school can promote a new sub-admin.

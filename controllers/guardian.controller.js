@@ -67,6 +67,7 @@ const createGuardian = async (guardianData) => {
       guardian_name:          guardianData.guardian_name,
       guardian_relationship:  guardianData.guardian_relationship || null,
       guardian_phone:         guardianData.guardian_phone,
+      guardian_whatsapp:      guardianData.guardian_whatsapp || null,
       guardian_email:         guardianData.guardian_email || null,
       guardian_address:       guardianData.guardian_address || null,
       guardian_occupation:    guardianData.guardian_occupation || null,
@@ -107,7 +108,7 @@ const updateGuardian = async (guardianId, guardianData) => {
     const guardian = await StudentGuardian.findOne({ guardian_id: guardianId });
     if (!guardian) return { success: false, error: "Guardian not found", message: "Guardian record not found" };
 
-    const fields = ["guardian_name", "guardian_relationship", "guardian_phone", "guardian_email", "guardian_address", "guardian_occupation", "is_primary"];
+    const fields = ["guardian_name", "guardian_relationship", "guardian_phone", "guardian_whatsapp", "guardian_email", "guardian_address", "guardian_occupation", "is_primary"];
     fields.forEach((f) => { if (guardianData[f] !== undefined) guardian[f] = guardianData[f]; });
     guardian.updated_at = new Date();
     await guardian.save();

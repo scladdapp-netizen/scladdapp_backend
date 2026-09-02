@@ -1,0 +1,1453 @@
+[
+  {
+    "section": "Getting Started",
+    "icon": "rocket",
+    "items": [
+      {
+        "id": "quick-start",
+        "title": "Quick Start Guide",
+        "content": "Welcome to Scladapp. This guide walks you through creating your school, verifying your email, choosing a plan, and getting your first academic session running.",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Welcome to Scladapp. This guide walks you through creating your school, verifying your email, choosing a plan, and getting your first academic session running."
+          },
+          {
+            "type": "video",
+            "title": "Quick Start Walkthrough",
+            "youtubeId": "dQw4w9WgXcQ"
+          }
+        ],
+        "steps": [
+          {
+            "step": "Start the setup wizard",
+            "desc": "Click Get Started on the homepage. Enter your school details, admin account, and choose a subscription plan.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Click Get Started on the homepage. Enter your school details, admin account, and choose a subscription plan."
+              },
+              {
+                "type": "image",
+                "url": "https://res.cloudinary.com/dxspjixju/image/upload/v1788176300/scladapp/docs/images/Screenshot_2026-07-29_051900_ak0fbs.png",
+                "alt": "ad",
+                "caption": "ad",
+                "public_id": "scladapp/docs/images/Screenshot_2026-07-29_051900_ak0fbs"
+              }
+            ]
+          },
+          {
+            "step": "Verify your email",
+            "desc": "A one-time code (OTP) is sent to your admin email during setup. Enter it to confirm your address before completing registration.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "A one-time code (OTP) is sent to your admin email during setup. Enter it to confirm your address before completing registration."
+              }
+            ]
+          },
+          {
+            "step": "Complete school setup",
+            "desc": "Upload your school logo (optional), agree to the terms, and finish setup. You are logged in automatically when setup succeeds.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Upload your school logo (optional), agree to the terms, and finish setup. You are logged in automatically when setup succeeds."
+              }
+            ]
+          },
+          {
+            "step": "Add staff and students",
+            "desc": "From the admin dashboard, add staff members, then enroll students manually. There is no bulk CSV import.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "From the admin dashboard, add staff members, then enroll students manually. There is no bulk CSV import."
+              }
+            ]
+          },
+          {
+            "step": "Create a session",
+            "desc": "Set up your academic session, add terms (subsessions), create classes, and assign subjects and teachers.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Set up your academic session, add terms (subsessions), create classes, and assign subjects and teachers."
+              }
+            ]
+          }
+        ],
+        "callout": "New schools get a free trial period. After that, a paid subscription is required to keep creating and editing data.",
+        "video": null
+      },
+      {
+        "id": "login-passwords",
+        "title": "Login & Passwords",
+        "content": "Scladapp supports admin, staff/teacher, and student logins. Each user signs in with email and password from the school login page.",
+        "steps": [
+          {
+            "step": "Sign in",
+            "desc": "Go to your school's login page and enter your email and password. Admins, staff, and students all use the same login form.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to your school's login page and enter your email and password. Admins, staff, and students all use the same login form."
+              }
+            ]
+          },
+          {
+            "step": "First-time password",
+            "desc": "If an account has no password yet, you will be prompted to create one using the set-password link sent to your email.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "If an account has no password yet, you will be prompted to create one using the set-password link sent to your email."
+              }
+            ]
+          },
+          {
+            "step": "Forgot password",
+            "desc": "Use Forgot Password on the login page. A reset link is emailed to you. Links expire after use.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use Forgot Password on the login page. A reset link is emailed to you. Links expire after use."
+              }
+            ]
+          },
+          {
+            "step": "Multiple roles",
+            "desc": "Staff members who are also sub-admins can access both the staff portal and admin features after login.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Staff members who are also sub-admins can access both the staff portal and admin features after login."
+              }
+            ]
+          }
+        ],
+        "callout": "Keep login credentials secure. Admins can resend invite emails to staff and students from their profile pages.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Scladapp supports admin, staff/teacher, and student logins. Each user signs in with email and password from the school login page."
+          },
+          {
+            "type": "image",
+            "url": "https://res.cloudinary.com/dxspjixju/image/upload/v1788176371/scladapp/docs/images/Screenshot_2026-07-29_051900_ieeigm.png",
+            "alt": "sd",
+            "caption": "sd",
+            "public_id": "scladapp/docs/images/Screenshot_2026-07-29_051900_ieeigm"
+          }
+        ]
+      },
+      {
+        "id": "subscription-plans",
+        "title": "Subscription & Plans",
+        "content": "Every school runs on a subscription plan. Plans control sub-admin limits and file storage. Students and staff are unlimited on all plans.",
+        "steps": [
+          {
+            "step": "View plans",
+            "desc": "See available plans on the Pricing page or under Settings → Subscriptions in your admin dashboard.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "See available plans on the Pricing page or under Settings → Subscriptions in your admin dashboard."
+              }
+            ]
+          },
+          {
+            "step": "Upgrade or renew",
+            "desc": "Choose a billing cycle (monthly, quarterly, or yearly) and pay via Paystack to activate or extend your subscription.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Choose a billing cycle (monthly, quarterly, or yearly) and pay via Paystack to activate or extend your subscription."
+              }
+            ]
+          },
+          {
+            "step": "Monitor usage",
+            "desc": "The subscription dashboard shows sub-admin and storage usage against your plan limits.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The subscription dashboard shows sub-admin and storage usage against your plan limits."
+              }
+            ]
+          },
+          {
+            "step": "Cancel",
+            "desc": "You can cancel from Settings → Subscriptions. Access continues until the current billing period ends.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "You can cancel from Settings → Subscriptions. Access continues until the current billing period ends."
+              }
+            ]
+          }
+        ],
+        "callout": "When a subscription expires, your data stays safe and viewable, but creating or editing records is blocked until you renew. Support tickets and feedback remain available.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Every school runs on a subscription plan. Plans control sub-admin limits and file storage. Students and staff are unlimited on all plans."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "section": "School Management",
+    "icon": "school",
+    "items": [
+      {
+        "id": "adding-students",
+        "title": "Adding Students",
+        "content": "Students are added manually, one at a time. Each student receives a unique ID and a secure portal login. You can also admit a student using an existing student ID from another school.",
+        "steps": [
+          {
+            "step": "Go to Students",
+            "desc": "From the admin dashboard, open Students in the sidebar.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "From the admin dashboard, open Students in the sidebar."
+              }
+            ]
+          },
+          {
+            "step": "Add a student",
+            "desc": "Click Add Student and fill in personal details, upload a profile photo if needed, and save.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Click Add Student and fill in personal details, upload a profile photo if needed, and save."
+              }
+            ]
+          },
+          {
+            "step": "Enroll in a class",
+            "desc": "Use Enroll to assign the student to a class and arm for the active session and term.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use Enroll to assign the student to a class and arm for the active session and term."
+              }
+            ]
+          },
+          {
+            "step": "Resend credentials",
+            "desc": "Use Resend Invite to email portal login details to the student or guardian.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use Resend Invite to email portal login details to the student or guardian."
+              }
+            ]
+          },
+          {
+            "step": "Admit by ID",
+            "desc": "If a student already has a Scladapp student ID, use Admissions to enroll them into your school without re-entering all details.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "If a student already has a Scladapp student ID, use Admissions to enroll them into your school without re-entering all details."
+              }
+            ]
+          }
+        ],
+        "callout": "There is no bulk CSV import. Students must be added individually or admitted by existing student ID.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Students are added manually, one at a time. Each student receives a unique ID and a secure portal login. You can also admit a student using an existing student ID from another school."
+          },
+          {
+            "type": "video",
+            "title": "Adding Students Demo",
+            "youtubeId": "dQw4w9WgXcQ"
+          }
+        ]
+      },
+      {
+        "id": "guardians-admissions",
+        "title": "Guardians & Admissions",
+        "content": "Link parents and guardians to students, and manage admission records when students join or transfer.",
+        "steps": [
+          {
+            "step": "Add a guardian",
+            "desc": "From a student's profile, add guardian contact details including phone and email.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "From a student's profile, add guardian contact details including phone and email."
+              }
+            ]
+          },
+          {
+            "step": "Set primary guardian",
+            "desc": "Mark one guardian as primary for official communications.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Mark one guardian as primary for official communications."
+              }
+            ]
+          },
+          {
+            "step": "Create an admission",
+            "desc": "Use Admissions to register a new enrollment record for a student joining your school.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use Admissions to register a new enrollment record for a student joining your school."
+              }
+            ]
+          },
+          {
+            "step": "View history",
+            "desc": "Each student's admission history shows past enrollments and class assignments across sessions.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Each student's admission history shows past enrollments and class assignments across sessions."
+              }
+            ]
+          }
+        ],
+        "callout": "Guardian details are stored per student and can be updated at any time by an admin.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Link parents and guardians to students, and manage admission records when students join or transfer."
+          }
+        ]
+      },
+      {
+        "id": "managing-staff",
+        "title": "Managing Staff",
+        "content": "Manage teaching and non-teaching staff from one place. Staff receive portal credentials and can be promoted to sub-admin roles.",
+        "steps": [
+          {
+            "step": "Navigate to Staff",
+            "desc": "Click Staff in the admin sidebar to see all staff members.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Click Staff in the admin sidebar to see all staff members."
+              }
+            ]
+          },
+          {
+            "step": "Add a staff member",
+            "desc": "Click Add Staff, fill in personal details, role, and upload a photo. Login credentials are generated automatically.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Click Add Staff, fill in personal details, role, and upload a photo. Login credentials are generated automatically."
+              }
+            ]
+          },
+          {
+            "step": "Resend invite",
+            "desc": "If a staff member did not receive their login email, use Resend Invite from their profile.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "If a staff member did not receive their login email, use Resend Invite from their profile."
+              }
+            ]
+          },
+          {
+            "step": "Promote to sub-admin",
+            "desc": "Create a sub-admin from an existing staff member. Your plan limits how many sub-admins you can have.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Create a sub-admin from an existing staff member. Your plan limits how many sub-admins you can have."
+              }
+            ]
+          },
+          {
+            "step": "Deactivate staff",
+            "desc": "Deactivate a staff record to revoke portal access without deleting their history.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Deactivate a staff record to revoke portal access without deleting their history."
+              }
+            ]
+          }
+        ],
+        "callout": "Sub-admin count is limited by your plan. Students and staff headcount are unlimited on all plans.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Manage teaching and non-teaching staff from one place. Staff receive portal credentials and can be promoted to sub-admin roles."
+          }
+        ]
+      },
+      {
+        "id": "teachers-subjects",
+        "title": "Teachers & Subject Assignment",
+        "content": "Teachers are staff members with teaching assignments. Link teachers to subjects and classes so they can enter scores and mark attendance.",
+        "steps": [
+          {
+            "step": "Create a teacher profile",
+            "desc": "Assign the teacher role to a staff member from the Teachers section.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Assign the teacher role to a staff member from the Teachers section."
+              }
+            ]
+          },
+          {
+            "step": "Assign subjects",
+            "desc": "Link subjects to teachers for the current session. A teacher can teach multiple subjects across classes.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Link subjects to teachers for the current session. A teacher can teach multiple subjects across classes."
+              }
+            ]
+          },
+          {
+            "step": "Assign class teacher",
+            "desc": "Use Headmaster/Class Teacher assignment to designate who manages a class arm's attendance and remarks.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use Headmaster/Class Teacher assignment to designate who manages a class arm's attendance and remarks."
+              }
+            ]
+          },
+          {
+            "step": "View assignment history",
+            "desc": "See past teaching assignments when sessions change or teachers move between classes.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "See past teaching assignments when sessions change or teachers move between classes."
+              }
+            ]
+          }
+        ],
+        "callout": "Teachers access scores, attendance, and class resources only for subjects and classes assigned to them.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Teachers are staff members with teaching assignments. Link teachers to subjects and classes so they can enter scores and mark attendance."
+          }
+        ]
+      },
+      {
+        "id": "class-session-setup",
+        "title": "Class & Session Setup",
+        "content": "Sessions and terms (subsessions) define your academic calendar. Classes organize students; subjects are linked to classes for the active term.",
+        "steps": [
+          {
+            "step": "Create a session",
+            "desc": "Go to Sessions and add a new academic year with start and end dates.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to Sessions and add a new academic year with start and end dates."
+              }
+            ]
+          },
+          {
+            "step": "Add terms",
+            "desc": "Within the session, create subsessions (e.g. First Term, Second Term, Third Term).",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Within the session, create subsessions (e.g. First Term, Second Term, Third Term)."
+              }
+            ]
+          },
+          {
+            "step": "Create classes",
+            "desc": "Add class levels and arms (e.g. JSS1 A, JSS1 B) under Classes.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Add class levels and arms (e.g. JSS1 A, JSS1 B) under Classes."
+              }
+            ]
+          },
+          {
+            "step": "Assign subjects to classes",
+            "desc": "For each class, assign the subjects taught during the active term.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "For each class, assign the subjects taught during the active term."
+              }
+            ]
+          },
+          {
+            "step": "Complete session setup",
+            "desc": "Use the complete session wizard to set up sessions, terms, class teachers, and subject assignments in one flow.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use the complete session wizard to set up sessions, terms, class teachers, and subject assignments in one flow."
+              }
+            ]
+          }
+        ],
+        "callout": "Only one session is typically active at a time. Switch the active session from Settings when a new year begins.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Sessions and terms (subsessions) define your academic calendar. Classes organize students; subjects are linked to classes for the active term."
+          },
+          {
+            "type": "video",
+            "title": "Session & Class Setup",
+            "youtubeId": "dQw4w9WgXcQ"
+          }
+        ]
+      },
+      {
+        "id": "school-profile",
+        "title": "School Profile & Settings",
+        "content": "Manage your school's public profile, contact details, social links, logo, and gallery from the admin settings.",
+        "steps": [
+          {
+            "step": "Edit profile",
+            "desc": "Update school name, address, phone, email, and website from School Profile in settings.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Update school name, address, phone, email, and website from School Profile in settings."
+              }
+            ]
+          },
+          {
+            "step": "Social links",
+            "desc": "Add Facebook, Instagram, TikTok, and LinkedIn handles. These appear on student and staff portals.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Add Facebook, Instagram, TikTok, and LinkedIn handles. These appear on student and staff portals."
+              }
+            ]
+          },
+          {
+            "step": "School bio",
+            "desc": "Write a short description of your school visible on the school info page.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Write a short description of your school visible on the school info page."
+              }
+            ]
+          },
+          {
+            "step": "Gallery",
+            "desc": "Upload photos to the school gallery for display on portals and your school website.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Upload photos to the school gallery for display on portals and your school website."
+              }
+            ]
+          }
+        ],
+        "callout": "A free school website can be requested and hosted for you. See the School Website section for details.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Manage your school's public profile, contact details, social links, logo, and gallery from the admin settings."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Reports & Analytics",
+    "icon": "chart",
+    "items": [
+      {
+        "id": "generating-reports",
+        "title": "Generating Report Cards",
+        "content": "Scladapp generates report cards per student per term. Teachers enter scores; admins add comments and publish printable or emailable reports.",
+        "steps": [
+          {
+            "step": "Set up grading",
+            "desc": "Configure your grading template (grade boundaries and CA/exam weights) before the term begins.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Configure your grading template (grade boundaries and CA/exam weights) before the term begins."
+              }
+            ]
+          },
+          {
+            "step": "Enter scores",
+            "desc": "Teachers enter CA and exam scores per subject from their portal for each student.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Teachers enter CA and exam scores per subject from their portal for each student."
+              }
+            ]
+          },
+          {
+            "step": "Add trait scores",
+            "desc": "Record affective and psychomotor trait ratings that appear on the report card.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Record affective and psychomotor trait ratings that appear on the report card."
+              }
+            ]
+          },
+          {
+            "step": "Add comments",
+            "desc": "Class teachers and principals add remarks before publishing.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Class teachers and principals add remarks before publishing."
+              }
+            ]
+          },
+          {
+            "step": "Generate & export",
+            "desc": "Preview the report card, download as PDF, or email a secure download link to guardians.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Preview the report card, download as PDF, or email a secure download link to guardians."
+              }
+            ]
+          }
+        ],
+        "callout": "Report cards include subject scores, GPA, class position, traits, and teacher/principal comments. Choose a report card theme from Settings.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Scladapp generates report cards per student per term. Teachers enter scores; admins add comments and publish printable or emailable reports."
+          },
+          {
+            "type": "video",
+            "title": "Generating Report Cards",
+            "youtubeId": "dQw4w9WgXcQ"
+          }
+        ]
+      },
+      {
+        "id": "attendance-tracking",
+        "title": "Attendance Tracking",
+        "content": "Track daily attendance per student and per class. View summaries by term and use the data on report cards.",
+        "steps": [
+          {
+            "step": "Mark attendance",
+            "desc": "Teachers open Attendance each school day and mark students present or absent for their class.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Teachers open Attendance each school day and mark students present or absent for their class."
+              }
+            ]
+          },
+          {
+            "step": "Class view",
+            "desc": "Admins can view attendance for an entire class on a specific date.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Admins can view attendance for an entire class on a specific date."
+              }
+            ]
+          },
+          {
+            "step": "Student summary",
+            "desc": "View a student's attendance record and percentage for the current term.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "View a student's attendance record and percentage for the current term."
+              }
+            ]
+          },
+          {
+            "step": "Correct records",
+            "desc": "Admins can delete or correct attendance entries for a specific date if entered in error.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Admins can delete or correct attendance entries for a specific date if entered in error."
+              }
+            ]
+          }
+        ],
+        "callout": "Attendance summaries feed into report cards and are visible to students in their portal.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Track daily attendance per student and per class. View summaries by term and use the data on report cards."
+          }
+        ]
+      },
+      {
+        "id": "grade-management",
+        "title": "Grade Management",
+        "content": "Configure grading scales and score weights to match your school's standards. The system calculates totals, grades, and positions automatically.",
+        "steps": [
+          {
+            "step": "Create a grading template",
+            "desc": "Define grade boundaries (e.g. A: 70–100, B: 60–69) and assign the template to your school.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Define grade boundaries (e.g. A: 70–100, B: 60–69) and assign the template to your school."
+              }
+            ]
+          },
+          {
+            "step": "Set CA weights",
+            "desc": "Configure how continuous assessment and exam scores combine per subject.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Configure how continuous assessment and exam scores combine per subject."
+              }
+            ]
+          },
+          {
+            "step": "Enter scores",
+            "desc": "Teachers submit scores from their portal. Totals and letter grades are computed automatically.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Teachers submit scores from their portal. Totals and letter grades are computed automatically."
+              }
+            ]
+          },
+          {
+            "step": "View positions",
+            "desc": "Class and subject positions are calculated once all scores for a term are entered.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Class and subject positions are calculated once all scores for a term are entered."
+              }
+            ]
+          }
+        ],
+        "callout": "Grading templates can be duplicated and updated between sessions without losing historical records.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Configure grading scales and score weights to match your school's standards. The system calculates totals, grades, and positions automatically."
+          },
+          {
+            "type": "video",
+            "title": "Grade Management Overview",
+            "youtubeId": "dQw4w9WgXcQ"
+          }
+        ]
+      },
+      {
+        "id": "timetables",
+        "title": "Timetables",
+        "content": "Build class timetables manually or use the AI timetable assistant to generate a draft schedule.",
+        "steps": [
+          {
+            "step": "Create a template",
+            "desc": "Set up a timetable template with period times and break slots for your school.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Set up a timetable template with period times and break slots for your school."
+              }
+            ]
+          },
+          {
+            "step": "Build class timetable",
+            "desc": "Assign subjects and teachers to periods for each class and term.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Assign subjects and teachers to periods for each class and term."
+              }
+            ]
+          },
+          {
+            "step": "AI generation",
+            "desc": "Use the AI Timetable tool to auto-generate a draft timetable based on your classes, subjects, and teacher availability.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use the AI Timetable tool to auto-generate a draft timetable based on your classes, subjects, and teacher availability."
+              }
+            ]
+          },
+          {
+            "step": "Publish",
+            "desc": "Once finalized, students and teachers see the timetable in their portals.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Once finalized, students and teachers see the timetable in their portals."
+              }
+            ]
+          }
+        ],
+        "callout": "AI timetable generation is available on plans that include the AI assistant feature.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Build class timetables manually or use the AI timetable assistant to generate a draft schedule."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Fees & Finance",
+    "icon": "card",
+    "items": [
+      {
+        "id": "fee-bills",
+        "title": "Fee Bills & Payments",
+        "content": "Create fee bills, assign them to students or staff, and track who has paid.",
+        "steps": [
+          {
+            "step": "Create a fee bill template",
+            "desc": "Set up reusable bill templates with line items and amounts.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Set up reusable bill templates with line items and amounts."
+              }
+            ]
+          },
+          {
+            "step": "Issue a bill",
+            "desc": "Create a bill for a term or event and assign recipients (students, classes, or staff).",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Create a bill for a term or event and assign recipients (students, classes, or staff)."
+              }
+            ]
+          },
+          {
+            "step": "Record payments",
+            "desc": "Mark payments as received manually or through integrated payment channels.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Mark payments as received manually or through integrated payment channels."
+              }
+            ]
+          },
+          {
+            "step": "Track status",
+            "desc": "View paid, partial, and outstanding bills from the finance dashboard.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "View paid, partial, and outstanding bills from the finance dashboard."
+              }
+            ]
+          }
+        ],
+        "callout": "Connect your school's bank account via Paystack to receive online fee payments directly.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Create fee bills, assign them to students or staff, and track who has paid."
+          }
+        ]
+      },
+      {
+        "id": "school-accounts",
+        "title": "Bank Accounts & Paystack",
+        "content": "Link your school's bank accounts to receive fee payments through Paystack subaccounts.",
+        "steps": [
+          {
+            "step": "Add a bank account",
+            "desc": "Go to School Accounts in settings and enter your bank details.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to School Accounts in settings and enter your bank details."
+              }
+            ]
+          },
+          {
+            "step": "Verify account",
+            "desc": "Paystack verifies the account name against the account number before activation.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Paystack verifies the account name against the account number before activation."
+              }
+            ]
+          },
+          {
+            "step": "Create subaccount",
+            "desc": "Set up a Paystack subaccount so fee payments are settled to your school's bank.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Set up a Paystack subaccount so fee payments are settled to your school's bank."
+              }
+            ]
+          },
+          {
+            "step": "Set default",
+            "desc": "Mark one account as the default for new bills and transactions.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Mark one account as the default for new bills and transactions."
+              }
+            ]
+          }
+        ],
+        "callout": "Transaction history is available under Finance → Transactions with full pagination and filters.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Link your school's bank accounts to receive fee payments through Paystack subaccounts."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Communication",
+    "icon": "megaphone",
+    "items": [
+      {
+        "id": "notifications",
+        "title": "Notifications & Announcements",
+        "content": "Send announcements and alerts to students, staff, or specific groups. Users see notifications in their portal inbox.",
+        "steps": [
+          {
+            "step": "Create a notification",
+            "desc": "Compose a message and choose recipients (all students, a class, staff, or individuals).",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Compose a message and choose recipients (all students, a class, staff, or individuals)."
+              }
+            ]
+          },
+          {
+            "step": "Send",
+            "desc": "Publish the notification. Recipients see it in their portal and can mark it as read.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Publish the notification. Recipients see it in their portal and can mark it as read."
+              }
+            ]
+          },
+          {
+            "step": "Announcement templates",
+            "desc": "Design reusable announcement templates with the HTML editor for formatted messages.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Design reusable announcement templates with the HTML editor for formatted messages."
+              }
+            ]
+          },
+          {
+            "step": "Admin alerts",
+            "desc": "Admins receive system notifications for important events in the admin notification panel.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Admins receive system notifications for important events in the admin notification panel."
+              }
+            ]
+          }
+        ],
+        "callout": "Email delivery for reports and invites uses your connected Gmail account or the system email service.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Send announcements and alerts to students, staff, or specific groups. Users see notifications in their portal inbox."
+          }
+        ]
+      },
+      {
+        "id": "calendar-events",
+        "title": "Calendar & Events",
+        "content": "Manage your school's academic calendar and upcoming events visible to students and staff.",
+        "steps": [
+          {
+            "step": "Add calendar items",
+            "desc": "Create term dates, holidays, and exam periods on the school calendar.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Create term dates, holidays, and exam periods on the school calendar."
+              }
+            ]
+          },
+          {
+            "step": "Create events",
+            "desc": "Add school events (sports day, PTA meeting, etc.) with dates and descriptions.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Add school events (sports day, PTA meeting, etc.) with dates and descriptions."
+              }
+            ]
+          },
+          {
+            "step": "View by term",
+            "desc": "Filter calendar items and events by the active subsession (term).",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Filter calendar items and events by the active subsession (term)."
+              }
+            ]
+          }
+        ],
+        "callout": "Calendar and events appear on student and staff dashboards for the current term.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Manage your school's academic calendar and upcoming events visible to students and staff."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "section": "School Website",
+    "icon": "globe",
+    "items": [
+      {
+        "id": "free-website",
+        "title": "Free School Website",
+        "content": "Every school on Scladapp can request a free website created and hosted for you. No coding required.",
+        "steps": [
+          {
+            "step": "Request a website",
+            "desc": "Go to Settings → Website and submit a website request. Choose a template style.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to Settings → Website and submit a website request. Choose a template style."
+              }
+            ]
+          },
+          {
+            "step": "Wait for setup",
+            "desc": "The Scladapp team builds and publishes your site. You are notified when it is live.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The Scladapp team builds and publishes your site. You are notified when it is live."
+              }
+            ]
+          },
+          {
+            "step": "View your site",
+            "desc": "Your site is hosted at a unique URL (e.g. yourschool.scladapp.com or /sites/yourschool in development).",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Your site is hosted at a unique URL (e.g. yourschool.scladapp.com or /sites/yourschool in development)."
+              }
+            ]
+          },
+          {
+            "step": "Cancel request",
+            "desc": "You can cancel a pending website request before it is published.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "You can cancel a pending website request before it is published."
+              }
+            ]
+          }
+        ],
+        "callout": "Free website hosting is included with your Scladapp subscription at no extra cost.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Every school on Scladapp can request a free website created and hosted for you. No coding required."
+          }
+        ]
+      },
+      {
+        "id": "ai-website-editor",
+        "title": "AI Website Editor",
+        "content": "After your website is live, use the built-in AI editor to update pages, text, and images without writing code.",
+        "steps": [
+          {
+            "step": "Open the editor",
+            "desc": "Go to Settings → Website and open the AI Website Editor.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to Settings → Website and open the AI Website Editor."
+              }
+            ]
+          },
+          {
+            "step": "Edit with AI",
+            "desc": "Describe the change you want (e.g. update the hero text or add a section) and the AI applies it to your draft.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Describe the change you want (e.g. update the hero text or add a section) and the AI applies it to your draft."
+              }
+            ]
+          },
+          {
+            "step": "Save draft",
+            "desc": "Changes are saved as a draft before going live. Preview before publishing.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Changes are saved as a draft before going live. Preview before publishing."
+              }
+            ]
+          },
+          {
+            "step": "Publish",
+            "desc": "Publish the draft to make changes visible on your live school website.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Publish the draft to make changes visible on your live school website."
+              }
+            ]
+          },
+          {
+            "step": "AI tokens",
+            "desc": "AI edits use tokens from your school's balance. Purchase more tokens from settings if needed.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "AI edits use tokens from your school's balance. Purchase more tokens from settings if needed."
+              }
+            ]
+          }
+        ],
+        "callout": "Upload images directly in the editor. Images are stored securely and served on your school site.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "After your website is live, use the built-in AI editor to update pages, text, and images without writing code."
+          }
+        ]
+      },
+      {
+        "id": "student-application-form",
+        "title": "Student Application Form",
+        "content": "Accept new student applications online through a public form. Configure which fields to collect, review submissions, and admit applicants as enrolled students.",
+        "steps": [
+          {
+            "step": "Enable applications",
+            "desc": "Go to Settings → Website. Turn on Accept new applications and copy the public application link to share with prospective families.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to Settings → Website. Turn on Accept new applications and copy the public application link to share with prospective families."
+              }
+            ]
+          },
+          {
+            "step": "Configure fields",
+            "desc": "Open Configure fields to choose which sections and inputs appear on the form (personal details, guardians, documents, etc.). Required fields must be completed before submission.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open Configure fields to choose which sections and inputs appear on the form (personal details, guardians, documents, etc.). Required fields must be completed before submission."
+              }
+            ]
+          },
+          {
+            "step": "Review applications",
+            "desc": "Open Applications in the sidebar to see all submissions. Filter by status, open a row to view full details, and unread applications are marked with a blue dot until opened.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open Applications in the sidebar to see all submissions. Filter by status, open a row to view full details, and unread applications are marked with a blue dot until opened."
+              }
+            ]
+          },
+          {
+            "step": "Admit an applicant",
+            "desc": "From an application detail panel, click Admit to open the Create New Student form pre-filled with the applicant's data. Saving the student marks the application as approved.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "From an application detail panel, click Admit to open the Create New Student form pre-filled with the applicant's data. Saving the student marks the application as approved."
+              }
+            ]
+          },
+          {
+            "step": "Manage access",
+            "desc": "Grant sub-admins access under Admin permissions using the Applications module (read, create, edit, delete). Read access is required to view the Applications page.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Grant sub-admins access under Admin permissions using the Applications module (read, create, edit, delete). Read access is required to view the Applications page."
+              }
+            ]
+          }
+        ],
+        "callout": "The public form is available at /school/{schoolId}/apply. Turn off Accept new applications to stop new submissions without deleting existing records.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Accept new student applications online through a public form. Configure which fields to collect, review submissions, and admit applicants as enrolled students."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "section": "More Features",
+    "icon": "sparkles",
+    "items": [
+      {
+        "id": "resources-storage",
+        "title": "Resources & File Storage",
+        "content": "Upload and share files at the school, class, subject, and student level. Storage usage counts against your plan limit.",
+        "steps": [
+          {
+            "step": "School resources",
+            "desc": "Upload documents visible to all staff from the school resources library.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Upload documents visible to all staff from the school resources library."
+              }
+            ]
+          },
+          {
+            "step": "Class resources",
+            "desc": "Teachers upload materials for their assigned classes.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Teachers upload materials for their assigned classes."
+              }
+            ]
+          },
+          {
+            "step": "Subject resources",
+            "desc": "Attach textbooks, notes, and files to specific subjects.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Attach textbooks, notes, and files to specific subjects."
+              }
+            ]
+          },
+          {
+            "step": "Student resources",
+            "desc": "Share files with individual students from their profile.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Share files with individual students from their profile."
+              }
+            ]
+          },
+          {
+            "step": "Monitor storage",
+            "desc": "Check storage usage on your subscription dashboard. Upgrade your plan for more space.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Check storage usage on your subscription dashboard. Upgrade your plan for more space."
+              }
+            ]
+          }
+        ],
+        "callout": "Your plan includes a fixed amount of storage (GB). Files uploaded across all resource types count toward the limit.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Upload and share files at the school, class, subject, and student level. Storage usage counts against your plan limit."
+          }
+        ]
+      },
+      {
+        "id": "alumni",
+        "title": "Alumni Management",
+        "content": "Track graduated students as alumni and issue certificates.",
+        "steps": [
+          {
+            "step": "Graduate a student",
+            "desc": "Mark a student as graduated at the end of a session. They move to the alumni list.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Mark a student as graduated at the end of a session. They move to the alumni list."
+              }
+            ]
+          },
+          {
+            "step": "View alumni",
+            "desc": "Browse alumni by session or search by name from the Alumni section.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Browse alumni by session or search by name from the Alumni section."
+              }
+            ]
+          },
+          {
+            "step": "Issue certificates",
+            "desc": "Upload and manage graduation or achievement certificates for alumni records.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Upload and manage graduation or achievement certificates for alumni records."
+              }
+            ]
+          }
+        ],
+        "callout": "Alumni records preserve the student's academic history from their time at your school.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Track graduated students as alumni and issue certificates."
+          }
+        ]
+      },
+      {
+        "id": "class-promotion",
+        "title": "Class Promotion",
+        "content": "Promote students to the next class level at the end of a session using promotion templates.",
+        "steps": [
+          {
+            "step": "Create a promotion template",
+            "desc": "Define which class each level promotes to (e.g. JSS1 → JSS2).",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Define which class each level promotes to (e.g. JSS1 → JSS2)."
+              }
+            ]
+          },
+          {
+            "step": "Run promotion",
+            "desc": "At session end, apply the template to move students to their new classes for the next session.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "At session end, apply the template to move students to their new classes for the next session."
+              }
+            ]
+          },
+          {
+            "step": "Review assignments",
+            "desc": "Verify class assignments before activating the new session.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Verify class assignments before activating the new session."
+              }
+            ]
+          }
+        ],
+        "callout": "Promotion runs per session. Students not promoted remain in their current class until manually updated.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Promote students to the next class level at the end of a session using promotion templates."
+          }
+        ]
+      },
+      {
+        "id": "support-feedback",
+        "title": "Support & Feedback",
+        "content": "Get help, report issues, and send product feedback. Support remains available even when your subscription has expired.",
+        "steps": [
+          {
+            "step": "Open a support ticket",
+            "desc": "Go to Support in your admin dashboard. Describe your issue and attach a screenshot if needed.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to Support in your admin dashboard. Describe your issue and attach a screenshot if needed."
+              }
+            ]
+          },
+          {
+            "step": "Track replies",
+            "desc": "Reply to tickets in the thread. You are notified when the team responds.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Reply to tickets in the thread. You are notified when the team responds."
+              }
+            ]
+          },
+          {
+            "step": "Send feedback",
+            "desc": "Use App Feedback to share suggestions or report bugs directly from the dashboard.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use App Feedback to share suggestions or report bugs directly from the dashboard."
+              }
+            ]
+          },
+          {
+            "step": "Contact us",
+            "desc": "For general enquiries, use the Contact page on the Scladapp website.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "For general enquiries, use the Contact page on the Scladapp website."
+              }
+            ]
+          }
+        ],
+        "callout": "Support tickets and feedback work even when your subscription is expired, so you can always reach us for help.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Get help, report issues, and send product feedback. Support remains available even when your subscription has expired."
+          }
+        ]
+      }
+    ]
+  }
+]

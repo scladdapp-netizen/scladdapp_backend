@@ -279,6 +279,67 @@ exports.recordPayment = async (req, res) => {
   }
 };
 
+exports.updatePayment = async (req, res) => {
+  try {
+    const { userBillId, paymentId } = req.params;
+    const { amount, payment_method, reference, note, modified_by_name } = req.body;
+
+    if (amount !== undefined && (isNaN(amount) || Number(amount) <= 0)) {
+      return res.status(400).json({ success: false, message: "Valid amount is required" });
+    }
+
+    const ub = await UserBill.findOne({ user_bill_id: userBillId });
+    if (!ub) return res.status(404).json({ success: false, message: "User bill not found" });
+
+    const payment = ub.payments.find((p) => p.payment_id === paymentId);
+    if (!payment) return res.status(404).json({ success: false, message: "Payment not found" });
+
+    if (amount !== undefined)          payment.amount         = Number(amount);
+    if (payment_method !== undefined)  payment.payment_method = payment_method;
+    if (reference !== undefined)       payment.reference      = reference;
+    if (note !== undefined)            payment.note           = note;
+    if (modified_by_name !== undefined) payment.recorded_by_name = modified_by_name;
+
+    ub.amount_paid = ub.payments.reduce((sum, p) => sum + p.amount, 0);
+    ub.payment_status =
+      ub.amount_paid >= ub.amount_due ? "paid"
+      : ub.amount_paid > 0 ? "partial"
+      : "unpaid";
+    ub.paid_at = ub.payment_status === "paid" ? (ub.paid_at || new Date()) : null;
+
+    await ub.save();
+    res.json({ success: true, message: "Payment updated", data: ub });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.deletePayment = async (req, res) => {
+  try {
+    const { userBillId, paymentId } = req.params;
+
+    const ub = await UserBill.findOne({ user_bill_id: userBillId });
+    if (!ub) return res.status(404).json({ success: false, message: "User bill not found" });
+
+    const idx = ub.payments.findIndex((p) => p.payment_id === paymentId);
+    if (idx === -1) return res.status(404).json({ success: false, message: "Payment not found" });
+
+    ub.payments.splice(idx, 1);
+
+    ub.amount_paid = ub.payments.reduce((sum, p) => sum + p.amount, 0);
+    ub.payment_status =
+      ub.amount_paid >= ub.amount_due ? "paid"
+      : ub.amount_paid > 0 ? "partial"
+      : "unpaid";
+    ub.paid_at = ub.payment_status === "paid" ? (ub.paid_at || new Date()) : null;
+
+    await ub.save();
+    res.json({ success: true, message: "Payment deleted", data: ub });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 exports.updateBillStatus = async (req, res) => {
   try {
     const { billId } = req.params;

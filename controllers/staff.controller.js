@@ -8,6 +8,27 @@ const Subsession = require("../models/Subsession.model");
 const TeacherAssignmentHistory = require("../models/TeacherAssignmentHistory.model");
 const { checkStaffLimit } = require("../utils/planLimitCheck");
 
+const composeResidenceAddress = (d) => {
+  if (d.address && String(d.address).trim()) return d.address.trim();
+  return [
+    d.houseNumberStreet,
+    d.areaEstate,
+    d.city,
+    d.lgaOfResidence,
+    d.stateOfResidence,
+    d.landmark,
+  ]
+    .map((v) => (v == null ? "" : String(v).trim()))
+    .filter(Boolean)
+    .join(", ") || null;
+};
+
+const pickStr = (v) => {
+  if (v === undefined || v === null) return null;
+  const s = String(v).trim();
+  return s === "" ? null : s;
+};
+
 const createStaff = async (staffData) => {
   try {
     if (!staffData.fullName || !staffData.email || !staffData.phone || !staffData.position || !staffData.department || !staffData.school_id) {
@@ -33,44 +54,42 @@ const createStaff = async (staffData) => {
       full_name:                      staffData.fullName,
       email:                          normalizedEmail,
       phone:                          staffData.phone,
-      alternate_phone:                staffData.alternatePhone || null,
+      whatsapp:                       pickStr(staffData.whatsapp),
       position:                       staffData.position,
-      job_title:                      staffData.jobTitle || staffData.position,
+      job_title:                      staffData.position,
       department:                     staffData.department,
-      qualification:                  staffData.qualification || null,
+      qualification:                  pickStr(staffData.qualification),
       experience_years:               staffData.experience ? parseInt(staffData.experience) : 0,
       employment_type:                staffData.employmentType || "Full-time",
-      employment_status:              staffData.employmentStatus || "active",
-      record_status:                  staffData.recordStatus || "active",
-      role:                           staffData.role || "Support Staff",
-      salary:                         staffData.salary ? parseFloat(staffData.salary) : null,
-      salary_grade:                   staffData.salaryGrade || null,
+      employment_status:              "active",
+      record_status:                  "active",
       joining_date:                   staffData.joiningDate || new Date().toISOString().split("T")[0],
-      confirmation_date:              staffData.confirmationDate || null,
-      date_of_birth:                  staffData.dateOfBirth || null,
-      gender:                         staffData.gender || null,
-      religion:                       staffData.religion || null,
-      marital_status:                 staffData.maritalStatus || null,
-      nationality:                    staffData.nationality || null,
-      state_of_origin:                staffData.stateOfOrigin || null,
-      address:                        staffData.address || null,
-      blood_group:                    staffData.bloodGroup || null,
-      genotype:                       staffData.genotype || null,
-      medical_conditions:             staffData.medicalConditions || null,
+      date_of_birth:                  pickStr(staffData.dateOfBirth),
+      gender:                         pickStr(staffData.gender),
+      religion:                       pickStr(staffData.religion),
+      marital_status:                 pickStr(staffData.maritalStatus),
+      nationality:                    pickStr(staffData.nationality),
+      state_of_origin:                pickStr(staffData.stateOfOrigin),
+      place_of_birth:                 pickStr(staffData.placeOfBirth),
+      lga_of_origin:                  pickStr(staffData.lgaOfOrigin),
+      tribe:                          pickStr(staffData.tribe),
+      nin:                            pickStr(staffData.nin),
+      national_id:                    pickStr(staffData.nin),
+      address:                        composeResidenceAddress(staffData),
+      house_number_street:            pickStr(staffData.houseNumberStreet),
+      area_estate:                    pickStr(staffData.areaEstate),
+      city:                           pickStr(staffData.city),
+      lga_of_residence:               pickStr(staffData.lgaOfResidence),
+      state_of_residence:             pickStr(staffData.stateOfResidence),
+      landmark:                       pickStr(staffData.landmark),
+      blood_group:                    pickStr(staffData.bloodGroup),
+      genotype:                       pickStr(staffData.genotype),
       staff_photo:                    staffData.staffPhoto || null,
-      national_id:                    staffData.nationalId || null,
-      tax_number:                     staffData.taxNumber || null,
-      bank_name:                      staffData.bankName || null,
-      bank_account:                   staffData.bankAccount || null,
-      emergency_contact_name:         staffData.emergencyContact || null,
-      emergency_contact_phone:        staffData.emergencyContactPhone || null,
-      emergency_contact_relationship: staffData.emergencyContactRelationship || null,
-      emergency_contact_address:      staffData.emergencyContactAddress || null,
-      next_of_kin_name:               staffData.nextOfKin || null,
-      next_of_kin_phone:              staffData.nextOfKinPhone || null,
-      next_of_kin_relationship:       staffData.nextOfKinRelationship || null,
-      next_of_kin_address:            staffData.nextOfKinAddress || null,
-      two_factor_auth:                staffData.twoFactorAuth || false,
+      emergency_contact_name:         pickStr(staffData.emergencyContact),
+      emergency_contact_phone:        pickStr(staffData.emergencyContactPhone),
+      emergency_contact_whatsapp:     pickStr(staffData.emergencyContactWhatsapp),
+      emergency_contact_relationship: pickStr(staffData.emergencyContactRelationship),
+      two_factor_auth:                false,
       is_active:                      true,
       created_by:                     staffData.created_by || null,
     });
@@ -112,28 +131,46 @@ const updateStaff = async (staffId, staffData) => {
     }
 
     const fieldMap = {
-      fullName: "full_name", email: null, phone: "phone", alternatePhone: "alternate_phone",
-      position: "position", jobTitle: "job_title", department: "department", qualification: "qualification",
-      employmentType: "employment_type", employmentStatus: "employment_status", recordStatus: "record_status",
-      role: "role", salaryGrade: "salary_grade", joiningDate: "joining_date", confirmationDate: "confirmation_date",
+      fullName: "full_name", email: null, phone: "phone", whatsapp: "whatsapp",
+      position: "position", department: "department", qualification: "qualification",
+      employmentType: "employment_type", joiningDate: "joining_date",
       dateOfBirth: "date_of_birth", gender: "gender", religion: "religion", maritalStatus: "marital_status",
-      nationality: "nationality", stateOfOrigin: "state_of_origin", address: "address",
-      bloodGroup: "blood_group", genotype: "genotype", medicalConditions: "medical_conditions",
-      staffPhoto: "staff_photo", nationalId: "national_id", taxNumber: "tax_number",
-      bankName: "bank_name", bankAccount: "bank_account",
+      nationality: "nationality", stateOfOrigin: "state_of_origin",
+      placeOfBirth: "place_of_birth", lgaOfOrigin: "lga_of_origin", tribe: "tribe", nin: "nin",
+      houseNumberStreet: "house_number_street", areaEstate: "area_estate", city: "city",
+      lgaOfResidence: "lga_of_residence", stateOfResidence: "state_of_residence", landmark: "landmark",
+      bloodGroup: "blood_group", genotype: "genotype", staffPhoto: "staff_photo",
       emergencyContact: "emergency_contact_name", emergencyContactPhone: "emergency_contact_phone",
-      emergencyContactRelationship: "emergency_contact_relationship", emergencyContactAddress: "emergency_contact_address",
-      nextOfKin: "next_of_kin_name", nextOfKinPhone: "next_of_kin_phone",
-      nextOfKinRelationship: "next_of_kin_relationship", nextOfKinAddress: "next_of_kin_address",
-      twoFactorAuth: "two_factor_auth",
+      emergencyContactWhatsapp: "emergency_contact_whatsapp",
+      emergencyContactRelationship: "emergency_contact_relationship",
     };
 
     Object.entries(fieldMap).forEach(([src, dest]) => {
       if (staffData[src] !== undefined && dest) staffMember[dest] = staffData[src];
     });
     if (staffData.email)      staffMember.email           = staffData.email.toLowerCase().trim();
-    if (staffData.experience) staffMember.experience_years = parseInt(staffData.experience);
-    if (staffData.salary)     staffMember.salary           = parseFloat(staffData.salary);
+    if (staffData.experience !== undefined && staffData.experience !== "") {
+      staffMember.experience_years = parseInt(staffData.experience);
+    }
+    if (staffData.nin !== undefined) staffMember.national_id = staffData.nin;
+    if (staffData.position !== undefined) staffMember.job_title = staffData.position;
+    if (
+      staffData.houseNumberStreet !== undefined ||
+      staffData.areaEstate !== undefined ||
+      staffData.city !== undefined ||
+      staffData.lgaOfResidence !== undefined ||
+      staffData.stateOfResidence !== undefined ||
+      staffData.landmark !== undefined
+    ) {
+      staffMember.address = composeResidenceAddress({
+        houseNumberStreet: staffMember.house_number_street,
+        areaEstate: staffMember.area_estate,
+        city: staffMember.city,
+        lgaOfResidence: staffMember.lga_of_residence,
+        stateOfResidence: staffMember.state_of_residence,
+        landmark: staffMember.landmark,
+      });
+    }
     staffMember.updated_at = new Date();
     await staffMember.save();
 

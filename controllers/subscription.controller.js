@@ -96,8 +96,8 @@ exports.getDashboard = async (req, res) => {
         },
         plan,
         usage: {
-          students:  { current: activeStudents,  limit: plan ? parseInt(plan.max_students)  : 0 },
-          staff:     { current: activeStaff,     limit: plan ? parseInt(plan.max_staff)     : 0 },
+          students:  { current: activeStudents,  limit: null },
+          staff:     { current: activeStaff,     limit: null },
           subadmins: { current: activeSubAdmins, limit: plan ? parseInt(plan.max_subadmin)  : 0 },
           storage:   { current: storageGB, limit: storageLimitGB, unit: "GB" },
         },
@@ -172,6 +172,39 @@ exports.upgradeSubscription = async (req, res) => {
     res.json({ success: true, message: "Subscription upgraded successfully", data: { subscription: newSubscription, payment: newPayment } });
   } catch (error) {
     console.error("Upgrade subscription error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// POST /api/subscription/school/:schoolId/cancel
+exports.cancelSubscription = async (req, res) => {
+  try {
+    const { schoolId } = req.params;
+    const now = new Date();
+
+    const active = await Subscription.findOne({
+      school_id: schoolId,
+      subscription_status: { $in: ["active", "trialing"] },
+    }).sort({ end_date: -1 });
+
+    if (!active) {
+      return res.status(400).json({
+        success: false,
+        message: "No active subscription to cancel",
+      });
+    }
+
+    active.subscription_status = "cancelled";
+    active.canceled_at = now;
+    await active.save();
+
+    res.json({
+      success: true,
+      message: "Subscription cancelled successfully",
+      data: { subscription: active },
+    });
+  } catch (error) {
+    console.error("Cancel subscription error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

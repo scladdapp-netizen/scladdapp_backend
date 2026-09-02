@@ -13,6 +13,7 @@ const Class = require("../models/Class.model");
 const Session = require("../models/Session.model");
 const Notification = require("../models/Notification.model");
 const Bill = require("../models/Bill.model");
+const StudentApplication = require("../models/StudentApplication.model");
 
 exports.getProfile = async (req, res) => {
   try {
@@ -26,12 +27,44 @@ exports.updateProfile = async (req, res) => {
   try {
     const school = await School.findOne({ school_id: req.params.schoolId });
     if (!school) return res.status(404).json({ success: false, message: "School not found" });
-    const fields = ["school_name","motto","address","phone_number","email","website","instagram","state","country"];
-    fields.forEach((f) => { if (req.body[f] !== undefined) school[f] = req.body[f]; });
+    const fields = ["school_name", "motto", "address", "phone_number", "email", "website", "state", "country"];
+    fields.forEach((f) => {
+      if (req.body[f] !== undefined) school[f] = req.body[f];
+    });
+
+    if (req.body.social_links !== undefined) {
+      let links = req.body.social_links;
+      if (typeof links === "string") {
+        try {
+          links = JSON.parse(links);
+        } catch {
+          links = [];
+        }
+      }
+      const allowed = new Set(["facebook", "tiktok", "linkedin", "instagram"]);
+      school.social_links = Array.isArray(links)
+        ? links
+            .map((item) => ({
+              platform: String(item?.platform || "")
+                .toLowerCase()
+                .trim(),
+              handle: String(item?.handle || "")
+                .trim()
+                .replace(/^@+/, ""),
+            }))
+            .filter((item) => allowed.has(item.platform) && item.handle)
+        : [];
+    }
+
+    // Clear legacy single instagram field if present
+    if (school.instagram !== undefined) school.instagram = undefined;
+
     school.updated_at = new Date();
     await school.save();
     res.json({ success: true, data: school, message: "Profile saved" });
-  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 exports.getBio = async (req, res) => {
@@ -61,7 +94,32 @@ exports.getWebsite = async (req, res) => {
       .select("school_id school_name website website_requested logo_url")
       .lean();
     if (!school) return res.status(404).json({ success: false, message: "School not found" });
-    res.json({ success: true, data: school });
+
+    // Attach hosted-site fields from WebsiteRequest so every client sees the same state
+    const WebsiteRequest = require("../models/WebsiteRequest.model");
+    const brief = await WebsiteRequest.findOne({ school_id: req.params.schoolId })
+      .select("status scladapp_website_url subdomain_slug scladapp_website_published_at custom_domain custom_domain_status")
+      .lean();
+
+    const scladappWebsiteUrl =
+      brief?.scladapp_website_url ||
+      (brief?.status === "published" && school.website ? school.website : null) ||
+      null;
+
+    res.json({
+      success: true,
+      data: {
+        ...school,
+        // Keep DB flag, but also treat published hosted site as requested
+        website_requested: !!(school.website_requested || brief || scladappWebsiteUrl),
+        website_request_status: brief?.status || null,
+        scladapp_website_url: scladappWebsiteUrl,
+        subdomain_slug: brief?.subdomain_slug || null,
+        custom_domain: brief?.custom_domain || null,
+        custom_domain_status: brief?.custom_domain_status || null,
+        website_request: brief || null,
+      },
+    });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 };
 
@@ -181,6 +239,48 @@ exports.getEnrollmentTrend = async (req, res) => {
     });
     res.json({ success: true, data: months });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};
+
+exports.getApplicationsMonthlyTrend = async (req, res) => {
+  try {
+    const now = new Date();
+    const months = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push({
+        key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
+        label: d.toLocaleString("default", { month: "short" }),
+        count: 0,
+      });
+    }
+
+    const applications = await StudentApplication.find({ school_id: req.params.schoolId })
+      .select("submitted_at created_at")
+      .lean();
+
+    applications.forEach((app) => {
+      const date = app.submitted_at || app.created_at;
+      if (!date) return;
+      const key = new Date(date).toISOString().substring(0, 7);
+      const month = months.find((m) => m.key === key);
+      if (month) month.count++;
+    });
+
+    const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const currentMonth = months.find((m) => m.key === currentKey)?.count || 0;
+    const total = months.reduce((sum, m) => sum + m.count, 0);
+
+    res.json({
+      success: true,
+      data: {
+        months,
+        currentMonth,
+        total,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 exports.getRecentActivities = async (req, res) => {

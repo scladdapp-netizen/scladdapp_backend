@@ -152,6 +152,52 @@ router.post("/student/:studentId/subsession/:subsessionId/report-card", async (r
   res.status(result.success ? 200 : 400).json(result);
 });
 
+// Current email send quota (daily limit)
+router.get("/email-quota", async (_req, res) => {
+  res.status(200).json({ success: true, data: ctrl.getEmailQuota() });
+});
+
+// Public: payload for email PDF download link (tokenized, no auth)
+router.get("/download-payload/:token", async (req, res) => {
+  const result = await ctrl.getReportDownloadPayload(req.params.token);
+  res.status(result.success ? 200 : 400).json(result);
+});
+
+// Send one published result email
+router.post("/student/:studentId/subsession/:subsessionId/send-email", async (req, res) => {
+  const result = await ctrl.sendReportResultEmail(req.params.studentId, req.params.subsessionId);
+  if (result.success) {
+    logActivity(
+      req.body?.modified_by || "system",
+      null,
+      "SEND_RESULT_EMAIL",
+      "Student Report",
+      `Sent result email for student ${req.params.studentId} in subsession ${req.params.subsessionId}`,
+      "success",
+      "admin"
+    );
+  }
+  res.status(result.success ? 200 : 400).json(result);
+});
+
+// Bulk send published result emails
+router.post("/subsession/:subsessionId/send-emails", async (req, res) => {
+  const studentIds = req.body?.student_ids || req.body?.studentIds || [];
+  const result = await ctrl.sendReportResultEmailsBulk(req.params.subsessionId, studentIds);
+  if (result.success) {
+    logActivity(
+      req.body?.modified_by || "system",
+      null,
+      "SEND_RESULT_EMAILS_BULK",
+      "Student Report",
+      `Bulk result emails for subsession ${req.params.subsessionId}: sent ${result.data?.sent || 0}, queued ${result.data?.queued || 0}`,
+      "success",
+      "admin"
+    );
+  }
+  res.status(result.success ? 200 : 400).json(result);
+});
+
 // Delete report
 router.delete("/student/:studentId/subsession/:subsessionId", async (req, res) => {
   const result = await ctrl.deleteReport(req.params.studentId, req.params.subsessionId);

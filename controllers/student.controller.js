@@ -11,6 +11,28 @@ const studentsFilePath = "./data/students.json";
 const usersFilePath = "./data/users.json";
 const admissionsFilePath = "./data/admissions.json";
 
+const composeResidenceAddress = (d) => {
+  if (d.address && String(d.address).trim()) return d.address.trim();
+  return [
+    d.houseNumberStreet,
+    d.areaEstate,
+    d.city,
+    d.lgaOfResidence,
+    d.stateOfResidence,
+    d.landmark,
+    d.postalPmb,
+  ]
+    .map((v) => (v == null ? "" : String(v).trim()))
+    .filter(Boolean)
+    .join(", ") || null;
+};
+
+const pickStr = (v) => {
+  if (v === undefined || v === null) return null;
+  const s = String(v).trim();
+  return s === "" ? null : s;
+};
+
 // Create student function
 const createStudent = async (studentData) => {
   try {
@@ -143,7 +165,23 @@ const createStudent = async (studentData) => {
       religion: studentData.religion || null,
       nationality: studentData.nationality || null,
       state_of_origin: studentData.stateOfOrigin || null,
-      address: studentData.address || null,
+      place_of_birth: pickStr(studentData.placeOfBirth),
+      lga_of_origin: pickStr(studentData.lgaOfOrigin),
+      tribe: pickStr(studentData.tribe),
+      nin: pickStr(studentData.nin),
+      whatsapp: pickStr(studentData.whatsapp),
+      number_of_siblings: pickStr(studentData.numberOfSiblings),
+      family_position: pickStr(studentData.familyPosition),
+      lives_with: pickStr(studentData.livesWith),
+      address: composeResidenceAddress(studentData),
+      house_number_street: pickStr(studentData.houseNumberStreet),
+      area_estate: pickStr(studentData.areaEstate),
+      city: pickStr(studentData.city),
+      lga_of_residence: pickStr(studentData.lgaOfResidence),
+      state_of_residence: pickStr(studentData.stateOfResidence),
+      landmark: pickStr(studentData.landmark),
+      years_at_residence: pickStr(studentData.yearsAtResidence),
+      postal_pmb: pickStr(studentData.postalPmb),
       blood_group: studentData.bloodGroup || null,
       genotype: studentData.genotype || null,
       student_photo: studentData.studentPhoto || null,
@@ -157,6 +195,7 @@ const createStudent = async (studentData) => {
       // Emergency Contact
       emergency_contact_name: studentData.emergencyContactName || null,
       emergency_contact_phone: studentData.emergencyContactPhone || null,
+      emergency_contact_whatsapp: pickStr(studentData.emergencyContactWhatsapp),
       emergency_contact_relationship:
         studentData.emergencyContactRelationship || null,
 
@@ -185,7 +224,23 @@ const createStudent = async (studentData) => {
       religion:                      newStudent.religion,
       nationality:                   newStudent.nationality,
       state_of_origin:               newStudent.state_of_origin,
+      place_of_birth:                newStudent.place_of_birth,
+      lga_of_origin:                 newStudent.lga_of_origin,
+      tribe:                         newStudent.tribe,
+      nin:                           newStudent.nin,
+      whatsapp:                      newStudent.whatsapp,
+      number_of_siblings:            newStudent.number_of_siblings,
+      family_position:               newStudent.family_position,
+      lives_with:                    newStudent.lives_with,
       address:                       newStudent.address,
+      house_number_street:           newStudent.house_number_street,
+      area_estate:                   newStudent.area_estate,
+      city:                          newStudent.city,
+      lga_of_residence:              newStudent.lga_of_residence,
+      state_of_residence:            newStudent.state_of_residence,
+      landmark:                      newStudent.landmark,
+      years_at_residence:            newStudent.years_at_residence,
+      postal_pmb:                    newStudent.postal_pmb,
       blood_group:                   newStudent.blood_group,
       genotype:                      newStudent.genotype,
       student_photo:                 newStudent.student_photo,
@@ -194,6 +249,7 @@ const createStudent = async (studentData) => {
       student_status:                newStudent.student_status,
       emergency_contact_name:        newStudent.emergency_contact_name,
       emergency_contact_phone:       newStudent.emergency_contact_phone,
+      emergency_contact_whatsapp:    newStudent.emergency_contact_whatsapp,
       emergency_contact_relationship: newStudent.emergency_contact_relationship,
       is_active:                     true,
       created_by:                    newStudent.created_by,
@@ -213,6 +269,7 @@ const createStudent = async (studentData) => {
             guardian_name: guardianData.guardianName,
             guardian_relationship: guardianData.guardianRelationship || null,
             guardian_phone: guardianData.guardianPhone,
+            guardian_whatsapp: guardianData.guardianWhatsapp || null,
             guardian_email: guardianData.guardianEmail || null,
             guardian_address: guardianData.guardianAddress || null,
             guardian_occupation: guardianData.guardianOccupation || null,
@@ -239,6 +296,7 @@ const createStudent = async (studentData) => {
         guardian_name: studentData.guardianName,
         guardian_relationship: studentData.guardianRelationship || null,
         guardian_phone: studentData.guardianPhone,
+        guardian_whatsapp: studentData.guardianWhatsapp || null,
         guardian_email: studentData.guardianEmail || null,
         guardian_address: studentData.guardianAddress || null,
         guardian_occupation: studentData.guardianOccupation || null,
@@ -441,10 +499,67 @@ const updateStudent = async (studentId, studentData) => {
         studentData.stateOfOrigin !== undefined
           ? studentData.stateOfOrigin
           : existingStudent.state_of_origin,
+      place_of_birth:
+        studentData.placeOfBirth !== undefined
+          ? studentData.placeOfBirth
+          : existingStudent.place_of_birth,
+      lga_of_origin:
+        studentData.lgaOfOrigin !== undefined
+          ? studentData.lgaOfOrigin
+          : existingStudent.lga_of_origin,
+      tribe:
+        studentData.tribe !== undefined ? studentData.tribe : existingStudent.tribe,
+      nin: studentData.nin !== undefined ? studentData.nin : existingStudent.nin,
+      whatsapp:
+        studentData.whatsapp !== undefined
+          ? studentData.whatsapp
+          : existingStudent.whatsapp,
+      number_of_siblings:
+        studentData.numberOfSiblings !== undefined
+          ? studentData.numberOfSiblings
+          : existingStudent.number_of_siblings,
+      family_position:
+        studentData.familyPosition !== undefined
+          ? studentData.familyPosition
+          : existingStudent.family_position,
+      lives_with:
+        studentData.livesWith !== undefined
+          ? studentData.livesWith
+          : existingStudent.lives_with,
       address:
         studentData.address !== undefined
           ? studentData.address
           : existingStudent.address,
+      house_number_street:
+        studentData.houseNumberStreet !== undefined
+          ? studentData.houseNumberStreet
+          : existingStudent.house_number_street,
+      area_estate:
+        studentData.areaEstate !== undefined
+          ? studentData.areaEstate
+          : existingStudent.area_estate,
+      city:
+        studentData.city !== undefined ? studentData.city : existingStudent.city,
+      lga_of_residence:
+        studentData.lgaOfResidence !== undefined
+          ? studentData.lgaOfResidence
+          : existingStudent.lga_of_residence,
+      state_of_residence:
+        studentData.stateOfResidence !== undefined
+          ? studentData.stateOfResidence
+          : existingStudent.state_of_residence,
+      landmark:
+        studentData.landmark !== undefined
+          ? studentData.landmark
+          : existingStudent.landmark,
+      years_at_residence:
+        studentData.yearsAtResidence !== undefined
+          ? studentData.yearsAtResidence
+          : existingStudent.years_at_residence,
+      postal_pmb:
+        studentData.postalPmb !== undefined
+          ? studentData.postalPmb
+          : existingStudent.postal_pmb,
       blood_group:
         studentData.bloodGroup !== undefined
           ? studentData.bloodGroup
@@ -479,6 +594,10 @@ const updateStudent = async (studentId, studentData) => {
         studentData.emergencyContactPhone !== undefined
           ? studentData.emergencyContactPhone
           : existingStudent.emergency_contact_phone,
+      emergency_contact_whatsapp:
+        studentData.emergencyContactWhatsapp !== undefined
+          ? studentData.emergencyContactWhatsapp
+          : existingStudent.emergency_contact_whatsapp,
       emergency_contact_relationship:
         studentData.emergencyContactRelationship !== undefined
           ? studentData.emergencyContactRelationship
@@ -492,6 +611,65 @@ const updateStudent = async (studentId, studentData) => {
     students[studentIndex] = updatedStudent;
     writeData(studentsFilePath, students);
     console.log("Student updated with ID:", studentId);
+
+    if (
+      studentData.houseNumberStreet !== undefined ||
+      studentData.areaEstate !== undefined ||
+      studentData.city !== undefined ||
+      studentData.lgaOfResidence !== undefined ||
+      studentData.stateOfResidence !== undefined ||
+      studentData.landmark !== undefined
+    ) {
+      updatedStudent.address = composeResidenceAddress({
+        houseNumberStreet: updatedStudent.house_number_street,
+        areaEstate: updatedStudent.area_estate,
+        city: updatedStudent.city,
+        lgaOfResidence: updatedStudent.lga_of_residence,
+        stateOfResidence: updatedStudent.state_of_residence,
+        landmark: updatedStudent.landmark,
+      });
+      students[studentIndex] = updatedStudent;
+      writeData(studentsFilePath, students);
+    }
+
+    await Student.findOneAndUpdate(
+      { student_id: studentId },
+      {
+        $set: {
+          full_name: updatedStudent.full_name,
+          email: updatedStudent.email,
+          phone: updatedStudent.phone,
+          date_of_birth: updatedStudent.date_of_birth,
+          gender: updatedStudent.gender,
+          religion: updatedStudent.religion,
+          nationality: updatedStudent.nationality,
+          state_of_origin: updatedStudent.state_of_origin,
+          place_of_birth: updatedStudent.place_of_birth,
+          lga_of_origin: updatedStudent.lga_of_origin,
+          tribe: updatedStudent.tribe,
+          nin: updatedStudent.nin,
+          whatsapp: updatedStudent.whatsapp,
+          number_of_siblings: updatedStudent.number_of_siblings,
+          family_position: updatedStudent.family_position,
+          lives_with: updatedStudent.lives_with,
+          address: updatedStudent.address,
+          house_number_street: updatedStudent.house_number_street,
+          area_estate: updatedStudent.area_estate,
+          city: updatedStudent.city,
+          lga_of_residence: updatedStudent.lga_of_residence,
+          state_of_residence: updatedStudent.state_of_residence,
+          landmark: updatedStudent.landmark,
+          blood_group: updatedStudent.blood_group,
+          genotype: updatedStudent.genotype,
+          student_photo: updatedStudent.student_photo,
+          emergency_contact_name: updatedStudent.emergency_contact_name,
+          emergency_contact_phone: updatedStudent.emergency_contact_phone,
+          emergency_contact_whatsapp: updatedStudent.emergency_contact_whatsapp,
+          emergency_contact_relationship: updatedStudent.emergency_contact_relationship,
+          updated_at: new Date(),
+        },
+      }
+    );
 
     // Step 5: Update user record if email or password changed
     const users = readData(usersFilePath);

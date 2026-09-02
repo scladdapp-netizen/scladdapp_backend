@@ -47,6 +47,46 @@ router.post("/:billId/recipients/:userBillId/payment", (req, res, next) => {
   ctrl.recordPayment(req, res, next);
 });
 
+// Update payment
+router.patch("/:billId/recipients/:userBillId/payment/:paymentId", (req, res, next) => {
+  const originalJson = res.json.bind(res);
+  res.json = (body) => {
+    if (body?.success) {
+      logActivity(
+        req.body.modified_by_id || "system",
+        body.data?.school_id,
+        "UPDATE_PAYMENT",
+        "Fee Billing",
+        `Updated payment ${req.params.paymentId} on user bill ${req.params.userBillId}`,
+        "success",
+        "admin"
+      );
+    }
+    return originalJson(body);
+  };
+  ctrl.updatePayment(req, res, next);
+});
+
+// Delete payment
+router.delete("/:billId/recipients/:userBillId/payment/:paymentId", (req, res, next) => {
+  const originalJson = res.json.bind(res);
+  res.json = (body) => {
+    if (body?.success) {
+      logActivity(
+        req.body?.deleted_by_id || "system",
+        null,
+        "DELETE_PAYMENT",
+        "Fee Billing",
+        `Deleted payment ${req.params.paymentId} from user bill ${req.params.userBillId}`,
+        "success",
+        "admin"
+      );
+    }
+    return originalJson(body);
+  };
+  ctrl.deletePayment(req, res, next);
+});
+
 // Update bill status
 router.patch("/:billId/status", (req, res, next) => {
   const originalJson = res.json.bind(res);

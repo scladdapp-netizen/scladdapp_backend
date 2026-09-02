@@ -12,6 +12,7 @@ router.get("/:schoolId/attendance/today",    ctrl.getTodayAttendance);
 router.get("/:schoolId/fee-payments",        ctrl.getFeePayments);
 router.get("/:schoolId/gender-distribution", ctrl.getGenderDistribution);
 router.get("/:schoolId/enrollment-trend",    ctrl.getEnrollmentTrend);
+router.get("/:schoolId/applications-monthly-trend", ctrl.getApplicationsMonthlyTrend);
 router.get("/:schoolId/recent-activities",   ctrl.getRecentActivities);
 router.get("/:schoolId/monthly-financials",  ctrl.getMonthlyFinancials);
 router.get("/:schoolId/search",              ctrl.search);

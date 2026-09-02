@@ -199,6 +199,21 @@ const queueEmail = async (emailOptions) => {
   return { sent: false, queued: true };
 };
 
+/**
+ * Current email quota for the rolling daily period.
+ */
+const getEmailQuota = () => {
+  maybeResetPeriod();
+  const queue = loadQueue();
+  return {
+    sent_count: state.sentCount,
+    daily_limit: DAILY_LIMIT,
+    remaining: Math.max(0, DAILY_LIMIT - state.sentCount),
+    queued: queue.length,
+    period_hours: PERIOD_HOURS,
+  };
+};
+
 // ── Hourly scheduler ──────────────────────────────────────────────────────────
 setInterval(async () => {
   const wasReset = maybeResetPeriod();
@@ -214,4 +229,4 @@ setInterval(async () => {
   }
 })();
 
-module.exports = { queueEmail, drainQueue };
+module.exports = { queueEmail, drainQueue, getEmailQuota };

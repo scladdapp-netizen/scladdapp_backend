@@ -7,6 +7,7 @@ const studentGuardianSchema = new mongoose.Schema(
     guardian_name: { type: String, required: true },
     guardian_relationship: { type: String, default: null },
     guardian_phone: { type: String, default: null },
+    guardian_whatsapp: { type: String, default: null },
     guardian_email: { type: String, default: null },
     guardian_address: { type: String, default: null },
     guardian_occupation: { type: String, default: null },
