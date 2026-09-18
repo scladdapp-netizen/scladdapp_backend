@@ -115,16 +115,31 @@ exports.getAssignmentsBySession = async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { page = 1, limit = 20, search = "", searchField = "", sortBy = "assignment_date",
-            sortOrder = "desc", assignmentMethod = "" } = req.query;
+            sortOrder = "desc", assignmentMethod = "", status = "" } = req.query;
 
     if (!sessionId) return res.status(400).json({ success: false, message: "Session ID is required" });
 
-    const query = { session_id: sessionId, is_active: true };
+    const query = { session_id: sessionId };
     if (assignmentMethod && assignmentMethod.trim()) {
       query.assignment_method = { $in: assignmentMethod.split(",").map((m) => m.trim()) };
     }
 
+    // Optional status filter for the table rows (active | inactive | all/empty)
+    const statusFilter = String(status || "").toLowerCase();
+    if (statusFilter === "active") query.is_active = true;
+    else if (statusFilter === "inactive") query.is_active = false;
+
     let assignments = await StudentClassAssignment.find(query).lean();
+
+    // Stats from the full session set (method-filtered, ignoring page/status/search)
+    const statsQuery = { session_id: sessionId };
+    if (assignmentMethod && assignmentMethod.trim()) {
+      statsQuery.assignment_method = query.assignment_method;
+    }
+    const [activeCount, inactiveCount] = await Promise.all([
+      StudentClassAssignment.countDocuments({ ...statsQuery, is_active: true }),
+      StudentClassAssignment.countDocuments({ ...statsQuery, is_active: { $ne: true } }),
+    ]);
 
     // Enrich with student names
     const studentIds = assignments.map((a) => a.student_id);
@@ -170,11 +185,16 @@ exports.getAssignmentsBySession = async (req, res) => {
       data: paged,
       pagination: {
         currentPage: pageNum,
-        totalPages:  Math.ceil(rows.length / limitNum),
+        totalPages:  Math.ceil(rows.length / limitNum) || 1,
         totalItems:  rows.length,
         itemsPerPage: limitNum,
         hasNextPage: startIndex + limitNum < rows.length,
         hasPrevPage: pageNum > 1,
+      },
+      stats: {
+        active: activeCount,
+        inactive: inactiveCount,
+        total: activeCount + inactiveCount,
       },
       count: paged.length,
     });

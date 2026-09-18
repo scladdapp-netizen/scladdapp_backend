@@ -98,25 +98,70 @@ app.use("/api/otp", require("./routes/otp.routes"));
 app.use("/api/gmail", require("./routes/gmail_auth.routes"));
 
 // ── School website hosting ────────────────────────────────────────────────────
-const { serveSchoolSite } = require("./controllers/websiteRequest.controller");
+const {
+  serveSchoolSite,
+  normalizeDomain,
+} = require("./controllers/websiteRequest.controller");
+const WebsiteRequest = require("./models/WebsiteRequest.model");
 
-// DEV: path-based  →  GET /sites/:slug
-// PROD: subdomain middleware  →  <slug>.mydomain.com  hits here first
-if (process.env.NODE_ENV === "production") {
-  // Intercept wildcard subdomains before all other routes
-  app.use(async (req, res, next) => {
-    const host = req.hostname; // e.g. "greenvalleyschool.mydomain.com"
-    const prodDomain = process.env.PROD_DOMAIN; // e.g. "mydomain.com"
+// Host-based serving: custom domains + platform subdomains (multi-page paths work)
+// Runs before API routes so school.com/about hits the published site.
+app.use(async (req, res, next) => {
+  try {
+    const rawHost = String(req.hostname || req.headers.host || "")
+      .split(":")[0]
+      .toLowerCase();
+    if (!rawHost || rawHost === "localhost" || rawHost === "127.0.0.1") return next();
 
-    if (!prodDomain || !host.endsWith(`.${prodDomain}`)) return next();
+    const host = normalizeDomain(rawHost);
+    const prodDomain = normalizeDomain(process.env.PROD_DOMAIN || "");
 
-    // Extract the slug  "greenvalleyschool.mydomain.com" → "greenvalleyschool"
-    req.params = { slug: host.slice(0, -(`.${prodDomain}`.length)) };
+    // Platform subdomain: school.PROD_DOMAIN
+    if (prodDomain && host.endsWith(`.${prodDomain}`) && host !== prodDomain) {
+      const slug = host.slice(0, -(`.${prodDomain}`.length));
+      if (slug && !slug.includes(".")) {
+        req.params = {
+          slug,
+          pagePath: String(req.path || "/").replace(/^\//, ""),
+        };
+        req.siteMount = "host";
+        return serveSchoolSite(req, res, next);
+      }
+    }
+
+    // Custom domain (connected only)
+    const doc = await WebsiteRequest.findOne({
+      status: "published",
+      custom_domain_status: "connected",
+      custom_domain: host,
+    }).lean();
+
+    if (doc?.subdomain_slug) {
+      req.params = {
+        slug: doc.subdomain_slug,
+        pagePath: String(req.path || "/").replace(/^\//, ""),
+      };
+      req.siteDoc = doc;
+      req.siteMount = "host";
+      return serveSchoolSite(req, res, next);
+    }
+  } catch (err) {
+    console.warn("[site-host-middleware]", err.message);
+  }
+  return next();
+});
+
+// Path-based hosting (dev + fallback): /sites/:slug/...
+{
+  const serveDevSite = (req, res, next) => {
+    const raw = req.params.pagePath;
+    req.params.pagePath = Array.isArray(raw) ? raw.join("/") : (raw || "");
+    req.siteMount = "path";
     return serveSchoolSite(req, res, next);
-  });
-} else {
-  // Dev: serve via path  GET /sites/:slug
-  app.get("/sites/:slug", serveSchoolSite);
+  };
+  app.get("/sites/:slug", serveDevSite);
+  app.get("/sites/:slug/", serveDevSite);
+  app.get("/sites/:slug/{*pagePath}", serveDevSite);
 }
 
 // Serve uploaded files

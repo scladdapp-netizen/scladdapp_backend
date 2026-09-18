@@ -46,4 +46,53 @@ const checkSubAdminLimit = async (schoolId) => {
   return { allowed: true };
 };
 
-module.exports = { checkStudentLimit, checkStaffLimit, checkSubAdminLimit };
+/**
+ * AI Timetable is available on Standard and Premium plans only.
+ */
+const isStandardOrAbove = (plan) => {
+  const name = String(plan?.plan_name || "").toLowerCase();
+  return name.includes("standard") || name.includes("premium");
+};
+
+const checkAITimetableAccess = async (schoolId) => {
+  const plan = await getPlan(schoolId);
+
+  if (!isStandardOrAbove(plan)) {
+    return {
+      allowed: false,
+      code: "upgrade_required",
+      error: "Plan upgrade required",
+      message: "Upgrade to Standard or above to use AI Timetable.",
+      plan_name: plan?.plan_name || null,
+    };
+  }
+  return { allowed: true, plan_name: plan.plan_name };
+};
+
+/**
+ * AI Website Editor mode is available on Standard and Premium plans only.
+ */
+const checkAIWebsiteEditorAccess = async (schoolId) => {
+  const plan = await getPlan(schoolId);
+
+  if (!isStandardOrAbove(plan)) {
+    return {
+      allowed: false,
+      code: "upgrade_required",
+      error: "Plan upgrade required",
+      message: "Upgrade your plan to use AI. Standard Plan or above is required.",
+      plan_name: plan?.plan_name || null,
+    };
+  }
+  return { allowed: true, plan_name: plan.plan_name };
+};
+
+module.exports = {
+  getPlan,
+  checkStudentLimit,
+  checkStaffLimit,
+  checkSubAdminLimit,
+  checkAITimetableAccess,
+  checkAIWebsiteEditorAccess,
+  isStandardOrAbove,
+};

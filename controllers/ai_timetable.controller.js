@@ -8,6 +8,7 @@ const ClassTimetable = require("../models/ClassTimetable.model");
 const AIConfig = require("../models/AIConfig.model");
 const { USE_TIMETABLE, usesForFeature } = require("../utils/aiConfigUse");
 const { getMessageText, hasReasoningOnly, parseTimetableAIResponse } = require("../utils/parseAiJson");
+const { checkAITimetableAccess } = require("../utils/planLimitCheck");
 const axios = require("axios");
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -581,6 +582,17 @@ exports.generateTimetables = async (req, res) => {
     }
     if (!subsession_id) {
       return res.status(400).json({ success: false, message: "subsession_id is required" });
+    }
+
+    const planAccess = await checkAITimetableAccess(school_id);
+    if (!planAccess.allowed) {
+      return res.status(403).json({
+        success: false,
+        error: planAccess.error,
+        code: planAccess.code,
+        message: planAccess.message,
+        plan_name: planAccess.plan_name,
+      });
     }
 
     const config = configId

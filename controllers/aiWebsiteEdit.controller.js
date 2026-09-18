@@ -7,7 +7,7 @@
  *  3. AI returns a JSON diff with ops: replace, insert_before, insert_after, delete,
  *     or replace_section (full section fallback).
  *  4. Backend applies ops to the innerHTML, rewraps the section, splices it back.
- *  5. Deducts 1 token and returns the full updated HTML.
+ *  5. Returns the full updated HTML (AI website editing is free — no token deduction).
  */
 
 const AIConfig = require("../models/AIConfig.model");
@@ -18,10 +18,34 @@ const School         = require("../models/School.model");
 const { uploadToCloudinary } = require("../utils/cloudinary");
 const cloudinary     = require("cloudinary").v2;
 const axios          = require("axios");
+const { checkAIWebsiteEditorAccess } = require("../utils/planLimitCheck");
 
 const OPENROUTER_URL         = "https://openrouter.ai/api/v1/chat/completions";
 const OPENROUTER_TIMEOUT_MS  = 90_000;
 const OPENROUTER_MAX_RETRIES = 2;
+
+/** Build page list from brief.pages, with Home fallback */
+function buildPageMeta(doc) {
+  const briefPages = doc?.brief?.pages;
+  if (Array.isArray(briefPages) && briefPages.length) {
+    return briefPages.map((p, i) => ({
+      id: p.id || `page_${i}`,
+      title: p.title || `Page ${i + 1}`,
+      slug: p.slug || (i === 0 ? "/" : `/${p.id || `page-${i + 1}`}`),
+      order: p.order ?? i,
+    }));
+  }
+  return [{ id: "home", title: "Home", slug: "/", order: 0 }];
+}
+
+function normalizePathSlug(pathOrSlug) {
+  if (!pathOrSlug || pathOrSlug === "" || pathOrSlug === "index" || pathOrSlug === "index.html") return "/";
+  let s = String(pathOrSlug).trim();
+  if (!s.startsWith("/")) s = `/${s}`;
+  s = s.replace(/\/+$/, "") || "/";
+  s = s.replace(/\.html$/i, "");
+  return s === "" ? "/" : s;
+}
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -434,20 +458,25 @@ exports.editWebsite = async (req, res) => {
     if (!prompt?.trim())   return res.status(400).json({ success: false, message: "prompt is required" });
     if (!fullHtml?.trim()) return res.status(400).json({ success: false, message: "fullHtml is required" });
 
-    // 1. Token check
-    const tokenDoc = await getOrCreateTokenDoc(schoolId);
-    if (tokenDoc.balance < 1) {
-      return res.status(402).json({ success: false, code: "INSUFFICIENT_TOKENS",
-        message: "You have no AI tokens left. Please purchase more.", balance: 0 });
+    const planAccess = await checkAIWebsiteEditorAccess(schoolId);
+    if (!planAccess.allowed) {
+      return res.status(403).json({
+        success: false,
+        code: planAccess.code || "upgrade_required",
+        message: planAccess.message,
+        plan_name: planAccess.plan_name,
+      });
     }
 
-    // 2. Config
+    // AI website editing is free — no token balance required
+
+    // 1. Config
     const config = configId
       ? await AIConfig.findOne({ config_id: configId, use: usesForFeature(USE_WEBSITE) })
       : await getWebsiteConfig();
     if (!config) return res.status(404).json({ success: false, message: "AI config not found" });
 
-    // 3. Locate target section
+    // 2. Locate target section
     let sectionInfo = null;
     if (sectionId)  sectionInfo = extractSectionById(fullHtml, sectionId);
     if (!sectionInfo && sectionHtml?.trim().length > 20) {
@@ -462,7 +491,7 @@ exports.editWebsite = async (req, res) => {
 
     console.log(`${tag} sectionId="${sectionId || "none"}" found=${!!sectionInfo} sending ${workingInner.length} chars`);
 
-    // 4. Build messages
+    // 3. Build messages
     const elCtx = element
       ? `\nTargeted element: ${element.selector || element.tagName}` +
         (element.textContent ? `\nElement text: "${element.textContent.slice(0, 100)}"` : "")
@@ -544,12 +573,8 @@ exports.editWebsite = async (req, res) => {
       console.log(`${tag} Spliced section back — total html: ${newHtml.length} chars`);
     }
 
-    // 7. Deduct token
-    await SchoolAIToken.updateOne({ school_id: schoolId }, { $inc: { balance: -1, total_used: 1 } });
-    const newBalance = Math.max(0, tokenDoc.balance - 1);
-
     return res.json({
-      success: true, newHtml, tokensUsed: 1, newBalance,
+      success: true, newHtml, tokensUsed: 0, newBalance: null,
       modelUsage: orData.usage || {},
       message: "Section updated successfully.",
       aiResponse: newInner.slice(0, 1200),
@@ -569,16 +594,76 @@ exports.saveDraft = async (req, res) => {
   const tag = "[AI-WEBSITE-DRAFT]";
   try {
     const { schoolId } = req.params;
-    const { html } = req.body;
-    if (!html) return res.status(400).json({ success: false, message: "html is required" });
+    const { html, pageId, pages } = req.body;
+
+    const existing = await WebsiteRequest.findOne({ school_id: schoolId }).lean();
+    const pageMeta = buildPageMeta(existing);
+
+    let nextDraftPages = Array.isArray(existing?.draft_pages) ? [...existing.draft_pages] : [];
+
+    // Seed from legacy draft_html / empty stubs
+    if (!nextDraftPages.length) {
+      nextDraftPages = pageMeta.map((p, i) => ({
+        ...p,
+        html: i === 0 ? (existing?.draft_html || "") : "",
+      }));
+    } else {
+      // Ensure brief pages exist in draft_pages
+      pageMeta.forEach((meta) => {
+        if (!nextDraftPages.find((p) => p.id === meta.id)) {
+          nextDraftPages.push({ ...meta, html: "" });
+        }
+      });
+    }
+
+    if (Array.isArray(pages) && pages.length) {
+      pages.forEach((incoming) => {
+        const idx = nextDraftPages.findIndex((p) => p.id === incoming.id || p.slug === incoming.slug);
+        if (idx >= 0) {
+          nextDraftPages[idx] = {
+            ...nextDraftPages[idx],
+            html: incoming.html ?? nextDraftPages[idx].html,
+            title: incoming.title || nextDraftPages[idx].title,
+            slug: incoming.slug || nextDraftPages[idx].slug,
+          };
+        } else if (incoming.id) {
+          nextDraftPages.push({
+            id: incoming.id,
+            title: incoming.title || "Page",
+            slug: incoming.slug || `/${incoming.id}`,
+            order: nextDraftPages.length,
+            html: incoming.html || "",
+          });
+        }
+      });
+    } else if (html !== undefined) {
+      const targetId = pageId || nextDraftPages[0]?.id || "home";
+      const idx = nextDraftPages.findIndex((p) => p.id === targetId);
+      if (idx >= 0) nextDraftPages[idx] = { ...nextDraftPages[idx], html };
+      else nextDraftPages.push({ id: targetId, title: "Home", slug: "/", order: 0, html });
+    } else {
+      return res.status(400).json({ success: false, message: "html or pages is required" });
+    }
+
+    const homeHtml = nextDraftPages.find((p) => p.slug === "/" || p.id === "home")?.html
+      || nextDraftPages[0]?.html
+      || "";
+
     await WebsiteRequest.findOneAndUpdate(
       { school_id: schoolId },
-      { $set: { draft_html: html, school_id: schoolId } },
+      {
+        $set: {
+          draft_pages: nextDraftPages,
+          draft_html: homeHtml,
+          school_id: schoolId,
+        },
+      },
       { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: false }
     );
     await School.updateOne({ school_id: schoolId }, { $set: { website_requested: true, updated_at: new Date() } });
-    return res.json({ success: true, message: "Draft saved" });
+    return res.json({ success: true, message: "Draft saved", data: { pages: nextDraftPages } });
   } catch (err) {
+    console.error(`${tag} Error:`, err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -661,14 +746,63 @@ exports.deleteImage = async (req, res) => {
 exports.getLiveHtml = async (req, res) => {
   try {
     const { schoolId } = req.params;
+    const pageId = req.query.pageId || null;
     const doc = await WebsiteRequest.findOne({ school_id: schoolId }).lean();
-    if (!doc?.html_cloudinary_url) {
-      return res.status(404).json({ success: false, message: "No published website found for this school." });
+    if (!doc) {
+      return res.status(404).json({ success: false, message: "No website request found for this school." });
     }
-    const cloudRes = await fetch(doc.html_cloudinary_url);
-    if (!cloudRes.ok) return res.status(502).json({ success: false, message: "Could not fetch published HTML from storage." });
-    const html = await cloudRes.text();
-    return res.json({ success: true, data: { html } });
+
+    const published = Array.isArray(doc.published_pages) ? doc.published_pages : [];
+    const meta = buildPageMeta(doc);
+
+    const fetchPage = async (url) => {
+      const cloudRes = await fetch(url);
+      if (!cloudRes.ok) throw new Error("Could not fetch published HTML from storage.");
+      return cloudRes.text();
+    };
+
+    if (published.length) {
+      const pages = [];
+      for (const p of published) {
+        let html = "";
+        if (p.html_cloudinary_url) {
+          try { html = await fetchPage(p.html_cloudinary_url); } catch (_) {}
+        }
+        pages.push({
+          id: p.id,
+          title: p.title,
+          slug: p.slug,
+          order: p.order ?? 0,
+          html,
+        });
+      }
+      const active = pageId
+        ? pages.find((p) => p.id === pageId) || pages[0]
+        : pages.find((p) => p.slug === "/" || p.id === "home") || pages[0];
+      return res.json({
+        success: true,
+        data: {
+          pages,
+          html: active?.html || null,
+          pageId: active?.id || null,
+          source: "published",
+        },
+      });
+    }
+
+    if (doc.html_cloudinary_url) {
+      const html = await fetchPage(doc.html_cloudinary_url);
+      const pages = meta.map((p, i) => ({
+        ...p,
+        html: i === 0 ? html : "",
+      }));
+      return res.json({
+        success: true,
+        data: { pages, html, pageId: pages[0]?.id || "home", source: "published" },
+      });
+    }
+
+    return res.status(404).json({ success: false, message: "No published website found for this school." });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -677,21 +811,81 @@ exports.getLiveHtml = async (req, res) => {
 exports.getDraft = async (req, res) => {
   try {
     const { schoolId } = req.params;
+    const pageId = req.query.pageId || null;
     const doc = await WebsiteRequest.findOne({ school_id: schoolId }).lean();
+    const meta = buildPageMeta(doc);
 
-    if (doc?.draft_html) {
-      return res.json({ success: true, data: { html: doc.draft_html, source: "draft" } });
-    }
-    if (doc?.html_cloudinary_url) {
+    let pages = [];
+    let source = "none";
+
+    if (Array.isArray(doc?.draft_pages) && doc.draft_pages.length) {
+      source = "draft";
+      pages = meta.map((m) => {
+        const found = doc.draft_pages.find((p) => p.id === m.id || p.slug === m.slug);
+        return { ...m, html: found?.html || "" };
+      });
+      // Keep any extra draft pages not in brief
+      doc.draft_pages.forEach((p) => {
+        if (!pages.find((x) => x.id === p.id)) {
+          pages.push({
+            id: p.id,
+            title: p.title || "Page",
+            slug: p.slug || `/${p.id}`,
+            order: p.order ?? pages.length,
+            html: p.html || "",
+          });
+        }
+      });
+    } else if (doc?.draft_html) {
+      source = "draft";
+      pages = meta.map((m, i) => ({ ...m, html: i === 0 ? doc.draft_html : "" }));
+    } else if (Array.isArray(doc?.published_pages) && doc.published_pages.length) {
+      source = "published";
+      pages = [];
+      for (const m of meta) {
+        const pub = doc.published_pages.find((p) => p.id === m.id || p.slug === m.slug);
+        let html = "";
+        if (pub?.html_cloudinary_url) {
+          try {
+            const cloudRes = await fetch(pub.html_cloudinary_url);
+            if (cloudRes.ok) html = await cloudRes.text();
+          } catch (_) {}
+        } else if ((m.slug === "/" || m.id === "home") && doc.html_cloudinary_url) {
+          try {
+            const cloudRes = await fetch(doc.html_cloudinary_url);
+            if (cloudRes.ok) html = await cloudRes.text();
+          } catch (_) {}
+        }
+        pages.push({ ...m, html });
+      }
+    } else if (doc?.html_cloudinary_url) {
+      source = "published";
       try {
         const cloudRes = await fetch(doc.html_cloudinary_url);
         if (cloudRes.ok) {
           const html = await cloudRes.text();
-          return res.json({ success: true, data: { html, source: "published" } });
+          pages = meta.map((m, i) => ({ ...m, html: i === 0 ? html : "" }));
         }
       } catch (_) {}
     }
-    return res.json({ success: true, data: { html: null, source: "none" } });
+
+    if (!pages.length) {
+      pages = meta.map((m) => ({ ...m, html: "" }));
+    }
+
+    const active = pageId
+      ? pages.find((p) => p.id === pageId) || pages[0]
+      : pages.find((p) => p.slug === "/" || p.id === "home") || pages[0];
+
+    return res.json({
+      success: true,
+      data: {
+        pages,
+        html: active?.html || null,
+        pageId: active?.id || null,
+        source: active?.html ? source : "none",
+      },
+    });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

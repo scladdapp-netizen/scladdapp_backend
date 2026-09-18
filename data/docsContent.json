@@ -81,6 +81,225 @@
         "video": null
       },
       {
+        "id": "setting-up-your-school",
+        "title": "Setting up your school",
+        "content": "After you create your school, follow this order to finish basic setup before day-to-day use: staff, teachers, classes, subjects, templates, session, then students.",
+        "blocks": [
+          {
+            "type": "video",
+            "title": "Setting up your school",
+            "youtubeId": "dQw4w9WgXcQ"
+          },
+          {
+            "type": "paragraph",
+            "text": "After you create your school, follow this order to finish basic setup before day-to-day use: staff, teachers, classes, subjects, templates, session, then students."
+          }
+        ],
+        "steps": [
+          {
+            "step": "After you create your school",
+            "desc": "Finish registration and open the admin dashboard. Complete the steps below in order so classes, subjects, and students connect correctly.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Finish registration and open the admin dashboard. Complete the steps below in order so classes, subjects, and students connect correctly."
+              }
+            ]
+          },
+          {
+            "step": "Add staff",
+            "desc": "Go to Staff and add your school staff members (admins and other roles as needed).",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to Staff and add your school staff members (admins and other roles as needed)."
+              }
+            ]
+          },
+          {
+            "step": "Add teachers",
+            "desc": "Assign the teacher role to staff who will teach classes and enter scores.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Assign the teacher role to staff who will teach classes and enter scores."
+              }
+            ]
+          },
+          {
+            "step": "Add classes",
+            "desc": "Create your class levels and arms (for example JSS 1 A, JSS 1 B) under Classes.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Create your class levels and arms (for example JSS 1 A, JSS 1 B) under Classes."
+              }
+            ]
+          },
+          {
+            "step": "Add subjects",
+            "desc": "Add subjects and link them to the classes (and teachers) that offer them.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Add subjects and link them to the classes (and teachers) that offer them."
+              }
+            ]
+          },
+          {
+            "step": "Set up class promotion template",
+            "desc": "Create a class promotion template so you can move students to the next class at the end of a session.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Create a class promotion template so you can move students to the next class at the end of a session."
+              }
+            ]
+          },
+          {
+            "step": "Set up grading template",
+            "desc": "Configure your grading template (grade boundaries and CA/exam weights) before results are entered.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Configure your grading template (grade boundaries and CA/exam weights) before results are entered."
+              }
+            ]
+          },
+          {
+            "step": "Set up timetable template",
+            "desc": "Create a timetable template with school days, period times, and break slots. You will use it when building class timetables.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Create a timetable template with school days, period times, and break slots. You will use it when building class timetables."
+              }
+            ]
+          },
+          {
+            "step": "Set up fee bill template (optional)",
+            "desc": "Create reusable fee bill templates with line items and amounts for tuition and other charges.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Create reusable fee bill templates with line items and amounts for tuition and other charges."
+              }
+            ]
+          },
+          {
+            "step": "Set up announcement template (optional)",
+            "desc": "Design reusable announcement templates for notices you send to students, staff, or guardians.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Design reusable announcement templates for notices you send to students, staff, or guardians."
+              }
+            ]
+          },
+          {
+            "step": "Create a session",
+            "desc": "Create the academic session and terms (subsessions) your school will run on.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Create the academic session and terms (subsessions) your school will run on."
+              }
+            ]
+          },
+          {
+            "step": "Add students",
+            "desc": "Add students and enroll them in the right class for the active session and term.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Add students and enroll them in the right class for the active session and term."
+              }
+            ]
+          }
+        ],
+        "callout": "Do these in order. Classes, subjects, and templates should exist before you create a session and enroll students. See the Templates section for full guides on each template type.",
+        "video": null
+      },
+      {
+        "id": "tutorial-videos-library",
+        "title": "Tutorial Videos Library",
+        "content": "These tutorial videos power the admin dashboard tutorial card and the floating tutorial helper. Portal admins can add or remove videos from this shared list.",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "These tutorial videos power the admin dashboard tutorial card and the floating tutorial helper. Portal admins can add or remove videos from this shared list."
+          },
+          {
+            "type": "video",
+            "title": "Getting Started with Scladapp",
+            "youtubeId": "dQw4w9WgXcQ",
+            "description": "Learn how to set up your school and configure basic settings.",
+            "duration": "5:32",
+            "category": "Getting Started",
+            "page": ""
+          },
+          {
+            "type": "video",
+            "title": "Managing Students & Admissions",
+            "youtubeId": "ScMzIvxBSi4",
+            "description": "A complete walkthrough of student enrollment and admission management.",
+            "duration": "8:14",
+            "category": "Students",
+            "page": ""
+          },
+          {
+            "type": "video",
+            "title": "Setting Up Classes & Timetables",
+            "youtubeId": "9bZkp7q19f0",
+            "description": "How to create classes, assign teachers, and build timetables.",
+            "duration": "6:47",
+            "category": "Classes",
+            "page": ""
+          },
+          {
+            "type": "video",
+            "title": "Fee Billing & Payments",
+            "youtubeId": "kJQP7kiw5Fk",
+            "description": "Configure fee templates, generate bills, and track payments.",
+            "duration": "7:20",
+            "category": "Finance",
+            "page": ""
+          },
+          {
+            "type": "video",
+            "title": "Staff & Teacher Management",
+            "youtubeId": "JGwWNGJdvx8",
+            "description": "Add staff, assign roles, and manage teacher subjects.",
+            "duration": "4:55",
+            "category": "Staff",
+            "page": ""
+          },
+          {
+            "type": "video",
+            "title": "How to request a school website",
+            "youtubeId": "ScMzIvxBSi4",
+            "description": "",
+            "duration": "5:00",
+            "category": "Website",
+            "page": "website-brief"
+          }
+        ],
+        "steps": [
+          {
+            "step": "Manage this list from admin settings",
+            "desc": "Open Settings and use the Tutorial Videos page to add new videos, remove old ones, and keep the dashboard and floating helper in sync.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open Settings and use the Tutorial Videos page to add new videos, remove old ones, and keep the dashboard and floating helper in sync."
+              }
+            ]
+          }
+        ],
+        "callout": "This is a shared source list used in multiple places across the admin experience.",
+        "video": null
+      },
+      {
         "id": "login-passwords",
         "title": "Login & Passwords",
         "content": "Scladapp supports admin, staff/teacher, and student logins. Each user signs in with email and password from the school login page.",
@@ -145,7 +364,7 @@
       {
         "id": "subscription-plans",
         "title": "Subscription & Plans",
-        "content": "Every school runs on a subscription plan. Plans control sub-admin limits and file storage. Students and staff are unlimited on all plans.",
+        "content": "Every school runs on a subscription plan. Plans control sub-admin limits, file storage, and paid extras like a hosted school website. Students and staff are unlimited on all plans.",
         "steps": [
           {
             "step": "View plans",
@@ -159,11 +378,11 @@
           },
           {
             "step": "Upgrade or renew",
-            "desc": "Choose a billing cycle (monthly, quarterly, or yearly) and pay via Paystack to activate or extend your subscription.",
+            "desc": "Choose a billing cycle (monthly, quarterly, or yearly) and pay via Paystack to activate or extend your subscription. Upgrading unlocks paid features such as requesting a branded school website.",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Choose a billing cycle (monthly, quarterly, or yearly) and pay via Paystack to activate or extend your subscription."
+                "text": "Choose a billing cycle (monthly, quarterly, or yearly) and pay via Paystack to activate or extend your subscription. Upgrading unlocks paid features such as requesting a branded school website."
               }
             ]
           },
@@ -188,12 +407,12 @@
             ]
           }
         ],
-        "callout": "When a subscription expires, your data stays safe and viewable, but creating or editing records is blocked until you renew. Support tickets and feedback remain available.",
+        "callout": "When a subscription expires, your data stays safe and viewable, but creating or editing records is blocked until you renew. Support tickets and feedback remain available. School website requests require an active paid plan.",
         "video": null,
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Every school runs on a subscription plan. Plans control sub-admin limits and file storage. Students and staff are unlimited on all plans."
+            "text": "Every school runs on a subscription plan. Plans control sub-admin limits, file storage, and paid extras like a hosted school website. Students and staff are unlimited on all plans."
           }
         ]
       }
@@ -203,6 +422,115 @@
     "section": "School Management",
     "icon": "school",
     "items": [
+      {
+        "id": "session-management",
+        "title": "Session Management",
+        "content": "A session is one full school year. Inside it, you create terms (subsessions) with real start and end dates. A session is active when the current date is inside the session start and end dates. In the same way, a term (subsession) is active when the current date is inside that term's start and end dates. Everything else — classes, enrollment, scores, and report cards — runs inside the active session and active term.",
+        "steps": [
+          {
+            "step": "How a session works (with real dates)",
+            "desc": "Think of a session as the whole school year, and terms as the parts of that year.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Think of a session as the whole school year, and terms as the parts of that year."
+              },
+              {
+                "type": "paragraph",
+                "text": "Example session: 2025/2026 — Start: 8 September 2025 — End: 24 July 2026. That date range is the full academic year."
+              },
+              {
+                "type": "paragraph",
+                "text": "Inside that same session, you create terms (subsessions). Example:"
+              },
+              {
+                "type": "paragraph",
+                "text": "First Term: 8 September 2025 → 12 December 2025. Second Term: 12 January 2026 → 3 April 2026. Third Term: 20 April 2026 → 24 July 2026."
+              },
+              {
+                "type": "paragraph",
+                "text": "Rules that make this easy: every term date must sit inside the session dates. Terms should not overlap each other. When one term ends, the next term starts later — not on the same day as another active term."
+              },
+              {
+                "type": "paragraph",
+                "text": "What uses these dates: students enroll into a class for a session and term. Attendance, scores, and report cards belong to that term. When the year ends, you create a new session (for example 2026/2027) and promote students to the next class."
+              }
+            ]
+          },
+          {
+            "step": "Open Sessions",
+            "desc": "From the admin sidebar, go to Academic Sessions to see all sessions for your school.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "From the admin sidebar, go to Academic Sessions to see all sessions for your school."
+              }
+            ]
+          },
+          {
+            "step": "Search sessions",
+            "desc": "Use the search bar at the top of the Sessions page to find a session quickly. Search by session name, session code, status (for example draft or active), or creator name. Clear the search to show the full list again.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use the search bar at the top of the Sessions page to find a session quickly. Search by session name, session code, status (for example draft or active), or creator name. Clear the search to show the full list again."
+              }
+            ]
+          },
+          {
+            "step": "Create a session",
+            "desc": "Click Create Session. Give it a clear name (for example 2025/2026), then set the real start and end dates for the whole school year. Save.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Click Create Session. Give it a clear name (for example 2025/2026), then set the real start and end dates for the whole school year — like 8 September 2025 to 24 July 2026. Save."
+              }
+            ]
+          },
+          {
+            "step": "Add terms (subsessions)",
+            "desc": "Open the session and add First Term, Second Term, and Third Term with their own start and end dates. Each term must fit inside the session dates.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open the session and add First Term, Second Term, and Third Term with their own start and end dates. Each term must fit inside the session dates. For example, First Term cannot start before the session start date, and Third Term cannot end after the session end date."
+              }
+            ]
+          },
+          {
+            "step": "Complete session setup",
+            "desc": "Use the session setup flow to assign class teachers, subjects, and related setup for that year.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use the session setup flow to assign class teachers, subjects, and related setup for that year. Students and scores will then follow the active session and term dates."
+              }
+            ]
+          },
+          {
+            "step": "Edit, archive, or reactivate",
+            "desc": "Edit session details from the actions menu. Archive completed sessions to keep the list clean, and reactivate an archived session when needed.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Edit session details from the actions menu. When a year is finished, archive it so your list stays clean. You can reactivate an archived session later if you need to open it again."
+              }
+            ]
+          }
+        ],
+        "callout": "Simple rule: Session = full year dates. Terms = parts of that year. Term dates must stay inside the session. Use search when you have many sessions.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "A session is one full school year. Inside it, you create terms (subsessions) with real start and end dates. A session is active when the current date is inside the session start and end dates. In the same way, a term (subsession) is active when the current date is inside that term's start and end dates. Everything else — classes, enrollment, scores, and report cards — runs inside the active session and active term."
+          },
+          {
+            "type": "paragraph",
+            "text": "Example: Session 2025/2026 runs from 8 September 2025 to 24 July 2026. First Term, Second Term, and Third Term sit inside those dates, one after another, without overlapping."
+          }
+        ]
+      },
       {
         "id": "adding-students",
         "title": "Adding Students",
@@ -270,6 +598,71 @@
             "type": "video",
             "title": "Adding Students Demo",
             "youtubeId": "dQw4w9WgXcQ"
+          }
+        ]
+      },
+      {
+        "id": "student-application-form",
+        "title": "Student Application Form",
+        "content": "Accept new student applications online through a public form. Configure which fields to collect, review submissions, and admit applicants as enrolled students.",
+        "steps": [
+          {
+            "step": "Enable applications",
+            "desc": "Go to Settings → Website. Turn on Accept new applications and copy the public application link to share with prospective families.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to Settings → Website. Turn on Accept new applications and copy the public application link to share with prospective families."
+              }
+            ]
+          },
+          {
+            "step": "Configure fields",
+            "desc": "Open Configure fields to choose which sections and inputs appear on the form (personal details, guardians, documents, etc.). Required fields must be completed before submission.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open Configure fields to choose which sections and inputs appear on the form (personal details, guardians, documents, etc.). Required fields must be completed before submission."
+              }
+            ]
+          },
+          {
+            "step": "Review applications",
+            "desc": "Open Applications in the sidebar to see all submissions. Filter by status, open a row to view full details, and unread applications are marked with a blue dot until opened.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open Applications in the sidebar to see all submissions. Filter by status, open a row to view full details, and unread applications are marked with a blue dot until opened."
+              }
+            ]
+          },
+          {
+            "step": "Admit an applicant",
+            "desc": "From an application detail panel, click Admit to open the Create New Student form pre-filled with the applicant's data. Saving the student marks the application as approved.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "From an application detail panel, click Admit to open the Create New Student form pre-filled with the applicant's data. Saving the student marks the application as approved."
+              }
+            ]
+          },
+          {
+            "step": "Manage access",
+            "desc": "Grant sub-admins access under Admin permissions using the Applications module (read, create, edit, delete). Read access is required to view the Applications page.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Grant sub-admins access under Admin permissions using the Applications module (read, create, edit, delete). Read access is required to view the Applications page."
+              }
+            ]
+          }
+        ],
+        "callout": "The public form is available at /school/{schoolId}/apply. Turn off Accept new applications to stop new submissions without deleting existing records.",
+        "video": null,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Accept new student applications online through a public form. Configure which fields to collect, review submissions, and admit applicants as enrolled students."
           }
         ]
       },
@@ -572,6 +965,317 @@
             "text": "Manage your school's public profile, contact details, social links, logo, and gallery from the admin settings."
           }
         ]
+      }
+    ]
+  },
+  {
+    "section": "Templates",
+    "icon": "layers",
+    "items": [
+      {
+        "id": "grading-templates",
+        "title": "Grading Templates",
+        "content": "Grading templates define how continuous assessment and exams are weighted, your letter-grade scale, and optional behavioural traits used on report cards.",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Grading templates define how continuous assessment and exams are weighted, your letter-grade scale, and optional behavioural traits used on report cards. Open Templates → Grading Templates in the admin dashboard."
+          }
+        ],
+        "steps": [
+          {
+            "step": "Open Templates",
+            "desc": "From the admin sidebar, go to Templates. The Grading Templates tab is shown by default.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "From the admin sidebar, go to Templates. The Grading Templates tab is shown by default."
+              }
+            ]
+          },
+          {
+            "step": "Create a template",
+            "desc": "Click Create, give the template a name and description, then add grading fields (for example CA1, CA2, Exam) with weights that total 100%.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Click Create, give the template a name and description, then add grading fields (for example CA1, CA2, Exam) with weights that total 100%."
+              }
+            ]
+          },
+          {
+            "step": "Set the grading scheme",
+            "desc": "Define letter grades and score ranges (for example A: 70–100, B: 60–69). Ranges must not overlap.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Define letter grades and score ranges (for example A: 70–100, B: 60–69). Ranges must not overlap."
+              }
+            ]
+          },
+          {
+            "step": "Add behavioural traits (optional)",
+            "desc": "Add traits such as punctuality or neatness if teachers will rate them on report cards.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Add traits such as punctuality or neatness if teachers will rate them on report cards."
+              }
+            ]
+          },
+          {
+            "step": "Edit report card layout",
+            "desc": "Open the HTML editor on the template to customise how the printed report card looks, then save and publish the draft.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open the HTML editor on the template to customise how the printed report card looks, then save and publish the draft."
+              }
+            ]
+          },
+          {
+            "step": "Activate and assign",
+            "desc": "Activate the template and assign it so scores and report cards use this scheme for the school or session.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Activate the template and assign it so scores and report cards use this scheme for the school or session."
+              }
+            ]
+          }
+        ],
+        "callout": "Weights must add up to 100%. You can duplicate a template for a new session without changing past results.",
+        "video": null
+      },
+      {
+        "id": "timetable-templates",
+        "title": "Timetable Templates",
+        "content": "Timetable templates define your school week: days, period start/end times, and break slots. Class timetables are built from these templates.",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Timetable templates define your school week: days, period start/end times, and break slots. Class timetables are built from these templates. Open Templates → Timetable Templates."
+          }
+        ],
+        "steps": [
+          {
+            "step": "Open Timetable Templates",
+            "desc": "Go to Templates → Timetable Templates in the admin dashboard.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to Templates → Timetable Templates in the admin dashboard."
+              }
+            ]
+          },
+          {
+            "step": "Create a template",
+            "desc": "Click Create, enter a name and description, then set the school days and period times for a typical week.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Click Create, enter a name and description, then set the school days and period times for a typical week."
+              }
+            ]
+          },
+          {
+            "step": "Add breaks",
+            "desc": "Add break or assembly slots between periods so they appear correctly on every class timetable that uses this template.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Add break or assembly slots between periods so they appear correctly on every class timetable that uses this template."
+              }
+            ]
+          },
+          {
+            "step": "Preview and save",
+            "desc": "Preview the weekly grid, save the template, and activate it when it is ready to use.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Preview the weekly grid, save the template, and activate it when it is ready to use."
+              }
+            ]
+          },
+          {
+            "step": "Use it for class timetables",
+            "desc": "When building a class timetable (or using AI Timetable), select this template so periods and breaks match your school day.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "When building a class timetable (or using AI Timetable), select this template so periods and breaks match your school day."
+              }
+            ]
+          }
+        ],
+        "callout": "Create the timetable template before assigning subjects and teachers to periods for each class.",
+        "video": null
+      },
+      {
+        "id": "fee-bill-templates",
+        "title": "Fee Bill Templates",
+        "content": "Fee bill templates are reusable lists of charges (tuition, levies, uniforms, and more) you can issue to students or classes each term.",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Fee bill templates are reusable lists of charges (tuition, levies, uniforms, and more) you can issue to students or classes each term. Open Templates → Fee Bill Templates."
+          }
+        ],
+        "steps": [
+          {
+            "step": "Open Fee Bill Templates",
+            "desc": "Go to Templates → Fee Bill Templates in the admin dashboard.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to Templates → Fee Bill Templates in the admin dashboard."
+              }
+            ]
+          },
+          {
+            "step": "Create a template",
+            "desc": "Click Create, name the template (for example Term 1 Fees), and add line items with amounts.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Click Create, name the template (for example Term 1 Fees), and add line items with amounts."
+              }
+            ]
+          },
+          {
+            "step": "Save and reuse",
+            "desc": "Save the template. When issuing a bill, pick this template so line items and amounts are filled in automatically.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Save the template. When issuing a bill, pick this template so line items and amounts are filled in automatically."
+              }
+            ]
+          },
+          {
+            "step": "Update as needed",
+            "desc": "Edit or duplicate a template for a new session or fee structure without changing bills already issued.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Edit or duplicate a template for a new session or fee structure without changing bills already issued."
+              }
+            ]
+          }
+        ],
+        "callout": "Templates only define the bill layout and amounts. You still issue bills and record payments under Fees.",
+        "video": null
+      },
+      {
+        "id": "announcement-templates",
+        "title": "Announcement Templates",
+        "content": "Announcement templates let you design formatted notices once and reuse them when messaging students, staff, or guardians.",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Announcement templates let you design formatted notices once and reuse them when messaging students, staff, or guardians. Open Templates → Announcement Templates."
+          }
+        ],
+        "steps": [
+          {
+            "step": "Open Announcement Templates",
+            "desc": "Go to Templates → Announcement Templates in the admin dashboard.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to Templates → Announcement Templates in the admin dashboard."
+              }
+            ]
+          },
+          {
+            "step": "Create a template",
+            "desc": "Click Create, give it a name, and write the default title and body. Use the HTML editor for headings, lists, and branding.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Click Create, give it a name, and write the default title and body. Use the HTML editor for headings, lists, and branding."
+              }
+            ]
+          },
+          {
+            "step": "Save and publish draft",
+            "desc": "Save your layout as a draft, preview it, then publish when it is ready to use.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Save your layout as a draft, preview it, then publish when it is ready to use."
+              }
+            ]
+          },
+          {
+            "step": "Use when announcing",
+            "desc": "When creating an announcement, select this template so the content starts from your designed layout.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "When creating an announcement, select this template so the content starts from your designed layout."
+              }
+            ]
+          }
+        ],
+        "callout": "Keep templates short and clear. You can still edit the message before sending each announcement.",
+        "video": null
+      },
+      {
+        "id": "class-promotion-templates",
+        "title": "Class Promotion Templates",
+        "content": "Class promotion templates map each class to the next level (for example JSS 1 → JSS 2) so you can promote students at session end in one go.",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Class promotion templates map each class to the next level (for example JSS 1 → JSS 2) so you can promote students at session end in one go. Open Templates → Class Promotion Templates."
+          }
+        ],
+        "steps": [
+          {
+            "step": "Open Class Promotion Templates",
+            "desc": "Go to Templates → Class Promotion Templates in the admin dashboard.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Go to Templates → Class Promotion Templates in the admin dashboard."
+              }
+            ]
+          },
+          {
+            "step": "Create a template",
+            "desc": "Click Create, name the template, then map each current class to its next class (and arm if needed).",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Click Create, name the template, then map each current class to its next class (and arm if needed)."
+              }
+            ]
+          },
+          {
+            "step": "Cover every class",
+            "desc": "Include all active classes so no group is left out when promotion runs. Graduating classes can map to alumni or leave blank as your school policy requires.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Include all active classes so no group is left out when promotion runs. Graduating classes can map to alumni or leave blank as your school policy requires."
+              }
+            ]
+          },
+          {
+            "step": "Save and activate",
+            "desc": "Save the template and set it active. At session end, run Class Promotion using this template to move students forward.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Save the template and set it active. At session end, run Class Promotion using this template to move students forward."
+              }
+            ]
+          }
+        ],
+        "callout": "Create classes first, then build the promotion template. Review mappings carefully before running promotion.",
+        "video": null
       }
     ]
   },
@@ -1048,57 +1752,71 @@
     "icon": "globe",
     "items": [
       {
-        "id": "free-website",
-        "title": "Free School Website",
-        "content": "Every school on Scladapp can request a free website created and hosted for you. No coding required.",
+        "id": "request-website",
+        "title": "Request a School Website",
+        "content": "Paid plans include a branded school website that we build and host for you. Free plans must upgrade before requesting.",
         "steps": [
           {
-            "step": "Request a website",
-            "desc": "Go to Settings → Website and submit a website request. Choose a template style.",
+            "step": "Upgrade to a paid plan",
+            "desc": "School websites are not available on the free plan. Upgrade from Settings → Subscriptions (or Pricing) to an active paid plan. Once your subscription is active, the Request website button unlocks on your dashboard.",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Go to Settings → Website and submit a website request. Choose a template style."
+                "text": "School websites are not available on the free plan. Upgrade from Settings → Subscriptions (or Pricing) to an active paid plan. Once your subscription is active, the Request website button unlocks on your dashboard."
               }
             ]
           },
           {
-            "step": "Wait for setup",
-            "desc": "The Scladapp team builds and publishes your site. You are notified when it is live.",
+            "step": "Open Request website",
+            "desc": "From the admin dashboard school-info card, click Request website. You can also open School → Website → Brief. This starts a guided brief where you choose pages, layouts, copy, and images.",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "The Scladapp team builds and publishes your site. You are notified when it is live."
+                "text": "From the admin dashboard school-info card, click Request website. You can also open School → Website → Brief. This starts a guided brief where you choose pages, layouts, copy, and images."
               }
             ]
           },
           {
-            "step": "View your site",
-            "desc": "Your site is hosted at a unique URL (e.g. yourschool.scladapp.com or /sites/yourschool in development).",
+            "step": "Complete and submit the brief",
+            "desc": "Fill in your school details, pick section layouts, add text and photos, then submit. You can save a draft and return later. Submitted briefs move into processing while our team builds the site.",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Your site is hosted at a unique URL (e.g. yourschool.scladapp.com or /sites/yourschool in development)."
+                "text": "Fill in your school details, pick section layouts, add text and photos, then submit. You can save a draft and return later. Submitted briefs move into processing while our team builds the site."
               }
             ]
           },
           {
-            "step": "Cancel request",
-            "desc": "You can cancel a pending website request before it is published.",
+            "step": "Get your live site",
+            "desc": "When publishing finishes, your hosted URL appears on the dashboard. Share the link, copy it, or visit the site anytime. Hosting is included with your paid plan at no extra fee.",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "You can cancel a pending website request before it is published."
+                "text": "When publishing finishes, your hosted URL appears on the dashboard. Share the link, copy it, or visit the site anytime. Hosting is included with your paid plan at no extra fee."
+              }
+            ]
+          },
+          {
+            "step": "What else is included",
+            "desc": "After go-live you can update pages with the AI Website Editor, keep branding consistent with your school logo and colours, and cancel a pending request before it is published if you change your mind.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "After go-live you can update pages with the AI Website Editor, keep branding consistent with your school logo and colours, and cancel a pending request before it is published if you change your mind."
               }
             ]
           }
         ],
-        "callout": "Free website hosting is included with your Scladapp subscription at no extra cost.",
+        "callout": "Upgrade to a paid plan to unlock Request website. Building and hosting are included — no separate website fee.",
         "video": null,
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Every school on Scladapp can request a free website created and hosted for you. No coding required."
+            "text": "Paid plans include a branded school website that we build and host for you. Free plans must upgrade before requesting."
+          },
+          {
+            "type": "paragraph",
+            "text": "On free plans the dashboard shows a locked School website card with Learn more. After you upgrade, that card becomes Request website so you can start the brief."
           }
         ]
       },
@@ -1164,71 +1882,6 @@
           {
             "type": "paragraph",
             "text": "After your website is live, use the built-in AI editor to update pages, text, and images without writing code."
-          }
-        ]
-      },
-      {
-        "id": "student-application-form",
-        "title": "Student Application Form",
-        "content": "Accept new student applications online through a public form. Configure which fields to collect, review submissions, and admit applicants as enrolled students.",
-        "steps": [
-          {
-            "step": "Enable applications",
-            "desc": "Go to Settings → Website. Turn on Accept new applications and copy the public application link to share with prospective families.",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Go to Settings → Website. Turn on Accept new applications and copy the public application link to share with prospective families."
-              }
-            ]
-          },
-          {
-            "step": "Configure fields",
-            "desc": "Open Configure fields to choose which sections and inputs appear on the form (personal details, guardians, documents, etc.). Required fields must be completed before submission.",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Open Configure fields to choose which sections and inputs appear on the form (personal details, guardians, documents, etc.). Required fields must be completed before submission."
-              }
-            ]
-          },
-          {
-            "step": "Review applications",
-            "desc": "Open Applications in the sidebar to see all submissions. Filter by status, open a row to view full details, and unread applications are marked with a blue dot until opened.",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Open Applications in the sidebar to see all submissions. Filter by status, open a row to view full details, and unread applications are marked with a blue dot until opened."
-              }
-            ]
-          },
-          {
-            "step": "Admit an applicant",
-            "desc": "From an application detail panel, click Admit to open the Create New Student form pre-filled with the applicant's data. Saving the student marks the application as approved.",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "From an application detail panel, click Admit to open the Create New Student form pre-filled with the applicant's data. Saving the student marks the application as approved."
-              }
-            ]
-          },
-          {
-            "step": "Manage access",
-            "desc": "Grant sub-admins access under Admin permissions using the Applications module (read, create, edit, delete). Read access is required to view the Applications page.",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Grant sub-admins access under Admin permissions using the Applications module (read, create, edit, delete). Read access is required to view the Applications page."
-              }
-            ]
-          }
-        ],
-        "callout": "The public form is available at /school/{schoolId}/apply. Turn off Accept new applications to stop new submissions without deleting existing records.",
-        "video": null,
-        "blocks": [
-          {
-            "type": "paragraph",
-            "text": "Accept new student applications online through a public form. Configure which fields to collect, review submissions, and admit applicants as enrolled students."
           }
         ]
       }

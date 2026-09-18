@@ -21,7 +21,7 @@ const APPLICATION_FORM_SECTIONS = [
       { id: "date_of_birth", label: "Date of birth", type: "date", defaultEnabled: true },
       { id: "gender", label: "Gender", type: "select", options: ["Male", "Female"], defaultEnabled: true },
       { id: "student_photo", label: "Student photo", type: "file", defaultEnabled: true },
-      { id: "email", label: "Student email", type: "email", defaultEnabled: false },
+      { id: "email", label: "Student email", type: "email", defaultEnabled: true, locked: true },
       { id: "phone", label: "Student phone", type: "tel", defaultEnabled: false },
       { id: "whatsapp", label: "Student WhatsApp", type: "tel", defaultEnabled: false },
       { id: "nationality", label: "Nationality", type: "text", defaultEnabled: false },
@@ -120,8 +120,19 @@ const APPLICATION_FORM_SECTIONS = [
 
 function getDefaultEnabledFields() {
   return APPLICATION_FORM_SECTIONS.flatMap((section) =>
-    section.fields.filter((f) => f.defaultEnabled).map((f) => f.id)
+    section.fields.filter((f) => f.defaultEnabled || f.locked).map((f) => f.id)
   );
+}
+
+function getLockedFieldIds() {
+  return APPLICATION_FORM_SECTIONS.flatMap((section) =>
+    section.fields.filter((f) => f.locked).map((f) => f.id)
+  );
+}
+
+function ensureLockedFields(fieldIds = []) {
+  const locked = getLockedFieldIds();
+  return [...new Set([...(fieldIds || []), ...locked])];
 }
 
 function getFieldById(fieldId) {
@@ -139,6 +150,8 @@ function getAllFieldIds() {
 module.exports = {
   APPLICATION_FORM_SECTIONS,
   getDefaultEnabledFields,
+  getLockedFieldIds,
+  ensureLockedFields,
   getFieldById,
   getAllFieldIds,
 };

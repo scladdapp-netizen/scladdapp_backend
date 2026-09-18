@@ -5,16 +5,49 @@ const Class = require("../models/Class.model");
 const ApplicationFormConfig = require("../models/ApplicationFormConfig.model");
 const StudentApplication = require("../models/StudentApplication.model");
 const { uploadToCloudinary } = require("../utils/cloudinary");
+const { sendEmailFromTemplate } = require("../utils/sendEmail");
 const {
   APPLICATION_FORM_SECTIONS,
   getDefaultEnabledFields,
   getFieldById,
   getAllFieldIds,
+  ensureLockedFields,
 } = require("../data/applicationFormFields");
 
 const FILE_FIELD_IDS = new Set(
   APPLICATION_FORM_SECTIONS.flatMap((s) => s.fields.filter((f) => f.type === "file").map((f) => f.id))
 );
+
+const EMAIL_FIELD_IDS = new Set(
+  APPLICATION_FORM_SECTIONS.flatMap((s) => s.fields.filter((f) => f.type === "email").map((f) => f.id))
+);
+
+/** In-memory OTP + verified email stores for application form (any email, no user required). */
+const appFormOtpStore = new Map(); // key: schoolId::email -> { otp, expiresAt }
+const appFormVerifiedStore = new Map(); // key: schoolId::email -> { expiresAt }
+
+function otpKey(schoolId, email) {
+  return `${schoolId}::${String(email || "").toLowerCase().trim()}`;
+}
+
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function isEmailVerified(schoolId, email) {
+  const key = otpKey(schoolId, email);
+  const record = appFormVerifiedStore.get(key);
+  if (!record) return false;
+  if (Date.now() > record.expiresAt) {
+    appFormVerifiedStore.delete(key);
+    return false;
+  }
+  return true;
+}
+
+function clearVerifiedEmail(schoolId, email) {
+  appFormVerifiedStore.delete(otpKey(schoolId, email));
+}
 
 function makeId(prefix) {
   return `${prefix}_${Date.now()}${Math.floor(Math.random() * 10000)}`;
@@ -41,8 +74,15 @@ async function getOrCreateConfig(schoolId) {
       is_active: true,
     });
   }
-  if (!config.enabled_fields?.length) {
-    config.enabled_fields = getDefaultEnabledFields();
+
+  const withLocked = ensureLockedFields(config.enabled_fields || []);
+  const needsSave =
+    !config.enabled_fields?.length ||
+    withLocked.length !== (config.enabled_fields || []).length ||
+    withLocked.some((id) => !(config.enabled_fields || []).includes(id));
+
+  if (needsSave) {
+    config.enabled_fields = withLocked;
     await config.save();
   }
   return config;
@@ -143,7 +183,9 @@ exports.updateAdminConfig = async (req, res) => {
     }
 
     const validIds = new Set(getAllFieldIds());
-    const cleaned = [...new Set(enabled_fields.filter((id) => validIds.has(id)))];
+    const cleaned = ensureLockedFields(
+      [...new Set(enabled_fields.filter((id) => validIds.has(id)))]
+    );
 
     if (!cleaned.length) {
       return res.status(400).json({ success: false, message: "At least one field must be enabled" });
@@ -234,7 +276,7 @@ exports.submitApplication = async (req, res) => {
       }
     }
 
-    const requiredCore = ["full_name", "class_applying", "guardian_phone"];
+    const requiredCore = ["full_name", "email", "class_applying", "guardian_phone"];
     for (const reqId of requiredCore) {
       if (enabledSet.has(reqId) && !data[reqId]) {
         const field = getFieldById(reqId);
@@ -252,6 +294,28 @@ exports.submitApplication = async (req, res) => {
       return res.status(400).json({ success: false, message: "Please agree to the school rules and data use." });
     }
 
+    // Every enabled email field with a value must be OTP-verified
+    for (const fieldId of enabledSet) {
+      if (!EMAIL_FIELD_IDS.has(fieldId)) continue;
+      const emailVal = data[fieldId];
+      if (!emailVal) continue;
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(emailVal));
+      if (!emailOk) {
+        const field = getFieldById(fieldId);
+        return res.status(400).json({
+          success: false,
+          message: `Please provide a valid address for ${field?.label || fieldId}`,
+        });
+      }
+      if (!isEmailVerified(schoolId, emailVal)) {
+        const field = getFieldById(fieldId);
+        return res.status(400).json({
+          success: false,
+          message: `Please verify ${field?.label || fieldId} before submitting`,
+        });
+      }
+    }
+
     const application = await StudentApplication.create({
       application_id: makeId("app"),
       school_id: schoolId,
@@ -259,6 +323,11 @@ exports.submitApplication = async (req, res) => {
       data,
       files,
     });
+
+    // Consume verifications used on this submit
+    for (const fieldId of EMAIL_FIELD_IDS) {
+      if (data[fieldId]) clearVerifiedEmail(schoolId, data[fieldId]);
+    }
 
     console.log(`${tag} New application ${application.application_id} for school ${schoolId}`);
     return res.status(201).json({
@@ -269,6 +338,81 @@ exports.submitApplication = async (req, res) => {
   } catch (err) {
     console.error(`${tag} Error:`, err);
     return res.status(500).json({ success: false, message: err.message || "Submission failed" });
+  }
+};
+
+/** POST send OTP to any email on the public application form */
+exports.sendEmailVerificationOtp = async (req, res) => {
+  try {
+    const { schoolId } = req.params;
+    const email = String(req.body?.email || "").toLowerCase().trim();
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required." });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ success: false, message: "Please enter a valid email address." });
+    }
+
+    const school = await School.findOne({ school_id: schoolId, is_active: true }).lean();
+    if (!school) return res.status(404).json({ success: false, message: "School not found" });
+
+    const config = await getOrCreateConfig(schoolId);
+    if (!config.is_active) {
+      return res.status(403).json({ success: false, message: "Applications are currently closed." });
+    }
+
+    const otp = generateOTP();
+    const expiresAt = Date.now() + 10 * 60 * 1000;
+    appFormOtpStore.set(otpKey(schoolId, email), { otp, expiresAt });
+    // Changing email invalidates prior verification for that address until re-verified
+    clearVerifiedEmail(schoolId, email);
+
+    await sendEmailFromTemplate(
+      "otp",
+      { otp },
+      { to: email, schoolId, displayName: "ScladApp_OTP" }
+    );
+
+    return res.json({ success: true, message: "Verification code sent to your email." });
+  } catch (err) {
+    console.error("Application form OTP send error:", err);
+    return res.status(500).json({ success: false, message: "Failed to send verification code. Please try again." });
+  }
+};
+
+/** POST verify OTP for application form email */
+exports.verifyEmailVerificationOtp = async (req, res) => {
+  try {
+    const { schoolId } = req.params;
+    const email = String(req.body?.email || "").toLowerCase().trim();
+    const otp = String(req.body?.otp || "").trim();
+
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, message: "Email and verification code are required." });
+    }
+
+    const key = otpKey(schoolId, email);
+    const record = appFormOtpStore.get(key);
+
+    if (!record) {
+      return res.status(400).json({ success: false, message: "No code found. Please request a new one." });
+    }
+    if (Date.now() > record.expiresAt) {
+      appFormOtpStore.delete(key);
+      return res.status(400).json({ success: false, message: "Code has expired. Please request a new one." });
+    }
+    if (record.otp !== otp) {
+      return res.status(400).json({ success: false, message: "Incorrect code. Please try again." });
+    }
+
+    appFormOtpStore.delete(key);
+    appFormVerifiedStore.set(key, { expiresAt: Date.now() + 60 * 60 * 1000 }); // 1 hour
+
+    return res.json({ success: true, message: "Email verified." });
+  } catch (err) {
+    console.error("Application form OTP verify error:", err);
+    return res.status(500).json({ success: false, message: "Failed to verify code. Please try again." });
   }
 };
 

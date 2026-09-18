@@ -112,8 +112,27 @@ exports.getDashboard = async (req, res) => {
 // GET /api/subscription/plans
 exports.getPlans = async (req, res) => {
   try {
-    const plans = await Plan.find().lean();
-    res.json({ success: true, data: plans });
+    let plans = await Plan.find().sort({ monthly_price: 1 }).lean();
+
+    // Fall back to bundled JSON if Mongo has no plans yet
+    if (!plans.length) {
+      plans = getPlansFromFile();
+    }
+
+    const data = plans.map((p) => {
+      const planId = String(p.plan_id ?? p.$id ?? "");
+      return {
+        ...p,
+        plan_id: planId,
+        $id: planId, // legacy clients
+        monthly_price: Number(p.monthly_price) || 0,
+        quataly_price: Number(p.quataly_price) || 0,
+        yearly_price: Number(p.yearly_price) || 0,
+        features: Array.isArray(p.features) ? p.features : [],
+      };
+    });
+
+    res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

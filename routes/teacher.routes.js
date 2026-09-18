@@ -38,6 +38,7 @@ router.post("/", async (req, res) => {
       const statusCode =
         result.error === "Staff not found" ? 404 :
         result.error === "Teacher code already exists" ||
+        result.error === "Staff already assigned" ||
         result.error === "Staff already a teacher" ||
         result.error === "Missing required fields" ? 400 : 500;
       return res.status(statusCode).json(result);

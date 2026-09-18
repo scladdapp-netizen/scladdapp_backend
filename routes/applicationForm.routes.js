@@ -15,6 +15,8 @@ const fileFields = APPLICATION_FORM_SECTIONS
 // Public
 router.get("/public", ctrl.getPublicForm);
 router.post("/submit", upload.fields(fileFields), ctrl.submitApplication);
+router.post("/verify-email/send", ctrl.sendEmailVerificationOtp);
+router.post("/verify-email/verify", ctrl.verifyEmailVerificationOtp);
 
 // Admin
 router.get("/config", ctrl.verifyToken, ctrl.getAdminConfig);

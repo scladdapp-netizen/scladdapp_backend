@@ -24,6 +24,19 @@ const createTeacher = async (teacherData) => {
     const staffMember = await Staff.findOne({ staff_id: teacherData.staff_id, school_id: teacherData.school_id, is_active: true });
     if (!staffMember) return { success: false, error: "Staff not found", message: "Staff member not found or not active in the specified school" };
 
+    const staffAlreadyTeacher = await Teacher.findOne({
+      staff_id: teacherData.staff_id,
+      school_id: teacherData.school_id,
+      is_active: true,
+    });
+    if (staffAlreadyTeacher) {
+      return {
+        success: false,
+        error: "Staff already assigned",
+        message: "This staff member is already assigned as a teacher. One staff member cannot be linked to more than one teacher.",
+      };
+    }
+
     const codeExists = await Teacher.findOne({ teacher_code: teacherData.teacher_code, school_id: teacherData.school_id, is_active: true });
     if (codeExists) return { success: false, error: "Teacher code already exists", message: "A teacher with this code already exists in this school" };
 
@@ -185,6 +198,20 @@ const reactivateTeacher = async (teacherId, reactivatedBy) => {
     const teacher = await Teacher.findOne({ teacher_id: teacherId });
     if (!teacher) return { success: false, error: "Teacher not found", message: "Teacher not found" };
 
+    const staffAlreadyTeacher = await Teacher.findOne({
+      staff_id: teacher.staff_id,
+      school_id: teacher.school_id,
+      is_active: true,
+      teacher_id: { $ne: teacherId },
+    });
+    if (staffAlreadyTeacher) {
+      return {
+        success: false,
+        error: "Staff already assigned",
+        message: "This staff member is already assigned as another active teacher. One staff member cannot be linked to more than one teacher.",
+      };
+    }
+
     teacher.is_active  = true;
     teacher.updated_at = new Date();
     await teacher.save();
@@ -223,6 +250,22 @@ const changeTeacherAssignment = async (teacherId, newStaffId, changedBy) => {
     const oldStaffId = teacher.staff_id;
     const newStaffMember = await Staff.findOne({ staff_id: newStaffId, school_id: teacher.school_id, is_active: true });
     if (!newStaffMember) return { success: false, error: "Staff not found", message: "New staff member not found or not active in the specified school" };
+
+    if (newStaffId !== oldStaffId) {
+      const staffAlreadyTeacher = await Teacher.findOne({
+        staff_id: newStaffId,
+        school_id: teacher.school_id,
+        is_active: true,
+        teacher_id: { $ne: teacherId },
+      });
+      if (staffAlreadyTeacher) {
+        return {
+          success: false,
+          error: "Staff already assigned",
+          message: "This staff member is already assigned as a teacher. One staff member cannot be linked to more than one teacher.",
+        };
+      }
+    }
 
     const oldStaffMember = await Staff.findOne({ staff_id: oldStaffId }).lean();
 
