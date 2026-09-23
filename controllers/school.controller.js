@@ -14,6 +14,7 @@ const Session = require("../models/Session.model");
 const Notification = require("../models/Notification.model");
 const Bill = require("../models/Bill.model");
 const StudentApplication = require("../models/StudentApplication.model");
+const { rewriteStoredSiteUrl } = require("../utils/siteUrl");
 
 exports.getProfile = async (req, res) => {
   try {
@@ -101,10 +102,14 @@ exports.getWebsite = async (req, res) => {
       .select("status scladapp_website_url subdomain_slug scladapp_website_published_at custom_domain custom_domain_status")
       .lean();
 
-    const scladappWebsiteUrl =
+    if (brief?.scladapp_website_url) {
+      brief.scladapp_website_url = rewriteStoredSiteUrl(brief.scladapp_website_url);
+    }
+    const scladappWebsiteUrl = rewriteStoredSiteUrl(
       brief?.scladapp_website_url ||
-      (brief?.status === "published" && school.website ? school.website : null) ||
-      null;
+        (brief?.status === "published" && school.website ? school.website : null) ||
+        null,
+    );
 
     res.json({
       success: true,

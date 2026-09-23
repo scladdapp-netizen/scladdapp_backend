@@ -1,6 +1,7 @@
 const WebsiteRequest   = require("../models/WebsiteRequest.model");
 const School           = require("../models/School.model");
 const { uploadToCloudinary } = require("../utils/cloudinary");
+const { buildSiteUrl, rewriteStoredSiteUrl } = require("../utils/siteUrl");
 const cloudinary       = require("cloudinary").v2;
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -14,20 +15,6 @@ const toSlug = (name) =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "")
     .slice(0, 50);
-
-/**
- * Build the public-facing site URL based on environment
- *   dev  → http://localhost:<PORT>/sites/<slug>
- *   prod → https://<slug>.<PROD_DOMAIN>
- */
-const buildSiteUrl = (slug) => {
-  const isProd = process.env.NODE_ENV === "production";
-  if (isProd) {
-    return `https://${slug}.${process.env.PROD_DOMAIN}`;
-  }
-  const base = process.env.DEV_BASE_URL || `http://localhost:${process.env.PORT || 1234}`;
-  return `${base}/sites/${slug}`;
-};
 
 const normalizePathSlug = (pathOrSlug) => {
   if (!pathOrSlug || pathOrSlug === "" || pathOrSlug === "index" || pathOrSlug === "index.html") return "/";
@@ -164,6 +151,9 @@ const purgeWebsiteFolder = async (schoolId) => {
 exports.get = async (req, res) => {
   try {
     const doc = await WebsiteRequest.findOne({ school_id: req.params.schoolId }).lean();
+    if (doc?.scladapp_website_url) {
+      doc.scladapp_website_url = rewriteStoredSiteUrl(doc.scladapp_website_url);
+    }
     res.json({ success: true, data: doc || null });
   } catch (err) {
     console.error("[websiteRequest.get error]", err);
