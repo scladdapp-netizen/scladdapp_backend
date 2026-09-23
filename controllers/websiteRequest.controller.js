@@ -431,14 +431,27 @@ exports.publish = async (req, res) => {
 };
 
 // GET  /sites/:slug  and  /sites/:slug/*pagePath  (also used for custom domain / subdomain hosts)
+// Fixes the hamburger menu toggle on mobile (iOS Safari / Android WebKit).
+// The old CSS used `pointer-events: none` on the hidden checkbox input, which
+// prevents label-driven toggling on mobile browsers. We patch it at serve time
+// so all already-published sites get the fix without needing to be republished.
+const MOBILE_NAV_FIX = `<style>
+/* mobile-nav-fix: remove pointer-events:none from hidden checkbox toggles */
+.toggle { pointer-events: auto !important; }
+.sn-toggle { pointer-events: auto !important; }
+</style>`;
+
+const VIEWPORT_META = `<meta name="viewport" content="width=device-width, initial-scale=1">`;
+
 const injectBaseHref = (html, baseHref) => {
   if (!html || typeof html !== "string") return html;
   const safe = String(baseHref || "/").replace(/"/g, "");
   let out = html.replace(/<base\b[^>]*>/gi, "");
+  const viewport = /<meta[^>]+name=["']viewport["']/i.test(out) ? "" : `\n  ${VIEWPORT_META}`;
   if (/<head[^>]*>/i.test(out)) {
-    out = out.replace(/<head([^>]*)>/i, `<head$1>\n  <base href="${safe}" />`);
+    out = out.replace(/<head([^>]*)>/i, `<head$1>\n  <base href="${safe}" />${viewport}\n  ${MOBILE_NAV_FIX}`);
   } else {
-    out = `<base href="${safe}" />\n${out}`;
+    out = `<head><base href="${safe}" />${viewport}\n  ${MOBILE_NAV_FIX}</head>\n${out}`;
   }
   return out;
 };
