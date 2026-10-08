@@ -10,6 +10,7 @@ const School = require("../models/School.model");
 const Subscription = require("../models/Subscription.model");
 const Plan = require("../models/Plan.model");
 const { logActivity } = require("../controllers/staff_activity.controller");
+const { readData } = require("../utils/file");
 
 const router = express.Router();
 
@@ -28,7 +29,16 @@ async function buildLoginPayload(user, profile, userData) {
 
   let subscriptionData = subscription ? subscription.toObject() : null;
   if (subscriptionData) {
-    const plan = await Plan.findOne({ plan_id: String(subscriptionData.plan_id) });
+    const planId = String(subscriptionData.plan_id ?? "");
+    let plan = planId ? await Plan.findOne({ plan_id: planId }).lean() : null;
+    if (!plan && planId) {
+      try {
+        const plans = readData("./data/plans.json") || [];
+        plan = plans.find((item) => String(item.$id) === planId || String(item.plan_id) === planId) || null;
+      } catch (_) {
+        plan = null;
+      }
+    }
     subscriptionData.plan_features = plan?.features || [];
     subscriptionData.plan_name = plan?.plan_name || null;
   }
