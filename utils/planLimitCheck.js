@@ -1,17 +1,40 @@
+const path = require("path");
 const Subscription = require("../models/Subscription.model");
 const Plan = require("../models/Plan.model");
 const Admin = require("../models/Admin.model");
+const { readData } = require("./file");
+
+const plansFile = path.join(__dirname, "../data/plans.json");
+
+// Plans can live in Mongo or in data/plans.json. The billing screen already
+// falls back to the file, so AI access has to use the same plan.
+const findPlanById = async (planId) => {
+  const id = String(planId ?? "");
+  if (!id) return null;
+  const mongoPlan = await Plan.findOne({ plan_id: id }).lean();
+  if (mongoPlan) return mongoPlan;
+  try {
+    const plans = readData(plansFile) || [];
+    return (
+      plans.find(
+        (p) => String(p.$id) === id || String(p.plan_id) === id,
+      ) || null
+    );
+  } catch (_) {
+    return null;
+  }
+};
 
 const getPlan = async (schoolId) => {
   const now = new Date();
   const activeSub = await Subscription.findOne({
-    school_id: schoolId,
+    school_id: String(schoolId),
     subscription_status: { $in: ["active", "trialing"] },
     end_date: { $gt: now },
   }).sort({ end_date: -1 });
 
   if (!activeSub) return null;
-  return Plan.findOne({ plan_id: String(activeSub.plan_id) });
+  return findPlanById(activeSub.plan_id);
 };
 
 /**

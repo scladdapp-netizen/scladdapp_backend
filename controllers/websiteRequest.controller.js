@@ -443,6 +443,28 @@ const MOBILE_NAV_FIX = `<style>
 
 const VIEWPORT_META = `<meta name="viewport" content="width=device-width, initial-scale=1">`;
 
+const logoHref = (logo) => {
+  if (!logo) return "";
+  if (typeof logo === "string") return logo;
+  return logo.url || logo.secure_url || "";
+};
+
+const injectBrowserIcon = (html, { schoolName, logo }) => {
+  const href = logoHref(logo).replace(/"/g, "");
+  if (!href || !html) return html;
+  const icon = `<link rel="icon" href="${href}"><link rel="apple-touch-icon" href="${href}">`;
+  let out = String(html).replace(/<link\b[^>]*rel=["'](?:shortcut icon|icon|apple-touch-icon)["'][^>]*>/gi, "");
+  const title = String(schoolName || "School").replace(/[<>&"]/g, "");
+  if (/<head[^>]*>/i.test(out)) {
+    out = out.replace(/<head([^>]*)>/i, `<head$1>\n  ${icon}`);
+  } else {
+    out = `<head>${icon}</head>\n${out}`;
+  }
+  if (/<title\b/i.test(out)) out = out.replace(/<title\b[^>]*>[\s\S]*?<\/title>/i, `<title>${title}</title>`);
+  else out = out.replace(/<head([^>]*)>/i, `<head$1>\n  <title>${title}</title>`);
+  return out;
+};
+
 const injectBaseHref = (html, baseHref) => {
   if (!html || typeof html !== "string") return html;
   const safe = String(baseHref || "/").replace(/"/g, "");
@@ -516,6 +538,10 @@ exports.serveSchoolSite = async (req, res) => {
       ? "/"
       : `/sites/${siteSlug}/`;
     html = injectBaseHref(html, baseHref);
+    const school = doc.school_id
+      ? await School.findOne({ school_id: doc.school_id }).select("school_name logo_url").lean()
+      : null;
+    if (school) html = injectBrowserIcon(html, { schoolName: school.school_name, logo: school.logo_url });
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.setHeader("X-Site-Mount", req.siteMount || "path");

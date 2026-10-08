@@ -17,6 +17,7 @@ const express = require("express");
 const jwt     = require("jsonwebtoken");
 const multer  = require("multer");
 const ctrl    = require("../controllers/aiWebsiteEdit.controller");
+const createCtrl = require("../controllers/aiSiteCreate.controller");
 
 const router  = express.Router({ mergeParams: true });
 const upload  = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
@@ -44,6 +45,9 @@ function verifyToken(req, res, next) {
 router.get    ("/:schoolId/ai-website/tokens",       verifyToken, ctrl.getTokenBalance);
 router.get    ("/:schoolId/ai-website/models",       verifyToken, ctrl.getAvailableModels);
 router.post   ("/:schoolId/ai-website/edit",         verifyToken, ctrl.editWebsite);
+router.post   ("/:schoolId/ai-website/create-site",  verifyToken, createCtrl.createSite);
+router.post   ("/:schoolId/ai-website/add-page",     verifyToken, createCtrl.addPage);
+router.post   ("/:schoolId/ai-website/edit-page",    verifyToken, createCtrl.editPage);
 router.get    ("/:schoolId/ai-website/live",         verifyToken, ctrl.getLiveHtml);
 router.get    ("/:schoolId/ai-website/draft",        verifyToken, ctrl.getDraft);
 router.patch  ("/:schoolId/ai-website/draft",        verifyToken, ctrl.saveDraft);

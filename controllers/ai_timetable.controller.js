@@ -8,12 +8,10 @@ const ClassTimetable = require("../models/ClassTimetable.model");
 const AIConfig = require("../models/AIConfig.model");
 const { USE_TIMETABLE, usesForFeature } = require("../utils/aiConfigUse");
 const { getMessageText, hasReasoningOnly, parseTimetableAIResponse } = require("../utils/parseAiJson");
+const { groqChat } = require("../utils/groqChat");
 const { checkAITimetableAccess } = require("../utils/planLimitCheck");
-const axios = require("axios");
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_TIMEOUT_MS = 90_000;
-const OPENROUTER_MAX_RETRIES = 1;
+const GROQ_MAX_RETRIES = 1;
 const TAG = "[AI-TIMETABLE]";
 
 /** Force models to emit JSON in content, not burn tokens on chain-of-thought. */
@@ -41,43 +39,31 @@ function isRetryableNetworkError(err) {
   );
 }
 
-async function callOpenRouter({ apiKey, model, maxTokens, messages, tag = "[AI-TIMETABLE]", extra = {} }) {
+async function callGroq({ apiKey, model, maxTokens, messages, tag = "[AI-TIMETABLE]", extra = {} }) {
   let lastErr;
-  for (let attempt = 0; attempt <= OPENROUTER_MAX_RETRIES; attempt++) {
+  for (let attempt = 0; attempt <= GROQ_MAX_RETRIES; attempt++) {
     try {
-      const res = await axios.post(
-        OPENROUTER_URL,
-        {
-          model,
-          max_tokens: maxTokens,
-          temperature: 0.2,
-          messages,
-          ...extra,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-            "HTTP-Referer": process.env.APP_URL || "http://localhost:1234",
-            "X-Title": "ScladApp Timetable Generator",
-          },
-          timeout: OPENROUTER_TIMEOUT_MS,
-          validateStatus: () => true,
-        }
-      );
-      return { status: res.status, data: res.data, ok: res.status >= 200 && res.status < 300 };
+      const completion = await groqChat({
+        apiKey,
+        model,
+        maxTokens,
+        temperature: 0.2,
+        messages,
+        responseFormat: extra.response_format,
+      });
+      return { status: 200, data: completion, ok: true };
     } catch (err) {
       lastErr = err;
-      if (attempt < OPENROUTER_MAX_RETRIES && isRetryableNetworkError(err)) {
+      if (attempt < GROQ_MAX_RETRIES && isRetryableNetworkError(err)) {
         const delay = 2000 * (attempt + 1);
-        console.warn(`${tag} OpenRouter attempt ${attempt + 1} failed (${err.code || err.message}), retrying in ${delay}ms...`);
+        console.warn(`${tag} Groq attempt ${attempt + 1} failed (${err.code || err.message}), retrying in ${delay}ms...`);
         await new Promise((r) => setTimeout(r, delay));
         continue;
       }
-      throw err;
+      return { status: err.status || 500, data: { error: { message: err.message || "The Groq model did not answer." } }, ok: false };
     }
   }
-  throw lastErr;
+  return { status: 500, data: { error: { message: lastErr?.message || "The Groq model did not answer." } }, ok: false };
 }
 
 function estimateMaxTokens(classCount, periodTotal = 0) {
@@ -375,8 +361,8 @@ function finalizeTimetableEntries(rawEntries, classInfo, breaks, selectedDays) {
   return injectTemplateBreaks(normalized, breaks, selectedDays);
 }
 
-async function callOpenRouterWithJson(opts) {
-  const withJson = await callOpenRouter({
+async function callGroqWithJson(opts) {
+  const withJson = await callGroq({
     ...opts,
     extra: {
       ...NO_REASONING,
@@ -394,7 +380,7 @@ async function callOpenRouterWithJson(opts) {
     errMsg.includes("effort")
   ) {
     console.warn(`${opts.tag || TAG} JSON/reasoning params unsupported — retrying plain + no-reasoning`);
-    return callOpenRouter({
+    return callGroq({
       ...opts,
       extra: { ...NO_REASONING, ...(opts.extra || {}) },
     });
@@ -405,7 +391,7 @@ async function callOpenRouterWithJson(opts) {
 async function generateTimetableJson({ apiKey, model, maxTokens, systemPrompt, userPrompt }) {
   console.log(`${TAG} Generating for model=${model}, max_tokens=${maxTokens}`);
 
-  const primary = await callOpenRouterWithJson({
+  const primary = await callGroqWithJson({
     apiKey,
     model,
     maxTokens,
@@ -447,7 +433,7 @@ async function generateTimetableJson({ apiKey, model, maxTokens, systemPrompt, u
     const retryTokens = Math.min(16000, Math.max(maxTokens * 2, 8000));
     console.warn(`${TAG} Retrying with max_tokens=${retryTokens} (strict JSON, no reasoning)`);
 
-    const retry = await callOpenRouterWithJson({
+    const retry = await callGroqWithJson({
       apiKey,
       model,
       maxTokens: retryTokens,
@@ -482,7 +468,7 @@ async function generateTimetableJson({ apiKey, model, maxTokens, systemPrompt, u
 
       if (retryText) {
         console.warn(`${TAG} Retry did not parse — JSON repair`);
-        const repair = await callOpenRouterWithJson({
+        const repair = await callGroqWithJson({
           apiKey,
           model,
           maxTokens: Math.min(retryTokens, 8192),
@@ -510,7 +496,7 @@ async function generateTimetableJson({ apiKey, model, maxTokens, systemPrompt, u
 
     return {
       error:
-        "Model returned no JSON (often burns all tokens on reasoning). Switch AI Config to openai/gpt-4o-mini or another non-reasoning model — openrouter/free frequently fails for this.",
+        "Model returned no JSON. In AI Config, pick a Groq model that returns the answer in the message.",
       raw: null,
     };
   }
@@ -518,7 +504,7 @@ async function generateTimetableJson({ apiKey, model, maxTokens, systemPrompt, u
   console.warn(`${TAG} Primary response did not parse — running JSON repair`);
   console.warn(`${TAG} Primary text:\n${primaryText.slice(0, 2000)}${primaryText.length > 2000 ? "…" : ""}`);
 
-  const repair = await callOpenRouterWithJson({
+  const repair = await callGroqWithJson({
     apiKey,
     model,
     maxTokens: Math.min(maxTokens, 8192),

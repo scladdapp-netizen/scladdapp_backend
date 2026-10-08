@@ -19,7 +19,7 @@ const aiConfigSchema = new mongoose.Schema(
     use:         {
       type:     String,
       required: true,
-      enum:     ["website_editor", "timetable_generator", "both"],
+      enum:     ["website_editor", "timetable_generator", "both", "template_image", "template_code", "school_assistant"],
     },
 
     // OpenRouter API key — NEVER returned to frontend
@@ -28,8 +28,6 @@ const aiConfigSchema = new mongoose.Schema(
     // Full OpenRouter model identifier, e.g. "anthropic/claude-3.5-sonnet"
     model:       { type: String, required: true, trim: true },
 
-    // Optional model params
-    max_tokens:  { type: Number, default: 4096 },
     temperature: { type: Number, default: 0.7 },
 
     // Only one config per use should be active at a time

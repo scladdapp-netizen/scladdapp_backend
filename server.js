@@ -87,11 +87,13 @@ app.use("/api/school-gallery", require("./routes/school_gallery.routes"));
 app.use("/api/schools", require("./routes/school.routes"));
 app.use("/api/schools/:schoolId/application-form", require("./routes/applicationForm.routes"));
 app.use("/api/schools", require("./routes/websiteRequest.routes"));
+app.use("/api/schools/:schoolId/ai-assistant", require("./routes/schoolAssistant.routes"));
 app.use("/api/schools", require("./routes/aiWebsiteEdit.routes"));
 app.use("/api/schools", require("./routes/aiTokenPurchase.routes"));
 app.use("/api/ai-timetable", require("./routes/ai_timetable.routes"));
 app.use("/api/ai-config",    require("./routes/ai_config.routes"));
 app.use("/api/website-templates", require("./routes/websiteTemplate.routes"));
+app.use("/api/brief-template-images", require("./routes/briefTemplateImage.routes"));
 app.use("/api/contact", require("./routes/contact.routes"));
 app.use("/api/docs", require("./routes/docs.routes"));
 app.use("/api/otp", require("./routes/otp.routes"));
@@ -169,7 +171,11 @@ const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Server
-const PORT = 1234;
-app.listen(PORT, () => {
+const PORT = Number(process.env.PORT) || 4000;
+const server = app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+});
+server.on("error", (err) => {
+  console.error(`Cannot listen on port ${PORT}: ${err.message}`);
+  process.exit(1);
 });

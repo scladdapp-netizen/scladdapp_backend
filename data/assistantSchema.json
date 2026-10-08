@@ -1,0 +1,4652 @@
+{
+  "rules": [
+    "Questions about how to use the app use kind docs and an article id from the docs file. They do not query a collection.",
+    "Questions about this school's records use kind query. Never write database code.",
+    "Do not set school_id. The server limits every query to the signed-in school.",
+    "Subsession is a term. Its id is term_id. Other collections store that id as subsession_id.",
+    "For the best student of all time, query StudentScore, group by student_id, average the scores field, sort desc, limit 1, and look up Student.",
+    "A how-many question uses shape count and does not list rows. A blank or missing field uses op empty. A filled field uses op notEmpty.",
+    "Only use collection names, fields, and links listed here."
+  ],
+  "collections": [
+    {
+      "name": "Admin",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "admin_id",
+          "type": "String"
+        },
+        {
+          "name": "staff_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "username",
+          "type": "String"
+        },
+        {
+          "name": "email",
+          "type": "String"
+        },
+        {
+          "name": "admin_role",
+          "type": "String"
+        },
+        {
+          "name": "access_scope",
+          "type": "String"
+        },
+        {
+          "name": "permissions",
+          "type": "Mixed"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "assigned_by",
+          "type": "String"
+        },
+        {
+          "name": "assigned_at",
+          "type": "Date"
+        },
+        {
+          "name": "revoked_at",
+          "type": "Date"
+        },
+        {
+          "name": "two_fac_auth",
+          "type": "Boolean"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "AdminNotification",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "title",
+          "type": "String"
+        },
+        {
+          "name": "body",
+          "type": "String"
+        },
+        {
+          "name": "type",
+          "type": "String"
+        },
+        {
+          "name": "created_by_id",
+          "type": "String"
+        },
+        {
+          "name": "created_by_name",
+          "type": "String"
+        },
+        {
+          "name": "read_by",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "createdAt",
+          "type": "Date"
+        },
+        {
+          "name": "updatedAt",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Admission",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "admission_id",
+          "type": "String"
+        },
+        {
+          "name": "student_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "admitted_date",
+          "type": "String"
+        },
+        {
+          "name": "close_date",
+          "type": "String"
+        },
+        {
+          "name": "admission_class",
+          "type": "String"
+        },
+        {
+          "name": "admission_session",
+          "type": "String"
+        },
+        {
+          "name": "admission_term",
+          "type": "String"
+        },
+        {
+          "name": "active_status",
+          "type": "Boolean"
+        },
+        {
+          "name": "is_graduated",
+          "type": "Boolean"
+        },
+        {
+          "name": "graduated_id",
+          "type": "String"
+        },
+        {
+          "name": "graduation_session_id",
+          "type": "String"
+        },
+        {
+          "name": "graduation_session_name",
+          "type": "String"
+        },
+        {
+          "name": "admission_type",
+          "type": "String"
+        },
+        {
+          "name": "previous_school",
+          "type": "String"
+        },
+        {
+          "name": "transfer_certificate",
+          "type": "String"
+        },
+        {
+          "name": "remarks",
+          "type": "String"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": [
+        {
+          "field": "student_id",
+          "to": "Student",
+          "toField": "student_id",
+          "meaning": "student"
+        }
+      ]
+    },
+    {
+      "name": "Alumni",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "alumni_id",
+          "type": "String"
+        },
+        {
+          "name": "student_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "graduation_session_id",
+          "type": "String"
+        },
+        {
+          "name": "graduation_session_name",
+          "type": "String"
+        },
+        {
+          "name": "graduation_date",
+          "type": "String"
+        },
+        {
+          "name": "final_class",
+          "type": "String"
+        },
+        {
+          "name": "final_class_name",
+          "type": "String"
+        },
+        {
+          "name": "current_occupation",
+          "type": "String"
+        },
+        {
+          "name": "current_employer",
+          "type": "String"
+        },
+        {
+          "name": "current_position",
+          "type": "String"
+        },
+        {
+          "name": "current_location",
+          "type": "String"
+        },
+        {
+          "name": "contact_email",
+          "type": "String"
+        },
+        {
+          "name": "contact_phone",
+          "type": "String"
+        },
+        {
+          "name": "contact_address",
+          "type": "String"
+        },
+        {
+          "name": "linkedin_profile",
+          "type": "String"
+        },
+        {
+          "name": "facebook_profile",
+          "type": "String"
+        },
+        {
+          "name": "twitter_handle",
+          "type": "String"
+        },
+        {
+          "name": "achievements",
+          "type": "String"
+        },
+        {
+          "name": "awards",
+          "type": "String"
+        },
+        {
+          "name": "remarks",
+          "type": "String"
+        },
+        {
+          "name": "willing_to_mentor",
+          "type": "Boolean"
+        },
+        {
+          "name": "willing_to_speak",
+          "type": "Boolean"
+        },
+        {
+          "name": "willing_to_donate",
+          "type": "Boolean"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "AlumniCertificate",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "certificate_id",
+          "type": "String"
+        },
+        {
+          "name": "alumni_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "type",
+          "type": "String"
+        },
+        {
+          "name": "size",
+          "type": "String"
+        },
+        {
+          "name": "file_url",
+          "type": "String"
+        },
+        {
+          "name": "public_id",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "uploaded_by_id",
+          "type": "String"
+        },
+        {
+          "name": "uploaded_by_name",
+          "type": "String"
+        },
+        {
+          "name": "upload_date",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "AnnouncementTemplate",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "template_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "subject",
+          "type": "String"
+        },
+        {
+          "name": "content",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "last_modified",
+          "type": "Date"
+        },
+        {
+          "name": "modified_by",
+          "type": "String"
+        },
+        {
+          "name": "channels",
+          "type": "String"
+        },
+        {
+          "name": "placeholders",
+          "type": "String"
+        },
+        {
+          "name": "html_template",
+          "type": "String"
+        },
+        {
+          "name": "html_template_draft",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "AppFeedback",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "user_type",
+          "type": "String"
+        },
+        {
+          "name": "user_id",
+          "type": "String"
+        },
+        {
+          "name": "user_name",
+          "type": "String"
+        },
+        {
+          "name": "user_email",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "school_name",
+          "type": "String"
+        },
+        {
+          "name": "type",
+          "type": "String"
+        },
+        {
+          "name": "message",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "createdAt",
+          "type": "Date"
+        },
+        {
+          "name": "updatedAt",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "ApplicationFormConfig",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "enabled_fields",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "updated_by",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Bill",
+      "schoolField": "school_id",
+      "note": "A fee the school charges. total_amount is the fee total.",
+      "fields": [
+        {
+          "name": "bill_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "template_id",
+          "type": "String"
+        },
+        {
+          "name": "fee_code",
+          "type": "String"
+        },
+        {
+          "name": "fee_name",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "total_amount",
+          "type": "Number"
+        },
+        {
+          "name": "currency",
+          "type": "String"
+        },
+        {
+          "name": "allow_installments",
+          "type": "Boolean"
+        },
+        {
+          "name": "installment_count",
+          "type": "Number"
+        },
+        {
+          "name": "min_payment",
+          "type": "Number"
+        },
+        {
+          "name": "bill_items",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "school_account_id",
+          "type": "String"
+        },
+        {
+          "name": "mandatory",
+          "type": "Boolean"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "target_type",
+          "type": "String"
+        },
+        {
+          "name": "created_by_id",
+          "type": "String"
+        },
+        {
+          "name": "created_by_name",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": [
+        {
+          "field": "school_account_id",
+          "to": "SchoolAccount",
+          "toField": "account_id",
+          "meaning": "bank account that receives the fee"
+        },
+        {
+          "field": "template_id",
+          "to": "FeeBillTemplate",
+          "toField": "template_id",
+          "meaning": "fee template"
+        }
+      ]
+    },
+    {
+      "name": "Class",
+      "schoolField": "school_id",
+      "note": "A school class. Its id is class_id. class_name is the label.",
+      "fields": [
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "class_name",
+          "type": "String"
+        },
+        {
+          "name": "class_code",
+          "type": "String"
+        },
+        {
+          "name": "class_section",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "class_type",
+          "type": "String"
+        },
+        {
+          "name": "room_number",
+          "type": "String"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "ClassHeadmaster",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "assignment_id",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "teacher_id",
+          "type": "String"
+        },
+        {
+          "name": "teacher_name",
+          "type": "String"
+        },
+        {
+          "name": "teacher_email",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "session_name",
+          "type": "String"
+        },
+        {
+          "name": "session_code",
+          "type": "String"
+        },
+        {
+          "name": "start_date",
+          "type": "String"
+        },
+        {
+          "name": "end_date",
+          "type": "String"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "assigned_by",
+          "type": "String"
+        },
+        {
+          "name": "notes",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": [
+        {
+          "field": "class_id",
+          "to": "Class",
+          "toField": "class_id",
+          "meaning": "class"
+        }
+      ]
+    },
+    {
+      "name": "ClassPromotionTemplate",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "template_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "level",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "last_modified",
+          "type": "Date"
+        },
+        {
+          "name": "modified_by",
+          "type": "String"
+        },
+        {
+          "name": "criteria",
+          "type": "String"
+        },
+        {
+          "name": "class_promotions",
+          "type": "String"
+        },
+        {
+          "name": "retention_policy",
+          "type": "String"
+        },
+        {
+          "name": "appeal_process",
+          "type": "String"
+        },
+        {
+          "name": "notifications",
+          "type": "String"
+        },
+        {
+          "name": "total_weight",
+          "type": "Number"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "ClassResource",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "resource_id",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "file_name",
+          "type": "String"
+        },
+        {
+          "name": "file_type",
+          "type": "String"
+        },
+        {
+          "name": "file_url",
+          "type": "String"
+        },
+        {
+          "name": "file_public_id",
+          "type": "String"
+        },
+        {
+          "name": "file_size",
+          "type": "Number"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "subsession_id",
+          "type": "String"
+        },
+        {
+          "name": "download_count",
+          "type": "Number"
+        },
+        {
+          "name": "uploaded_by",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "ClassSubjectAssignment",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "assignment_id",
+          "type": "String"
+        },
+        {
+          "name": "subject_id",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "class_name",
+          "type": "String"
+        },
+        {
+          "name": "class_code",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "start_date",
+          "type": "String"
+        },
+        {
+          "name": "end_date",
+          "type": "String"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "assigned_by",
+          "type": "String"
+        },
+        {
+          "name": "notes",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": [
+        {
+          "field": "class_id",
+          "to": "Class",
+          "toField": "class_id",
+          "meaning": "class"
+        },
+        {
+          "field": "subject_id",
+          "to": "Subject",
+          "toField": "subject_id",
+          "meaning": "subject"
+        }
+      ]
+    },
+    {
+      "name": "ClassTimetable",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "timetable_id",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "subsession_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "entries",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "generated_by",
+          "type": "String"
+        },
+        {
+          "name": "generated_at",
+          "type": "Date"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": [
+        {
+          "field": "class_id",
+          "to": "Class",
+          "toField": "class_id",
+          "meaning": "class"
+        }
+      ]
+    },
+    {
+      "name": "CombinedTemplate",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "template_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "grading_fields",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "grading_scheme",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "total_weight",
+          "type": "Number"
+        },
+        {
+          "name": "level",
+          "type": "String"
+        },
+        {
+          "name": "layout",
+          "type": "String"
+        },
+        {
+          "name": "grade_display",
+          "type": "String"
+        },
+        {
+          "name": "behavioral_traits",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "styling",
+          "type": "Embedded"
+        },
+        {
+          "name": "html_template",
+          "type": "String"
+        },
+        {
+          "name": "html_template_draft",
+          "type": "String"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "last_modified",
+          "type": "Date"
+        },
+        {
+          "name": "modified_by",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "FeeBillTemplate",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "template_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "bill_items",
+          "type": "String"
+        },
+        {
+          "name": "total_amount",
+          "type": "Number"
+        },
+        {
+          "name": "currency",
+          "type": "String"
+        },
+        {
+          "name": "due_date_value",
+          "type": "String"
+        },
+        {
+          "name": "allow_installments",
+          "type": "Boolean"
+        },
+        {
+          "name": "installment_count",
+          "type": "Number"
+        },
+        {
+          "name": "min_payment",
+          "type": "Number"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "last_modified",
+          "type": "Date"
+        },
+        {
+          "name": "modified_by",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Notification",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "notification_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "title",
+          "type": "String"
+        },
+        {
+          "name": "resolved_content",
+          "type": "String"
+        },
+        {
+          "name": "template_id",
+          "type": "String"
+        },
+        {
+          "name": "placeholder_values",
+          "type": "Mixed"
+        },
+        {
+          "name": "delivery_channels",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "target_type",
+          "type": "String"
+        },
+        {
+          "name": "created_by_id",
+          "type": "String"
+        },
+        {
+          "name": "created_by_name",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Payment",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "payment_id",
+          "type": "String"
+        },
+        {
+          "name": "subscription_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "payment_provider",
+          "type": "String"
+        },
+        {
+          "name": "provider_transaction_id",
+          "type": "String"
+        },
+        {
+          "name": "payment_method",
+          "type": "String"
+        },
+        {
+          "name": "amount_paid",
+          "type": "Number"
+        },
+        {
+          "name": "currency",
+          "type": "String"
+        },
+        {
+          "name": "tax_amount",
+          "type": "Number"
+        },
+        {
+          "name": "discount_amount",
+          "type": "Number"
+        },
+        {
+          "name": "total_amount",
+          "type": "Number"
+        },
+        {
+          "name": "billing_cycle",
+          "type": "String"
+        },
+        {
+          "name": "billing_period_start",
+          "type": "Date"
+        },
+        {
+          "name": "billing_period_end",
+          "type": "Date"
+        },
+        {
+          "name": "payment_status",
+          "type": "String"
+        },
+        {
+          "name": "payment_date",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "ReportCardTheme",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "theme_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "is_global",
+          "type": "Boolean"
+        },
+        {
+          "name": "css",
+          "type": "String"
+        },
+        {
+          "name": "html_template",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "School",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "school_name",
+          "type": "String"
+        },
+        {
+          "name": "motto",
+          "type": "String"
+        },
+        {
+          "name": "country",
+          "type": "String"
+        },
+        {
+          "name": "state",
+          "type": "String"
+        },
+        {
+          "name": "address",
+          "type": "String"
+        },
+        {
+          "name": "phone_number",
+          "type": "String"
+        },
+        {
+          "name": "email",
+          "type": "String"
+        },
+        {
+          "name": "logo_url",
+          "type": "Mixed"
+        },
+        {
+          "name": "bio",
+          "type": "String"
+        },
+        {
+          "name": "website",
+          "type": "String"
+        },
+        {
+          "name": "website_requested",
+          "type": "Boolean"
+        },
+        {
+          "name": "social_links",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "SchoolAccount",
+      "schoolField": "school_id",
+      "note": "A school bank account.",
+      "fields": [
+        {
+          "name": "account_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "account_name",
+          "type": "String"
+        },
+        {
+          "name": "account_number",
+          "type": "String"
+        },
+        {
+          "name": "bank_name",
+          "type": "String"
+        },
+        {
+          "name": "account_type",
+          "type": "String"
+        },
+        {
+          "name": "balance",
+          "type": "String"
+        },
+        {
+          "name": "currency",
+          "type": "String"
+        },
+        {
+          "name": "is_default",
+          "type": "Boolean"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "last_modified",
+          "type": "Date"
+        },
+        {
+          "name": "modified_by",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "SchoolAIToken",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "balance",
+          "type": "Number"
+        },
+        {
+          "name": "total_bought",
+          "type": "Number"
+        },
+        {
+          "name": "total_used",
+          "type": "Number"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "SchoolCalendar",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "calendar_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "session_name",
+          "type": "String"
+        },
+        {
+          "name": "subsession_id",
+          "type": "String"
+        },
+        {
+          "name": "subsession_name",
+          "type": "String"
+        },
+        {
+          "name": "title",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "calendar_date",
+          "type": "String"
+        },
+        {
+          "name": "calendar_time",
+          "type": "String"
+        },
+        {
+          "name": "type",
+          "type": "String"
+        },
+        {
+          "name": "location",
+          "type": "String"
+        },
+        {
+          "name": "duration",
+          "type": "String"
+        },
+        {
+          "name": "participants",
+          "type": "String"
+        },
+        {
+          "name": "priority",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "created_by_name",
+          "type": "String"
+        },
+        {
+          "name": "created_by_role",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "SchoolEvent",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "event_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "session_name",
+          "type": "String"
+        },
+        {
+          "name": "subsession_id",
+          "type": "String"
+        },
+        {
+          "name": "subsession_name",
+          "type": "String"
+        },
+        {
+          "name": "title",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "event_date",
+          "type": "String"
+        },
+        {
+          "name": "event_time",
+          "type": "String"
+        },
+        {
+          "name": "location",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "organizer",
+          "type": "String"
+        },
+        {
+          "name": "participants",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "created_by_name",
+          "type": "String"
+        },
+        {
+          "name": "created_by_role",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "SchoolGallery",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "gallery_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "caption",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "file_url",
+          "type": "String"
+        },
+        {
+          "name": "file_public_id",
+          "type": "String"
+        },
+        {
+          "name": "file_name",
+          "type": "String"
+        },
+        {
+          "name": "file_size",
+          "type": "Number"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "SchoolResource",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "resource_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "visibility",
+          "type": "String"
+        },
+        {
+          "name": "file_name",
+          "type": "String"
+        },
+        {
+          "name": "file_type",
+          "type": "String"
+        },
+        {
+          "name": "file_url",
+          "type": "String"
+        },
+        {
+          "name": "file_public_id",
+          "type": "String"
+        },
+        {
+          "name": "file_size",
+          "type": "Number"
+        },
+        {
+          "name": "download_count",
+          "type": "Number"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Session",
+      "schoolField": "school_id",
+      "note": "An academic year. Its id is session_id.",
+      "fields": [
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "session_name",
+          "type": "String"
+        },
+        {
+          "name": "session_code",
+          "type": "String"
+        },
+        {
+          "name": "academic_year_start_date",
+          "type": "String"
+        },
+        {
+          "name": "academic_year_end_date",
+          "type": "String"
+        },
+        {
+          "name": "session_status",
+          "type": "String"
+        },
+        {
+          "name": "is_archived",
+          "type": "Boolean"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "created_by_name",
+          "type": "String"
+        },
+        {
+          "name": "created_by_role",
+          "type": "String"
+        },
+        {
+          "name": "modified_by",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Staff",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "staff_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "full_name",
+          "type": "String"
+        },
+        {
+          "name": "email",
+          "type": "String"
+        },
+        {
+          "name": "phone",
+          "type": "String"
+        },
+        {
+          "name": "whatsapp",
+          "type": "String"
+        },
+        {
+          "name": "alternate_phone",
+          "type": "String"
+        },
+        {
+          "name": "position",
+          "type": "String"
+        },
+        {
+          "name": "job_title",
+          "type": "String"
+        },
+        {
+          "name": "department",
+          "type": "String"
+        },
+        {
+          "name": "qualification",
+          "type": "String"
+        },
+        {
+          "name": "experience_years",
+          "type": "Number"
+        },
+        {
+          "name": "employment_type",
+          "type": "String"
+        },
+        {
+          "name": "employment_status",
+          "type": "String"
+        },
+        {
+          "name": "record_status",
+          "type": "String"
+        },
+        {
+          "name": "role",
+          "type": "String"
+        },
+        {
+          "name": "salary",
+          "type": "Number"
+        },
+        {
+          "name": "salary_grade",
+          "type": "String"
+        },
+        {
+          "name": "joining_date",
+          "type": "String"
+        },
+        {
+          "name": "confirmation_date",
+          "type": "String"
+        },
+        {
+          "name": "date_of_birth",
+          "type": "String"
+        },
+        {
+          "name": "gender",
+          "type": "String"
+        },
+        {
+          "name": "religion",
+          "type": "String"
+        },
+        {
+          "name": "marital_status",
+          "type": "String"
+        },
+        {
+          "name": "nationality",
+          "type": "String"
+        },
+        {
+          "name": "state_of_origin",
+          "type": "String"
+        },
+        {
+          "name": "place_of_birth",
+          "type": "String"
+        },
+        {
+          "name": "lga_of_origin",
+          "type": "String"
+        },
+        {
+          "name": "tribe",
+          "type": "String"
+        },
+        {
+          "name": "nin",
+          "type": "String"
+        },
+        {
+          "name": "address",
+          "type": "String"
+        },
+        {
+          "name": "house_number_street",
+          "type": "String"
+        },
+        {
+          "name": "area_estate",
+          "type": "String"
+        },
+        {
+          "name": "city",
+          "type": "String"
+        },
+        {
+          "name": "lga_of_residence",
+          "type": "String"
+        },
+        {
+          "name": "state_of_residence",
+          "type": "String"
+        },
+        {
+          "name": "landmark",
+          "type": "String"
+        },
+        {
+          "name": "blood_group",
+          "type": "String"
+        },
+        {
+          "name": "genotype",
+          "type": "String"
+        },
+        {
+          "name": "medical_conditions",
+          "type": "String"
+        },
+        {
+          "name": "staff_photo",
+          "type": "String"
+        },
+        {
+          "name": "national_id",
+          "type": "String"
+        },
+        {
+          "name": "tax_number",
+          "type": "String"
+        },
+        {
+          "name": "bank_name",
+          "type": "String"
+        },
+        {
+          "name": "bank_account",
+          "type": "String"
+        },
+        {
+          "name": "emergency_contact_name",
+          "type": "String"
+        },
+        {
+          "name": "emergency_contact_phone",
+          "type": "String"
+        },
+        {
+          "name": "emergency_contact_whatsapp",
+          "type": "String"
+        },
+        {
+          "name": "emergency_contact_relationship",
+          "type": "String"
+        },
+        {
+          "name": "emergency_contact_address",
+          "type": "String"
+        },
+        {
+          "name": "next_of_kin_name",
+          "type": "String"
+        },
+        {
+          "name": "next_of_kin_phone",
+          "type": "String"
+        },
+        {
+          "name": "next_of_kin_relationship",
+          "type": "String"
+        },
+        {
+          "name": "next_of_kin_address",
+          "type": "String"
+        },
+        {
+          "name": "two_factor_auth",
+          "type": "Boolean"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "StaffActivityLog",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "log_id",
+          "type": "String"
+        },
+        {
+          "name": "staff_type",
+          "type": "String"
+        },
+        {
+          "name": "user_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "action",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "performed_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "StaffCredential",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "credential_id",
+          "type": "String"
+        },
+        {
+          "name": "staff_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "title",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "fileName",
+          "type": "String"
+        },
+        {
+          "name": "type",
+          "type": "String"
+        },
+        {
+          "name": "size",
+          "type": "String"
+        },
+        {
+          "name": "file_url",
+          "type": "String"
+        },
+        {
+          "name": "file_public_id",
+          "type": "String"
+        },
+        {
+          "name": "file_size",
+          "type": "Number"
+        },
+        {
+          "name": "issuer",
+          "type": "String"
+        },
+        {
+          "name": "documentNumber",
+          "type": "String"
+        },
+        {
+          "name": "uploadDate",
+          "type": "String"
+        },
+        {
+          "name": "expiryDate",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "isRequired",
+          "type": "Boolean"
+        },
+        {
+          "name": "verificationStatus",
+          "type": "String"
+        },
+        {
+          "name": "downloadCount",
+          "type": "Number"
+        },
+        {
+          "name": "uploaded_by",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "StaffPerformance",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "evaluation_id",
+          "type": "String"
+        },
+        {
+          "name": "staff_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "evaluation_type",
+          "type": "String"
+        },
+        {
+          "name": "evaluation_period",
+          "type": "String"
+        },
+        {
+          "name": "evaluator",
+          "type": "String"
+        },
+        {
+          "name": "evaluator_role",
+          "type": "String"
+        },
+        {
+          "name": "evaluation_date",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "overall_rating",
+          "type": "String"
+        },
+        {
+          "name": "overall_score",
+          "type": "Number"
+        },
+        {
+          "name": "max_score",
+          "type": "Number"
+        },
+        {
+          "name": "categories",
+          "type": "Mixed"
+        },
+        {
+          "name": "strengths",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "areas_for_improvement",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "goals",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "comments",
+          "type": "String"
+        },
+        {
+          "name": "entered_by_id",
+          "type": "String"
+        },
+        {
+          "name": "entered_by_name",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "StaffResource",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "resource_id",
+          "type": "String"
+        },
+        {
+          "name": "staff_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "file_name",
+          "type": "String"
+        },
+        {
+          "name": "file_type",
+          "type": "String"
+        },
+        {
+          "name": "file_url",
+          "type": "String"
+        },
+        {
+          "name": "file_public_id",
+          "type": "String"
+        },
+        {
+          "name": "file_size",
+          "type": "Number"
+        },
+        {
+          "name": "download_count",
+          "type": "Number"
+        },
+        {
+          "name": "uploaded_by",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Student",
+      "schoolField": "school_id",
+      "note": "A learner. Other collections point here with student_id. current_class is the class name, not a class id.",
+      "fields": [
+        {
+          "name": "student_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "admission_number",
+          "type": "String"
+        },
+        {
+          "name": "full_name",
+          "type": "String"
+        },
+        {
+          "name": "email",
+          "type": "String"
+        },
+        {
+          "name": "phone",
+          "type": "String"
+        },
+        {
+          "name": "date_of_birth",
+          "type": "String"
+        },
+        {
+          "name": "gender",
+          "type": "String"
+        },
+        {
+          "name": "religion",
+          "type": "String"
+        },
+        {
+          "name": "nationality",
+          "type": "String"
+        },
+        {
+          "name": "state_of_origin",
+          "type": "String"
+        },
+        {
+          "name": "place_of_birth",
+          "type": "String"
+        },
+        {
+          "name": "lga_of_origin",
+          "type": "String"
+        },
+        {
+          "name": "tribe",
+          "type": "String"
+        },
+        {
+          "name": "nin",
+          "type": "String"
+        },
+        {
+          "name": "whatsapp",
+          "type": "String"
+        },
+        {
+          "name": "number_of_siblings",
+          "type": "String"
+        },
+        {
+          "name": "family_position",
+          "type": "String"
+        },
+        {
+          "name": "lives_with",
+          "type": "String"
+        },
+        {
+          "name": "address",
+          "type": "String"
+        },
+        {
+          "name": "house_number_street",
+          "type": "String"
+        },
+        {
+          "name": "area_estate",
+          "type": "String"
+        },
+        {
+          "name": "city",
+          "type": "String"
+        },
+        {
+          "name": "lga_of_residence",
+          "type": "String"
+        },
+        {
+          "name": "state_of_residence",
+          "type": "String"
+        },
+        {
+          "name": "landmark",
+          "type": "String"
+        },
+        {
+          "name": "years_at_residence",
+          "type": "String"
+        },
+        {
+          "name": "postal_pmb",
+          "type": "String"
+        },
+        {
+          "name": "blood_group",
+          "type": "String"
+        },
+        {
+          "name": "genotype",
+          "type": "String"
+        },
+        {
+          "name": "student_photo",
+          "type": "String"
+        },
+        {
+          "name": "current_class",
+          "type": "String"
+        },
+        {
+          "name": "admission_date",
+          "type": "String"
+        },
+        {
+          "name": "student_status",
+          "type": "String"
+        },
+        {
+          "name": "emergency_contact_name",
+          "type": "String"
+        },
+        {
+          "name": "emergency_contact_phone",
+          "type": "String"
+        },
+        {
+          "name": "emergency_contact_whatsapp",
+          "type": "String"
+        },
+        {
+          "name": "emergency_contact_relationship",
+          "type": "String"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "StudentApplication",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "application_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "is_seen",
+          "type": "Boolean"
+        },
+        {
+          "name": "seen_at",
+          "type": "Date"
+        },
+        {
+          "name": "data",
+          "type": "Mixed"
+        },
+        {
+          "name": "files",
+          "type": "Mixed"
+        },
+        {
+          "name": "submitted_at",
+          "type": "Date"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "Date"
+        },
+        {
+          "name": "reviewed_by",
+          "type": "String"
+        },
+        {
+          "name": "review_notes",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "StudentAttendance",
+      "schoolField": "school_id",
+      "note": "One mark for one student on one day. status is present, absent, excused, or late.",
+      "fields": [
+        {
+          "name": "attendance_id",
+          "type": "String"
+        },
+        {
+          "name": "student_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "subsession_id",
+          "type": "String"
+        },
+        {
+          "name": "attendance_date",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "marked_by",
+          "type": "String"
+        },
+        {
+          "name": "marked_at",
+          "type": "Date"
+        },
+        {
+          "name": "notes",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": [
+        {
+          "field": "student_id",
+          "to": "Student",
+          "toField": "student_id",
+          "meaning": "student who was marked"
+        },
+        {
+          "field": "class_id",
+          "to": "Class",
+          "toField": "class_id",
+          "meaning": "class"
+        },
+        {
+          "field": "session_id",
+          "to": "Session",
+          "toField": "session_id",
+          "meaning": "academic year"
+        },
+        {
+          "field": "subsession_id",
+          "to": "Subsession",
+          "toField": "term_id",
+          "meaning": "term"
+        }
+      ]
+    },
+    {
+      "name": "StudentClassAssignment",
+      "schoolField": "school_id",
+      "note": "Which class a student was in for a session or term.",
+      "fields": [
+        {
+          "name": "assignment_id",
+          "type": "String"
+        },
+        {
+          "name": "student_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "class_name",
+          "type": "String"
+        },
+        {
+          "name": "stream",
+          "type": "String"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "session_name",
+          "type": "String"
+        },
+        {
+          "name": "subsession_id",
+          "type": "String"
+        },
+        {
+          "name": "subsession_name",
+          "type": "String"
+        },
+        {
+          "name": "assignment_method",
+          "type": "String"
+        },
+        {
+          "name": "assignment_date",
+          "type": "String"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "assigned_by",
+          "type": "String"
+        },
+        {
+          "name": "remarks",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": [
+        {
+          "field": "student_id",
+          "to": "Student",
+          "toField": "student_id",
+          "meaning": "student placed in a class"
+        },
+        {
+          "field": "class_id",
+          "to": "Class",
+          "toField": "class_id",
+          "meaning": "class"
+        },
+        {
+          "field": "session_id",
+          "to": "Session",
+          "toField": "session_id",
+          "meaning": "academic year"
+        },
+        {
+          "field": "subsession_id",
+          "to": "Subsession",
+          "toField": "term_id",
+          "meaning": "term"
+        }
+      ]
+    },
+    {
+      "name": "StudentMedicalRecord",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "record_id",
+          "type": "String"
+        },
+        {
+          "name": "student_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "record_date",
+          "type": "String"
+        },
+        {
+          "name": "record_type",
+          "type": "String"
+        },
+        {
+          "name": "diagnosis",
+          "type": "String"
+        },
+        {
+          "name": "symptoms",
+          "type": "String"
+        },
+        {
+          "name": "treatment",
+          "type": "String"
+        },
+        {
+          "name": "prescription",
+          "type": "String"
+        },
+        {
+          "name": "doctor_name",
+          "type": "String"
+        },
+        {
+          "name": "hospital_clinic",
+          "type": "String"
+        },
+        {
+          "name": "doctor_phone",
+          "type": "String"
+        },
+        {
+          "name": "allergies",
+          "type": "String"
+        },
+        {
+          "name": "chronic_conditions",
+          "type": "String"
+        },
+        {
+          "name": "medications",
+          "type": "String"
+        },
+        {
+          "name": "notes",
+          "type": "String"
+        },
+        {
+          "name": "follow_up_required",
+          "type": "Boolean"
+        },
+        {
+          "name": "follow_up_date",
+          "type": "String"
+        },
+        {
+          "name": "attachments",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "StudentReport",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "report_id",
+          "type": "String"
+        },
+        {
+          "name": "student_id",
+          "type": "String"
+        },
+        {
+          "name": "student_name",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "subsession_id",
+          "type": "String"
+        },
+        {
+          "name": "term_name",
+          "type": "String"
+        },
+        {
+          "name": "template_id",
+          "type": "String"
+        },
+        {
+          "name": "generated_at",
+          "type": "Date"
+        },
+        {
+          "name": "subjects",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "behavioral_traits",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "teacher_comment",
+          "type": "String"
+        },
+        {
+          "name": "principal_comment",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        }
+      ],
+      "links": [
+        {
+          "field": "student_id",
+          "to": "Student",
+          "toField": "student_id",
+          "meaning": "student the report belongs to"
+        },
+        {
+          "field": "class_id",
+          "to": "Class",
+          "toField": "class_id",
+          "meaning": "class"
+        },
+        {
+          "field": "session_id",
+          "to": "Session",
+          "toField": "session_id",
+          "meaning": "academic year"
+        },
+        {
+          "field": "subsession_id",
+          "to": "Subsession",
+          "toField": "term_id",
+          "meaning": "term"
+        }
+      ]
+    },
+    {
+      "name": "StudentReportCard",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "report_card_id",
+          "type": "String"
+        },
+        {
+          "name": "student_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "subsession_id",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "subjects",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "published_subjects",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "teacher_remark",
+          "type": "String"
+        },
+        {
+          "name": "principal_remark",
+          "type": "String"
+        },
+        {
+          "name": "is_published",
+          "type": "Boolean"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "StudentResource",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "resource_id",
+          "type": "String"
+        },
+        {
+          "name": "student_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "file_name",
+          "type": "String"
+        },
+        {
+          "name": "file_type",
+          "type": "String"
+        },
+        {
+          "name": "file_url",
+          "type": "String"
+        },
+        {
+          "name": "file_public_id",
+          "type": "String"
+        },
+        {
+          "name": "download_count",
+          "type": "Number"
+        },
+        {
+          "name": "uploaded_by_id",
+          "type": "String"
+        },
+        {
+          "name": "uploaded_by_name",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "StudentScore",
+      "schoolField": "school_id",
+      "note": "One subject result for one student. scores is an object of numeric marks. Rank students by grouping on student_id and averaging scores. No session filter means all time.",
+      "fields": [
+        {
+          "name": "score_id",
+          "type": "String"
+        },
+        {
+          "name": "student_id",
+          "type": "String"
+        },
+        {
+          "name": "student_name",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "subsession_id",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "subject_id",
+          "type": "String"
+        },
+        {
+          "name": "subject_name",
+          "type": "String"
+        },
+        {
+          "name": "teacher_id",
+          "type": "String"
+        },
+        {
+          "name": "teacher_name",
+          "type": "String"
+        },
+        {
+          "name": "grading_template_id",
+          "type": "Mixed"
+        },
+        {
+          "name": "scores",
+          "type": "Mixed"
+        },
+        {
+          "name": "entered_by",
+          "type": "String"
+        },
+        {
+          "name": "entered_at",
+          "type": "Date"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        }
+      ],
+      "links": [
+        {
+          "field": "student_id",
+          "to": "Student",
+          "toField": "student_id",
+          "meaning": "student who earned the score"
+        },
+        {
+          "field": "class_id",
+          "to": "Class",
+          "toField": "class_id",
+          "meaning": "class the score was taken in"
+        },
+        {
+          "field": "subject_id",
+          "to": "Subject",
+          "toField": "subject_id",
+          "meaning": "subject"
+        },
+        {
+          "field": "session_id",
+          "to": "Session",
+          "toField": "session_id",
+          "meaning": "academic year"
+        },
+        {
+          "field": "subsession_id",
+          "to": "Subsession",
+          "toField": "term_id",
+          "meaning": "term"
+        }
+      ]
+    },
+    {
+      "name": "StudentTraitScore",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "score_id",
+          "type": "String"
+        },
+        {
+          "name": "student_id",
+          "type": "String"
+        },
+        {
+          "name": "student_name",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "subsession_id",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "traits",
+          "type": "Mixed"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Subject",
+      "schoolField": "school_id",
+      "note": "A subject. Its id is subject_id.",
+      "fields": [
+        {
+          "name": "subject_id",
+          "type": "String"
+        },
+        {
+          "name": "subject_name",
+          "type": "String"
+        },
+        {
+          "name": "subject_code",
+          "type": "String"
+        },
+        {
+          "name": "subject_description",
+          "type": "String"
+        },
+        {
+          "name": "stream",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "SubjectBook",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "book_id",
+          "type": "String"
+        },
+        {
+          "name": "subject_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "title",
+          "type": "String"
+        },
+        {
+          "name": "author",
+          "type": "String"
+        },
+        {
+          "name": "isbn",
+          "type": "String"
+        },
+        {
+          "name": "publisher",
+          "type": "String"
+        },
+        {
+          "name": "edition",
+          "type": "String"
+        },
+        {
+          "name": "publication_year",
+          "type": "String"
+        },
+        {
+          "name": "type",
+          "type": "String"
+        },
+        {
+          "name": "level",
+          "type": "String"
+        },
+        {
+          "name": "price",
+          "type": "String"
+        },
+        {
+          "name": "language",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "class_name",
+          "type": "String"
+        },
+        {
+          "name": "cover_image",
+          "type": "String"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "entered_by_id",
+          "type": "String"
+        },
+        {
+          "name": "entered_by_name",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "SubjectResource",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "resource_id",
+          "type": "String"
+        },
+        {
+          "name": "subject_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "file_name",
+          "type": "String"
+        },
+        {
+          "name": "file_type",
+          "type": "String"
+        },
+        {
+          "name": "file_url",
+          "type": "String"
+        },
+        {
+          "name": "file_public_id",
+          "type": "String"
+        },
+        {
+          "name": "file_size",
+          "type": "Number"
+        },
+        {
+          "name": "download_count",
+          "type": "Number"
+        },
+        {
+          "name": "uploaded_by_id",
+          "type": "String"
+        },
+        {
+          "name": "uploaded_by_name",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Subscription",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "subscription_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "plan_id",
+          "type": "Mixed"
+        },
+        {
+          "name": "subscription_type",
+          "type": "String"
+        },
+        {
+          "name": "subscription_status",
+          "type": "String"
+        },
+        {
+          "name": "start_date",
+          "type": "Date"
+        },
+        {
+          "name": "end_date",
+          "type": "Date"
+        },
+        {
+          "name": "canceled_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Subsession",
+      "schoolField": "school_id",
+      "note": "A term. Its own id is term_id. Other collections store that same value as subsession_id.",
+      "fields": [
+        {
+          "name": "term_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "term_name",
+          "type": "String"
+        },
+        {
+          "name": "term_code",
+          "type": "String"
+        },
+        {
+          "name": "term_start_date",
+          "type": "String"
+        },
+        {
+          "name": "term_end_date",
+          "type": "String"
+        },
+        {
+          "name": "term_status",
+          "type": "String"
+        },
+        {
+          "name": "is_archived",
+          "type": "Boolean"
+        },
+        {
+          "name": "grading_template_id",
+          "type": "Mixed"
+        },
+        {
+          "name": "grading_template_name",
+          "type": "String"
+        },
+        {
+          "name": "fee_bill_template_id",
+          "type": "String"
+        },
+        {
+          "name": "fee_bill_template_name",
+          "type": "String"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "created_by_name",
+          "type": "String"
+        },
+        {
+          "name": "created_by_role",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": [
+        {
+          "field": "session_id",
+          "to": "Session",
+          "toField": "session_id",
+          "meaning": "academic year this term belongs to"
+        }
+      ]
+    },
+    {
+      "name": "SupportTicket",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "user_type",
+          "type": "String"
+        },
+        {
+          "name": "user_id",
+          "type": "String"
+        },
+        {
+          "name": "user_name",
+          "type": "String"
+        },
+        {
+          "name": "user_email",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "school_name",
+          "type": "String"
+        },
+        {
+          "name": "type",
+          "type": "String"
+        },
+        {
+          "name": "title",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "attachment_url",
+          "type": "String"
+        },
+        {
+          "name": "attachment_public_id",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "user_unread",
+          "type": "Number"
+        },
+        {
+          "name": "support_unread",
+          "type": "Number"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "createdAt",
+          "type": "Date"
+        },
+        {
+          "name": "updatedAt",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Teacher",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "teacher_id",
+          "type": "String"
+        },
+        {
+          "name": "staff_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "teacher_code",
+          "type": "String"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "appointed_by",
+          "type": "String"
+        },
+        {
+          "name": "appointed_at",
+          "type": "Date"
+        },
+        {
+          "name": "revoked_at",
+          "type": "Date"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "TeacherAssignmentHistory",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "history_id",
+          "type": "String"
+        },
+        {
+          "name": "teacher_id",
+          "type": "String"
+        },
+        {
+          "name": "teacher_code",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "old_staff_id",
+          "type": "String"
+        },
+        {
+          "name": "old_staff_name",
+          "type": "String"
+        },
+        {
+          "name": "old_staff_email",
+          "type": "String"
+        },
+        {
+          "name": "new_staff_id",
+          "type": "String"
+        },
+        {
+          "name": "new_staff_name",
+          "type": "String"
+        },
+        {
+          "name": "new_staff_email",
+          "type": "String"
+        },
+        {
+          "name": "changed_by",
+          "type": "String"
+        },
+        {
+          "name": "changed_at",
+          "type": "Date"
+        },
+        {
+          "name": "reason",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "TeacherResource",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "resource_id",
+          "type": "String"
+        },
+        {
+          "name": "teacher_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "file_name",
+          "type": "String"
+        },
+        {
+          "name": "file_type",
+          "type": "String"
+        },
+        {
+          "name": "file_url",
+          "type": "String"
+        },
+        {
+          "name": "file_public_id",
+          "type": "String"
+        },
+        {
+          "name": "file_size",
+          "type": "Number"
+        },
+        {
+          "name": "download_count",
+          "type": "Number"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "TeacherSubjectAssignment",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "assignment_id",
+          "type": "String"
+        },
+        {
+          "name": "subject_id",
+          "type": "String"
+        },
+        {
+          "name": "teacher_id",
+          "type": "String"
+        },
+        {
+          "name": "teacher_name",
+          "type": "String"
+        },
+        {
+          "name": "teacher_email",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "class_id",
+          "type": "String"
+        },
+        {
+          "name": "class_name",
+          "type": "String"
+        },
+        {
+          "name": "session_id",
+          "type": "String"
+        },
+        {
+          "name": "session_name",
+          "type": "String"
+        },
+        {
+          "name": "session_code",
+          "type": "String"
+        },
+        {
+          "name": "start_date",
+          "type": "String"
+        },
+        {
+          "name": "end_date",
+          "type": "String"
+        },
+        {
+          "name": "is_active",
+          "type": "Boolean"
+        },
+        {
+          "name": "assigned_by",
+          "type": "String"
+        },
+        {
+          "name": "notes",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": [
+        {
+          "field": "subject_id",
+          "to": "Subject",
+          "toField": "subject_id",
+          "meaning": "subject"
+        },
+        {
+          "field": "teacher_id",
+          "to": "Teacher",
+          "toField": "teacher_id",
+          "meaning": "teacher"
+        }
+      ]
+    },
+    {
+      "name": "TimetableTemplate",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "template_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "type",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "created_by",
+          "type": "String"
+        },
+        {
+          "name": "last_modified",
+          "type": "Date"
+        },
+        {
+          "name": "modified_by",
+          "type": "String"
+        },
+        {
+          "name": "daily_periods",
+          "type": "String"
+        },
+        {
+          "name": "selected_days",
+          "type": "String"
+        },
+        {
+          "name": "max_period_duration",
+          "type": "Number"
+        },
+        {
+          "name": "daily_schedule",
+          "type": "String"
+        },
+        {
+          "name": "breaks",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "Transaction",
+      "schoolField": "school_id",
+      "note": "Money in or out. type is income or expense. date is YYYY-MM-DD.",
+      "fields": [
+        {
+          "name": "transaction_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "type",
+          "type": "String"
+        },
+        {
+          "name": "title",
+          "type": "String"
+        },
+        {
+          "name": "amount",
+          "type": "Number"
+        },
+        {
+          "name": "currency",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "date",
+          "type": "String"
+        },
+        {
+          "name": "payment_method",
+          "type": "String"
+        },
+        {
+          "name": "reference",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "school_account_id",
+          "type": "String"
+        },
+        {
+          "name": "created_by_id",
+          "type": "String"
+        },
+        {
+          "name": "created_by_name",
+          "type": "String"
+        },
+        {
+          "name": "approved_by_id",
+          "type": "String"
+        },
+        {
+          "name": "approved_by_name",
+          "type": "String"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": [
+        {
+          "field": "school_account_id",
+          "to": "SchoolAccount",
+          "toField": "account_id",
+          "meaning": "bank account"
+        }
+      ]
+    },
+    {
+      "name": "UserBill",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "user_bill_id",
+          "type": "String"
+        },
+        {
+          "name": "bill_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "user_id",
+          "type": "String"
+        },
+        {
+          "name": "user_name",
+          "type": "String"
+        },
+        {
+          "name": "user_type",
+          "type": "String"
+        },
+        {
+          "name": "amount_due",
+          "type": "Number"
+        },
+        {
+          "name": "amount_paid",
+          "type": "Number"
+        },
+        {
+          "name": "payment_status",
+          "type": "String"
+        },
+        {
+          "name": "due_date",
+          "type": "Date"
+        },
+        {
+          "name": "paid_at",
+          "type": "Date"
+        },
+        {
+          "name": "payments",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        }
+      ],
+      "links": [
+        {
+          "field": "bill_id",
+          "to": "Bill",
+          "toField": "bill_id",
+          "meaning": "fee"
+        }
+      ]
+    },
+    {
+      "name": "UserNotification",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "user_notification_id",
+          "type": "String"
+        },
+        {
+          "name": "notification_id",
+          "type": "String"
+        },
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "user_id",
+          "type": "String"
+        },
+        {
+          "name": "user_name",
+          "type": "String"
+        },
+        {
+          "name": "user_type",
+          "type": "String"
+        },
+        {
+          "name": "is_read",
+          "type": "Boolean"
+        },
+        {
+          "name": "read_at",
+          "type": "Date"
+        },
+        {
+          "name": "delivered_at",
+          "type": "Date"
+        },
+        {
+          "name": "email_address",
+          "type": "String"
+        },
+        {
+          "name": "email_sent",
+          "type": "Boolean"
+        },
+        {
+          "name": "email_sent_at",
+          "type": "Date"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        }
+      ],
+      "links": []
+    },
+    {
+      "name": "WebsiteRequest",
+      "schoolField": "school_id",
+      "note": "",
+      "fields": [
+        {
+          "name": "school_id",
+          "type": "String"
+        },
+        {
+          "name": "brief.primary_color",
+          "type": "String"
+        },
+        {
+          "name": "brief.secondary_color",
+          "type": "String"
+        },
+        {
+          "name": "brief.background_color",
+          "type": "String"
+        },
+        {
+          "name": "brief.font_style",
+          "type": "String"
+        },
+        {
+          "name": "brief.theme",
+          "type": "String"
+        },
+        {
+          "name": "brief.pages",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "brief.sections",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "brief.final_notes",
+          "type": "String"
+        },
+        {
+          "name": "description_doc_url",
+          "type": "String"
+        },
+        {
+          "name": "description_doc_name",
+          "type": "String"
+        },
+        {
+          "name": "reference_image_url",
+          "type": "String"
+        },
+        {
+          "name": "reference_image_name",
+          "type": "String"
+        },
+        {
+          "name": "scladapp_website_url",
+          "type": "String"
+        },
+        {
+          "name": "scladapp_website_published_at",
+          "type": "Date"
+        },
+        {
+          "name": "subdomain_slug",
+          "type": "String"
+        },
+        {
+          "name": "html_cloudinary_url",
+          "type": "String"
+        },
+        {
+          "name": "html_cloudinary_public_id",
+          "type": "String"
+        },
+        {
+          "name": "published_pages",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "custom_domain",
+          "type": "String"
+        },
+        {
+          "name": "custom_domain_status",
+          "type": "String"
+        },
+        {
+          "name": "custom_domain_updated_at",
+          "type": "Date"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "submitted_at",
+          "type": "Date"
+        },
+        {
+          "name": "draft_html",
+          "type": "String"
+        },
+        {
+          "name": "draft_pages",
+          "type": "Array<Mixed>"
+        },
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "created_at",
+          "type": "Date"
+        },
+        {
+          "name": "updated_at",
+          "type": "Date"
+        }
+      ],
+      "links": []
+    }
+  ]
+}

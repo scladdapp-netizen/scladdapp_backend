@@ -14,6 +14,8 @@ const express   = require("express");
 const jwt       = require("jsonwebtoken");
 const AIConfig  = require("../models/AIConfig.model");
 const { VALID_USES, conflictingUses } = require("../utils/aiConfigUse");
+const { groqChat } = require("../utils/groqChat");
+const { openRouterChat } = require("../utils/openRouterChat");
 
 const router = express.Router();
 
@@ -91,7 +93,7 @@ router.get("/", verifyToken, async (req, res) => {
 router.post("/", verifyToken, async (req, res) => {
   const tag = "[AI-CONFIG-CREATE]";
   try {
-    const { label, use, api_key, model, max_tokens, temperature, is_active } = req.body;
+    const { label, use, api_key, model, temperature, is_active } = req.body;
     const { portal_admin_id } = req.jwtPayload;
 
     console.log(`${tag} Creating config — use: ${use}, model: ${model}, by: ${portal_admin_id}`);
@@ -127,7 +129,6 @@ router.post("/", verifyToken, async (req, res) => {
       use,
       api_key:     api_key.trim(),
       model:       model.trim(),
-      max_tokens:  max_tokens  ?? 4096,
       temperature: temperature ?? 0.7,
       is_active:   is_active !== false,
       created_by:  portal_admin_id,
@@ -154,7 +155,7 @@ router.patch("/:configId", verifyToken, async (req, res) => {
   try {
     const { configId } = req.params;
     const { portal_admin_id } = req.jwtPayload;
-    const { label, use, api_key, model, max_tokens, temperature, is_active } = req.body;
+    const { label, use, api_key, model, temperature, is_active } = req.body;
 
     console.log(`${tag} Updating config_id: ${configId} by: ${portal_admin_id}`);
 
@@ -191,7 +192,6 @@ router.patch("/:configId", verifyToken, async (req, res) => {
     if (label       !== undefined) config.label       = label.trim();
     if (api_key     !== undefined) config.api_key     = api_key.trim();
     if (model       !== undefined) config.model       = model.trim();
-    if (max_tokens  !== undefined) config.max_tokens  = max_tokens;
     if (temperature !== undefined) config.temperature = temperature;
     config.updated_by = portal_admin_id;
 
@@ -232,7 +232,8 @@ router.delete("/:configId", verifyToken, async (req, res) => {
 });
 
 // ─── POST /api/ai-config/:configId/test ──────────────────────────────────────
-// Sends a tiny test prompt to OpenRouter using the stored key + model.
+// Sends a tiny test prompt using the stored key + model.
+// Image (site creation) goes to OpenRouter. Edit and the other uses go to Groq.
 // Returns success/failure so the admin knows the config actually works.
 router.post("/:configId/test", verifyToken, async (req, res) => {
   const tag = "[AI-CONFIG-TEST]";
@@ -249,41 +250,27 @@ router.post("/:configId/test", verifyToken, async (req, res) => {
       return res.status(400).json({ success: false, message: "No API key stored for this config" });
     }
 
-    // Fire a minimal single-message request to OpenRouter
-    const orRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method:  "POST",
-      headers: {
-        "Content-Type":  "application/json",
-        "Authorization": `Bearer ${config.api_key}`,
-        // OpenRouter recommends these headers
-        "HTTP-Referer":  process.env.APP_URL || "http://localhost:1234",
-        "X-Title":       "ScladApp Admin Test",
-      },
-      body: JSON.stringify({
-        model:      config.model,
-        max_tokens: 16,   // tiny — just enough to confirm the model responds
-        messages:   [{ role: "user", content: "Say: OK" }],
-      }),
-    });
-
-    const orData = await orRes.json();
-    console.log(`${tag} OpenRouter response status: ${orRes.status}`);
-
-    // OpenRouter returns error in { error: { message, code } }
-    if (!orRes.ok || orData.error) {
-      const errMsg =
-        orData.error?.message ||
-        orData.message         ||
-        `OpenRouter returned status ${orRes.status}`;
-      console.warn(`${tag} Test failed — ${errMsg}`);
+    const siteCreation = config.use === "template_image";
+    const chat = siteCreation ? openRouterChat : groqChat;
+    let completion;
+    try {
+      completion = await chat({
+        apiKey: config.api_key,
+        model: config.model,
+        maxTokens: 16,
+        temperature: 0,
+        messages: [{ role: "user", content: "Say: OK" }],
+      });
+    } catch (err) {
+      console.warn(`${tag} Test failed — ${err.message}`);
       return res.status(200).json({
         success: false,
-        message: errMsg,
-        details: { status: orRes.status, model: config.model },
+        message: err.message || (siteCreation ? "OpenRouter did not answer." : "Groq did not answer."),
+        details: { status: err.status || 500, model: config.model },
       });
     }
 
-    const reply = orData.choices?.[0]?.message?.content?.trim() || "(empty response)";
+    const reply = completion.choices?.[0]?.message?.content?.trim() || "(empty response)";
     console.log(`${tag} Test passed — model reply: "${reply}"`);
 
     return res.status(200).json({
@@ -292,7 +279,7 @@ router.post("/:configId/test", verifyToken, async (req, res) => {
       details: {
         model:  config.model,
         reply,
-        usage:  orData.usage || null,
+        usage:  completion.usage || null,
       },
     });
   } catch (err) {

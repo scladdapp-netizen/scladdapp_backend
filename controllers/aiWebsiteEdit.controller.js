@@ -17,12 +17,11 @@ const WebsiteRequest = require("../models/WebsiteRequest.model");
 const School         = require("../models/School.model");
 const { uploadToCloudinary } = require("../utils/cloudinary");
 const cloudinary     = require("cloudinary").v2;
-const axios          = require("axios");
+const { getMessageText, hasReasoningOnly } = require("../utils/parseAiJson");
+const { groqChat } = require("../utils/groqChat");
 const { checkAIWebsiteEditorAccess } = require("../utils/planLimitCheck");
 
-const OPENROUTER_URL         = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_TIMEOUT_MS  = 90_000;
-const OPENROUTER_MAX_RETRIES = 2;
+const GROQ_MAX_RETRIES = 2;
 
 /** Build page list from brief.pages, with Home fallback */
 function buildPageMeta(doc) {
@@ -75,56 +74,62 @@ function isRetryableNetworkError(err) {
   );
 }
 
-function formatOpenRouterNetworkError(err) {
+function formatGroqNetworkError(err) {
   const code = err?.code || err?.cause?.code;
   if (code === "UND_ERR_CONNECT_TIMEOUT" || code === "ETIMEDOUT" || code === "ECONNABORTED") {
-    return "Could not reach OpenRouter AI (connection timed out). Check your internet, firewall, or try a VPN, then retry.";
+    return "Could not reach Groq (connection timed out). Check your internet, firewall, or try a VPN, then retry.";
   }
   if (code === "ENOTFOUND") {
-    return "Could not resolve openrouter.ai. Check your DNS or internet connection.";
+    return "Could not resolve api.groq.com. Check your DNS or internet connection.";
   }
   if (code === "ECONNREFUSED") {
-    return "Connection to OpenRouter AI was refused. The service may be down or blocked on your network.";
+    return "Connection to Groq was refused. The service may be down or blocked on your network.";
   }
-  return err?.message || "Failed to connect to OpenRouter AI.";
+  return err?.message || "Failed to connect to Groq.";
 }
 
-async function callOpenRouter({ apiKey, model, maxTokens, messages, tag = "[AI-WEBSITE-EDIT]" }) {
+async function callGroq({ apiKey, model, maxTokens, messages, tag = "[AI-WEBSITE-EDIT]" }) {
   let lastErr;
-  for (let attempt = 0; attempt <= OPENROUTER_MAX_RETRIES; attempt++) {
+  for (let attempt = 0; attempt <= GROQ_MAX_RETRIES; attempt++) {
     try {
-      const res = await axios.post(
-        OPENROUTER_URL,
-        {
-          model,
-          max_tokens: maxTokens,
-          temperature: 0.2,
-          messages,
-        },
-        {
-          headers: {
-            "Content-Type":  "application/json",
-            Authorization:   `Bearer ${apiKey}`,
-            "HTTP-Referer":    process.env.APP_URL || "http://localhost:1234",
-            "X-Title":         "ScladApp Website Editor",
-          },
-          timeout: OPENROUTER_TIMEOUT_MS,
-          validateStatus: () => true,
-        }
-      );
-      return { status: res.status, data: res.data, ok: res.status >= 200 && res.status < 300 };
+      const completion = await groqChat({ apiKey, model, maxTokens, temperature: 0.2, messages });
+      return { status: 200, data: completion, ok: true };
     } catch (err) {
       lastErr = err;
-      if (attempt < OPENROUTER_MAX_RETRIES && isRetryableNetworkError(err)) {
+      if (attempt < GROQ_MAX_RETRIES && isRetryableNetworkError(err)) {
         const delay = 2000 * (attempt + 1);
-        console.warn(`${tag} OpenRouter attempt ${attempt + 1} failed (${err.code || err.message}), retrying in ${delay}ms...`);
+        console.warn(`${tag} Groq attempt ${attempt + 1} failed (${err.code || err.message}), retrying in ${delay}ms...`);
         await new Promise((r) => setTimeout(r, delay));
         continue;
+      }
+      if (!isRetryableNetworkError(err)) {
+        return { status: err.status || 500, data: { error: { message: err.message || "The Groq model did not answer." } }, ok: false };
       }
       throw err;
     }
   }
   throw lastErr;
+}
+
+async function completeText({ config, maxTokens, messages, tag }) {
+  const run = (tokens) => callGroq({
+    apiKey: config.api_key,
+    model: config.model,
+    maxTokens: tokens,
+    messages,
+    tag,
+  });
+  let result = await run(maxTokens);
+  let message = result.data?.choices?.[0]?.message;
+  let text = getMessageText(message);
+  if (result.ok && !result.data?.error && (!text || hasReasoningOnly(message))) {
+    const retryTokens = Math.min(16000, Math.max(maxTokens * 2, 4000));
+    console.warn(`${tag} empty or reasoning-only reply, retrying with max_tokens=${retryTokens}`);
+    result = await run(retryTokens);
+    message = result.data?.choices?.[0]?.message;
+    text = getMessageText(message);
+  }
+  return { result, text };
 }
 
 /** Depth-aware extract of <tag> starting at startIndex */
@@ -425,7 +430,117 @@ Rules:
 - Keep all existing content that the instruction does not ask to change.
 - You may add or modify <style> blocks for scoped CSS.
 - You may add or modify <script> blocks for scoped JS.
-- Make ONLY the change described. Do not remove unrelated cards, text, or sections.`;
+- Make ONLY the change described. Do not remove unrelated cards, text, or sections.
+- If the instruction is only a greeting, thanks, or a question that does not ask you to change the page, reply with exactly CHAT: followed by a short helpful reply. Do not return HTML in that case.`;
+
+const chatReplyFor = (raw) => {
+  const text = String(raw || "").trim().toLowerCase().replace(/[!?.]+$/g, "").trim();
+  if (!text || text.length > 80) return null;
+  const words = text.split(/\s+/);
+  const asksForEdit = /\b(change|edit|update|make|add|remove|delete|rewrite|color|colour|font|text|heading|section|image|button|layout|style)\b/.test(text);
+  if (asksForEdit) return null;
+  if (/^(hi|hello|hey|hiya|yo|good morning|good afternoon|good evening)$/.test(text)) {
+    return "Hi. Tell me what you would like to change on this page — a heading, a color, or a section.";
+  }
+  if (/^(hi|hello|hey)\b/.test(text) && words.length <= 4) {
+    return "Hi. Tell me what you would like to change on this page — a heading, a color, or a section.";
+  }
+  if (/^(thanks|thank you|ty)$/.test(text)) {
+    return "You're welcome. Tell me the next change you want on the page.";
+  }
+  if (/^(help|what can you do|who are you|how does this work)$/.test(text)) {
+    return "I edit the page you are looking at. Ask me to change text, colors, layout, or one section.";
+  }
+  return null;
+};
+
+const STYLE_PROPS = new Set([
+  "color", "background", "background-color", "font-size", "font-weight", "font-style",
+  "font-family", "text-align", "text-decoration", "letter-spacing", "line-height",
+  "padding", "margin", "border", "border-radius", "box-shadow", "opacity",
+  "text-transform", "width", "max-width",
+]);
+
+function parseStyleProps(raw) {
+  let text = String(raw || "").trim();
+  text = text.replace(/^```(?:css)?\n?/i, "").replace(/\n?```$/i, "").trim();
+  text = text.replace(/^CSS:\s*/i, "");
+  const props = {};
+  for (const line of text.split(/\n|;/)) {
+    const match = line.trim().match(/^([a-z][a-z0-9-]*)\s*:\s*(.+)$/i);
+    if (!match) continue;
+    const prop = match[1].toLowerCase();
+    if (!STYLE_PROPS.has(prop)) continue;
+    const value = match[2].trim().replace(/;+$/, "").replace(/\s*!important\s*$/i, "");
+    if (!value || /[{}<>]|url\s*\(|expression\s*\(/i.test(value) || value.length > 80) continue;
+    props[prop] = value;
+  }
+  return props;
+}
+
+function cleanContextHtml(html, limit) {
+  return String(html || "")
+    .replace(/\scontenteditable="[^"]*"/gi, "")
+    .replace(/\s__aie_(?:hover|selected|editing)__/g, "")
+    .replace(/\sclass=""/g, "")
+    .trim()
+    .slice(0, limit);
+}
+
+async function styleSelectedElement({ config, prompt, element, sectionHtml, tag }) {
+  const system = `You style ONE element on a school website. The surrounding section is context only — do not style or change anything else.
+Reply with CSS declarations for the selected element only, one per line. No selectors, no HTML, no explanation.
+Example:
+color: #166534
+font-weight: 700`;
+  const user = `Instruction: ${String(prompt || "").trim()}
+Selected element: ${element.tagName || "element"} ${element.label || element.selector || ""}
+Element text: "${String(element.textContent || "").slice(0, 160)}"
+
+Selected element HTML:
+${cleanContextHtml(element.outerHTML, 2000) || "(not available)"}
+
+Surrounding section (context only — do not restyle other elements):
+${cleanContextHtml(sectionHtml, 2500) || "(not available)"}`;
+
+  const { result, text: raw } = await completeText({
+    config,
+    maxTokens: 1200,
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ],
+    tag,
+  });
+  const styleProps = parseStyleProps(raw);
+  if (!result.ok || !Object.keys(styleProps).length) {
+    return {
+      success: false,
+      message: "I couldn't turn that into a style for the selected item. Try “make it green” or “make the text larger.”",
+    };
+  }
+  return { success: true, styleProps, message: "Styled." };
+}
+
+async function editWholeSection({ config, prompt, fullHtml, tag }) {
+  const system = `You edit one school website section. You receive the COMPLETE section: its <style> block and its <section> markup.
+Change only the component named in the instruction. Keep every other element, class, id, and CSS rule.
+Return the full section exactly as HTML, style block first, then the section. No markdown, no explanation.`;
+  const { result, text } = await completeText({
+    config,
+    maxTokens: Math.min(8192, Math.max(4096, Math.ceil(fullHtml.length / 2) + 512)),
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: `Instruction: ${prompt}\n\nFull section HTML:\n${fullHtml}` },
+    ],
+    tag,
+  });
+  let html = String(text || "").replace(/^```(?:html)?\n?/i, "").replace(/\n?```$/i, "").trim();
+  if (!result.ok || !html || !/<(section|style|div|nav|header|footer)\b/i.test(html)) {
+    return { success: false, message: "The edit did not come back as a full section. Try again." };
+  }
+  return { success: true, newHtml: html, message: "Section updated." };
+}
 
 // ─── Controllers ──────────────────────────────────────────────────────────────
 
@@ -468,6 +583,11 @@ exports.editWebsite = async (req, res) => {
       });
     }
 
+    const chatText = chatReplyFor(prompt);
+    if (chatText) {
+      return res.json({ success: true, chat: true, message: chatText });
+    }
+
     // AI website editing is free — no token balance required
 
     // 1. Config
@@ -475,6 +595,32 @@ exports.editWebsite = async (req, res) => {
       ? await AIConfig.findOne({ config_id: configId, use: usesForFeature(USE_WEBSITE) })
       : await getWebsiteConfig();
     if (!config) return res.status(404).json({ success: false, message: "AI config not found" });
+
+    if (req.body.styleOnly && element) {
+      const styled = await styleSelectedElement({
+        config,
+        prompt,
+        element,
+        sectionHtml,
+        tag,
+      });
+      return res.json(styled);
+    }
+
+    if (req.body.wholeSection && fullHtml) {
+      const elCtx = element
+        ? `\nChange only this component: <${element.tagName || "element"}> ${element.label || ""}.` +
+          (element.textContent ? ` Its text is "${String(element.textContent).slice(0, 120)}".` : "") +
+          `\nComponent HTML:\n${String(element.outerHTML || "").slice(0, 4000)}`
+        : "";
+      const whole = await editWholeSection({
+        config,
+        prompt: `${prompt.trim()}${elCtx}`,
+        fullHtml,
+        tag,
+      });
+      return res.json(whole);
+    }
 
     // 2. Locate target section
     let sectionInfo = null;
@@ -494,7 +640,8 @@ exports.editWebsite = async (req, res) => {
     // 3. Build messages
     const elCtx = element
       ? `\nTargeted element: ${element.selector || element.tagName}` +
-        (element.textContent ? `\nElement text: "${element.textContent.slice(0, 100)}"` : "")
+        (element.textContent ? `\nElement text: "${element.textContent.slice(0, 100)}"` : "") +
+        `\nIf the instruction is to remove or delete the targeted element, omit that element from the HTML. Do not leave it in place.`
       : "";
     const userMessage =
       `Instruction: ${prompt.trim()}${elCtx}\n\n` +
@@ -503,36 +650,37 @@ exports.editWebsite = async (req, res) => {
       `Current section inner HTML:\n${workingInner}`;
 
     const sendMaxTokens = Math.min(
-      config.max_tokens || 8192,
+      8192,
       Math.max(2048, Math.ceil(workingInner.length / 2) + 512)
     );
-    console.log(`${tag} → OpenRouter model: ${config.model} | max_tokens: ${sendMaxTokens}`);
+    console.log(`${tag} → Groq model: ${config.model} | max_tokens: ${sendMaxTokens}`);
 
     let orRes;
     let orData;
+    let newInner = "";
     try {
-      const result = await callOpenRouter({
-        apiKey:     config.api_key,
-        model:      config.model,
-        maxTokens:  sendMaxTokens,
+      const completed = await completeText({
+        config,
+        maxTokens: sendMaxTokens,
         messages: [
           { role: "system", content: SECTION_EDIT_SYSTEM_PROMPT },
           { role: "user",   content: userMessage },
         ],
         tag,
       });
-      orRes  = result;
-      orData = result.data;
+      orRes  = completed.result;
+      orData = completed.result.data;
+      newInner = completed.text;
     } catch (err) {
-      const msg = formatOpenRouterNetworkError(err);
-      console.error(`${tag} OpenRouter network error:`, err.message || err);
+      const msg = formatGroqNetworkError(err);
+      console.error(`${tag} Groq network error:`, err.message || err);
       return res.status(503).json({ success: false, message: msg });
     }
 
     if (!orRes.ok || orData.error) {
-      const errMsg = orData.error?.message || `OpenRouter error ${orRes.status}`;
+      const errMsg = orData.error?.message || `Groq error ${orRes.status}`;
       const partial = orData.choices?.[0]?.message?.content?.trim();
-      console.error(`${tag} OpenRouter error: ${errMsg}`);
+      console.error(`${tag} Groq error: ${errMsg}`);
       return res.status(502).json({
         success: false,
         message: errMsg,
@@ -540,7 +688,6 @@ exports.editWebsite = async (req, res) => {
       });
     }
 
-    let newInner = orData.choices?.[0]?.message?.content?.trim();
     if (!newInner) {
       return res.status(502).json({
         success: false,
@@ -550,6 +697,15 @@ exports.editWebsite = async (req, res) => {
     }
 
     newInner = stripAiSectionWrapper(newInner, sectionId);
+
+    const chatFromModel = newInner.match(/^CHAT:\s*([\s\S]+)/i);
+    if (chatFromModel) {
+      return res.json({
+        success: true,
+        chat: true,
+        message: chatFromModel[1].trim(),
+      });
+    }
 
     console.log(`${tag} ← AI returned ${newInner.length} chars`);
 
@@ -564,6 +720,14 @@ exports.editWebsite = async (req, res) => {
     }
 
     // 6. Splice modified inner back into fullHtml
+    const unchanged = newInner.replace(/\s+/g, "") === workingInner.replace(/\s+/g, "");
+    if (unchanged) {
+      return res.json({
+        success: false,
+        message: "Nothing changed. Select the item and say “remove it”, or describe the change more clearly.",
+      });
+    }
+
     let newHtml;
     if (isFullPage) {
       newHtml = newInner;
@@ -584,7 +748,7 @@ exports.editWebsite = async (req, res) => {
   } catch (err) {
     console.error(`[AI-WEBSITE-EDIT] Error:`, err);
     const message = isRetryableNetworkError(err)
-      ? formatOpenRouterNetworkError(err)
+      ? formatGroqNetworkError(err)
       : (err.message || "Server error");
     return res.status(500).json({ success: false, message });
   }
