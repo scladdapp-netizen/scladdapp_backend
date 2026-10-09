@@ -231,57 +231,47 @@
           },
           {
             "type": "video",
-            "title": "Getting Started with Scladapp",
-            "youtubeId": "dQw4w9WgXcQ",
-            "description": "Learn how to set up your school and configure basic settings.",
-            "duration": "5:32",
-            "category": "Getting Started",
-            "page": ""
-          },
-          {
-            "type": "video",
-            "title": "Managing Students & Admissions",
-            "youtubeId": "ScMzIvxBSi4",
-            "description": "A complete walkthrough of student enrollment and admission management.",
-            "duration": "8:14",
-            "category": "Students",
-            "page": ""
-          },
-          {
-            "type": "video",
-            "title": "Setting Up Classes & Timetables",
-            "youtubeId": "9bZkp7q19f0",
-            "description": "How to create classes, assign teachers, and build timetables.",
-            "duration": "6:47",
-            "category": "Classes",
-            "page": ""
-          },
-          {
-            "type": "video",
-            "title": "Fee Billing & Payments",
-            "youtubeId": "kJQP7kiw5Fk",
-            "description": "Configure fee templates, generate bills, and track payments.",
-            "duration": "7:20",
-            "category": "Finance",
-            "page": ""
-          },
-          {
-            "type": "video",
-            "title": "Staff & Teacher Management",
-            "youtubeId": "JGwWNGJdvx8",
-            "description": "Add staff, assign roles, and manage teacher subjects.",
-            "duration": "4:55",
-            "category": "Staff",
-            "page": ""
-          },
-          {
-            "type": "video",
-            "title": "How to request a school website",
-            "youtubeId": "ScMzIvxBSi4",
+            "title": "Create a school website in Scladapp in less than 3 min",
+            "youtubeId": "lO4WmYZSLlM",
             "description": "",
-            "duration": "5:00",
-            "category": "Website",
-            "page": "website-brief"
+            "duration": "3:00",
+            "category": "",
+            "page": "landing",
+            "thumbnail": "https://res.cloudinary.com/dxspjixju/image/upload/v1791549326/scladapp/docs/images/MPjvk_bhqtgl.jpg",
+            "thumbnailPublicId": "scladapp/docs/images/MPjvk_bhqtgl"
+          },
+          {
+            "type": "video",
+            "title": "Create a school website in Scladapp in less than 3 min",
+            "youtubeId": "lO4WmYZSLlM",
+            "description": "",
+            "duration": "",
+            "category": "",
+            "page": "",
+            "thumbnail": "https://res.cloudinary.com/dxspjixju/image/upload/v1791550829/scladapp/docs/images/MPjvk_yhbye2.jpg",
+            "thumbnailPublicId": "scladapp/docs/images/MPjvk_yhbye2"
+          },
+          {
+            "type": "video",
+            "title": "Step by step guide to setup  your school on Scladapp",
+            "youtubeId": "m64t8kWEvDQ",
+            "description": "In this video, I’ll walk you through the complete school setup process on Scladapp — step by step.",
+            "duration": "",
+            "category": "",
+            "page": "",
+            "thumbnail": "https://res.cloudinary.com/dxspjixju/image/upload/v1791550922/scladapp/docs/images/meigen-3e2526b9-dbb8-47da-83f9-62b190fce405_2_otmp3z.png",
+            "thumbnailPublicId": "scladapp/docs/images/meigen-3e2526b9-dbb8-47da-83f9-62b190fce405_2_otmp3z"
+          },
+          {
+            "type": "video",
+            "title": "Create a school website in Scladapp in less than 3 min",
+            "youtubeId": "lO4WmYZSLlM",
+            "description": "",
+            "duration": "",
+            "category": "",
+            "page": "website-brief",
+            "thumbnail": "https://res.cloudinary.com/dxspjixju/image/upload/v1791553546/scladapp/docs/images/MPjvk_b2zj8o.jpg",
+            "thumbnailPublicId": "scladapp/docs/images/MPjvk_b2zj8o"
           }
         ],
         "steps": [

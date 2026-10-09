@@ -81,6 +81,7 @@ const websiteRequestSchema = new mongoose.Schema(
     // ── Scladapp-built website (set by admin after publishing) ─────────────
     scladapp_website_url:          { type: String, default: null },
     scladapp_website_published_at: { type: Date,   default: null },
+    scladapp_website_built_at:     { type: Date,   default: null },
     subdomain_slug:                { type: String, default: null },
     html_cloudinary_url:           { type: String, default: null }, // home page mirror (legacy)
     html_cloudinary_public_id:     { type: String, default: null },

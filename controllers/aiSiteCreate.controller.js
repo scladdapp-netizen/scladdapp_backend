@@ -5,6 +5,7 @@ const { USE_TEMPLATE_IMAGE, USE_TEMPLATE_CODE, usesForFeature } = require("../ut
 const { getMessageText, hasReasoningOnly, extractJsonFromText } = require("../utils/parseAiJson");
 const { openRouterChat } = require("../utils/openRouterChat");
 const { groqChat } = require("../utils/groqChat");
+const siteDescriptionPrompts = require("../data/siteDescriptionPrompts");
 
 async function activeConfig(use) {
   const config = await AIConfig.findOne({ use: usesForFeature(use), is_active: true });
@@ -357,6 +358,30 @@ function ensureMobile(html) {
   return page;
 }
 
+const BUILD_WAIT_MS = 30 * 24 * 60 * 60 * 1000;
+
+function buildUnlocksAt(doc) {
+  const built = doc?.scladapp_website_built_at;
+  if (!built) return null;
+  return new Date(new Date(built).getTime() + BUILD_WAIT_MS);
+}
+
+exports.buildWait = async (req, res) => {
+  try {
+    const doc = await WebsiteRequest.findOne({ school_id: req.params.schoolId })
+      .select("scladapp_website_built_at")
+      .lean();
+    const unlocksAt = buildUnlocksAt(doc);
+    const locked = Boolean(unlocksAt && Date.now() < unlocksAt.getTime());
+    return res.json({
+      success: true,
+      data: { locked, unlocksAt: unlocksAt ? unlocksAt.toISOString() : null },
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 async function saveCreatedPage(schoolId, html, color) {
   const existing = await WebsiteRequest.findOne({ school_id: schoolId }).lean();
   const page = { id: "home", title: "Home", slug: "/", order: 0, html };
@@ -365,6 +390,7 @@ async function saveCreatedPage(schoolId, html, color) {
     draft_html: html,
     draft_pages: [page],
     "brief.primary_color": color,
+    scladapp_website_built_at: new Date(),
   };
   if (!existing?.brief?.pages?.length) {
     update["brief.pages"] = [{ id: "home", title: "Home", slug: "/", order: 0, sections: [] }];
@@ -417,6 +443,14 @@ function pickPage(text) {
   return null;
 }
 
+exports.randomSitePrompt = (req, res) => {
+  const except = String(req.query.except || "");
+  const pool = siteDescriptionPrompts.filter((item) => item.id !== except);
+  const list = pool.length ? pool : siteDescriptionPrompts;
+  const pick = list[Math.floor(Math.random() * list.length)];
+  return res.json({ success: true, data: { id: pick.id, text: pick.text } });
+};
+
 exports.createSite = async (req, res) => {
   const tag = "[AI-SITE-CREATE]";
   try {
@@ -433,6 +467,18 @@ exports.createSite = async (req, res) => {
     const fontStack = String(req.body.fontStack || "Georgia, serif");
     if (!image.startsWith("data:image/")) {
       return res.status(400).json({ success: false, message: "Choose a template image first." });
+    }
+
+    const priorBuild = await WebsiteRequest.findOne({ school_id: schoolId })
+      .select("scladapp_website_built_at")
+      .lean();
+    const unlocksAt = buildUnlocksAt(priorBuild);
+    if (unlocksAt && Date.now() < unlocksAt.getTime()) {
+      const when = unlocksAt.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+      return res.status(400).json({
+        success: false,
+        message: `You can build again on ${when}. A website can be built again 30 days after the last build.`,
+      });
     }
 
     const school = await School.findOne({ school_id: schoolId }).lean();

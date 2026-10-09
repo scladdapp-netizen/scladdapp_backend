@@ -251,10 +251,31 @@ exports.cancel = async (req, res) => {
 // DELETE  /api/schools/:schoolId/website-request/purge  (admin hard reset)
 // Drops every Cloudinary asset and the request itself, whatever its status,
 // leaving the school exactly as if it had never asked for a website.
+const WEBSITE_DELETE_WAIT_MS = 30 * 24 * 60 * 60 * 1000;
+
+function websiteCreatedAt(doc) {
+  return doc?.scladapp_website_published_at || doc?.created_at || null;
+}
+
+function websiteDeleteUnlocksAt(doc) {
+  const created = websiteCreatedAt(doc);
+  if (!created) return null;
+  return new Date(new Date(created).getTime() + WEBSITE_DELETE_WAIT_MS);
+}
+
 exports.purge = async (req, res) => {
   try {
     const { schoolId } = req.params;
     const existing = await WebsiteRequest.findOne({ school_id: schoolId });
+    const unlocksAt = websiteDeleteUnlocksAt(existing);
+
+    if (unlocksAt && Date.now() < unlocksAt.getTime()) {
+      const when = unlocksAt.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+      return res.status(400).json({
+        success: false,
+        message: `This website can be deleted after ${when}, 30 days after it was created.`,
+      });
+    }
 
     await deletePreviousPublishedHtml(existing);
 
@@ -395,6 +416,9 @@ exports.publish = async (req, res) => {
 
     const homePage = publishedPages.find((p) => p.slug === "/" || p.id === "home") || publishedPages[0];
     const siteUrl = buildSiteUrl(slug);
+    const prior = await WebsiteRequest.findOne({ school_id: schoolId })
+      .select("scladapp_website_published_at")
+      .lean();
 
     const doc = await WebsiteRequest.findOneAndUpdate(
       { school_id: schoolId },
@@ -406,7 +430,7 @@ exports.publish = async (req, res) => {
           html_cloudinary_url:           homePage.html_cloudinary_url,
           html_cloudinary_public_id:     homePage.html_cloudinary_public_id || null,
           scladapp_website_url:          siteUrl,
-          scladapp_website_published_at: new Date(),
+          scladapp_website_published_at: prior?.scladapp_website_published_at || new Date(),
         },
       },
       { new: true }

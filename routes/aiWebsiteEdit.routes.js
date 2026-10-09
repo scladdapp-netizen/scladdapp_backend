@@ -45,6 +45,8 @@ function verifyToken(req, res, next) {
 router.get    ("/:schoolId/ai-website/tokens",       verifyToken, ctrl.getTokenBalance);
 router.get    ("/:schoolId/ai-website/models",       verifyToken, ctrl.getAvailableModels);
 router.post   ("/:schoolId/ai-website/edit",         verifyToken, ctrl.editWebsite);
+router.get    ("/:schoolId/ai-website/site-prompt",   verifyToken, createCtrl.randomSitePrompt);
+router.get    ("/:schoolId/ai-website/build-wait",    verifyToken, createCtrl.buildWait);
 router.post   ("/:schoolId/ai-website/create-site",  verifyToken, createCtrl.createSite);
 router.post   ("/:schoolId/ai-website/add-page",     verifyToken, createCtrl.addPage);
 router.post   ("/:schoolId/ai-website/edit-page",    verifyToken, createCtrl.editPage);
