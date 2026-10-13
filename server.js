@@ -170,6 +170,21 @@ app.use(async (req, res, next) => {
 const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+app.get("/check-ip", async (req, res) => {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json();
+
+    res.json({
+      outgoingIP: data.ip
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Could not retrieve outgoing IP"
+    });
+  }
+});
+
 // Server
 const PORT = Number(process.env.PORT) || 4000;
 const server = app.listen(PORT, () => {

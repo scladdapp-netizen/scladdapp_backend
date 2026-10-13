@@ -46,7 +46,7 @@ async function groqChat({
     } catch (err) {
       lastErr = err;
       const message = groqErrorMessage(err);
-      if (isUnsupportedParam(message)) continue;
+      if (isUnsupportedParam(message) || /tool choice is none/i.test(message)) continue;
       const error = new Error(message);
       error.status = err?.status || err?.statusCode || 500;
       throw error;
