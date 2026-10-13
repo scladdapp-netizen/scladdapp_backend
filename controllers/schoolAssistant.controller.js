@@ -636,16 +636,28 @@ function packFor(question, history = []) {
   return "chat";
 }
 
+function mentionsTerm(question) {
+  return /\b(sub\s?se[a-z]{2,12}|terms?)\b/i.test(question);
+}
+
+function mentionsSession(question) {
+  const withoutTerm = String(question || "").replace(/\bsub\s?se[a-z]{2,12}\b/ig, " ");
+  return /\b(seasi?ons?|seasions?|seassions?|sessions?|academic years?)\b/i.test(withoutTerm);
+}
+
 function periodIdentity(question) {
   const q = String(question || "").trim();
-  const sessionWord = /\b(seasi?ons?|sessions?|academic years?)\b/i;
-  const termWord = /\b(sub\s?seasi?ons?|sub\s?sessions?|terms?)\b/i;
-  const askedSession = sessionWord.test(q);
-  const askedTerm = termWord.test(q);
+  const askedSession = mentionsSession(q);
+  const askedTerm = mentionsTerm(q);
   if (!askedSession && !askedTerm) return null;
   if (/\b(class|student|staff|teacher|timetable|time\s*table|attendance|score|fee|bill|subject|how many|who)\b/i.test(q)) return null;
-  if (!/\b(what|which|current|active|now|today)\b/i.test(q) && q.split(/\s+/).length > 6) return null;
-  return { session: askedSession, term: askedTerm };
+  if (!/\b(what|which|when|current|active|now|today|end|start|begin)\b/i.test(q) && q.split(/\s+/).length > 8) return null;
+  return {
+    session: askedSession,
+    term: askedTerm,
+    end: /\b(end|ends|ending|finish|finishes|over|until|close|closes)\b/i.test(q),
+    start: /\b(start|starts|starting|begin|begins)\b/i.test(q),
+  };
 }
 
 function periodQuestion(question, history = []) {
@@ -699,28 +711,157 @@ async function classesMissingTimetable(schoolId, question) {
     : `Every active class already has a timetable for ${termName}.`;
   const columns = [{ key: "class_name", label: "Class" }];
   const rows = missing.map((name) => ({ class_name: name }));
-  const payload = { success: true, kind: "query", title, message, columns, rows, truncated: false };
   if (!rows.length) return { success: true, kind: "chat", message };
-  return withReport(schoolId, question, { from: "Class", title, where: [] }, { columns, rows, truncated: false }, payload);
+  const payload = { success: true, kind: "query", title, message, columns, rows, truncated: false, offerPdf: true, report: reportSnapshot(title, columns, rows) };
+  payload.message = `${message.replace(/[.?\s]+$/, "")}. Should I give you the PDF?`;
+  return payload;
+}
+
+function feeQuestion(question) {
+  return /\b(fees?|bills?|bal+ances?|ballances?|outstanding|owe|owing)\b/i.test(question);
+}
+
+function classHint(question, history = []) {
+  const direct = wantedClass(question);
+  if (direct) return direct;
+  const previous = [...history].reverse().find((item) => classMentions(item.content || "").length);
+  const earlier = previous ? classMentions(previous.content).slice(-1)[0] : "";
+  return earlier || "";
+}
+
+async function studentFeeReport(schoolId, question, history) {
+  const period = await activePeriod(schoolId);
+  const hint = classHint(question, history);
+  let className = "";
+  let studentIds = null;
+  if (hint) {
+    const found = await mongoose.model("Class").find({
+      school_id: String(schoolId),
+      $or: classPatterns(hint).flatMap((pattern) => [{ class_name: pattern }, { class_code: pattern }]),
+    }).select("class_id class_name").limit(6).lean();
+    if (found.length !== 1) {
+      return { success: true, kind: "chat", message: found.length ? `"${hint}" matches more than one class. Which class do you mean?` : `I could not find a class called ${hint}.` };
+    }
+    className = found[0].class_name;
+    const assignmentQuery = { school_id: String(schoolId), class_id: found[0].class_id, is_active: true };
+    if (period.session) assignmentQuery.session_id = period.session.session_id;
+    const assignments = await mongoose.model("StudentClassAssignment").find(assignmentQuery).select("student_id").lean();
+    studentIds = [...new Set(assignments.map((item) => String(item.student_id || "")).filter(Boolean))];
+    if (!studentIds.length) {
+      return { success: true, kind: "chat", message: `${className} has no students in the current session.` };
+    }
+  }
+  const billQuery = { school_id: String(schoolId) };
+  if (studentIds) billQuery.user_id = { $in: studentIds };
+  else billQuery.user_type = /^student$/i;
+  const bills = await mongoose.model("UserBill").find(billQuery).select("user_id user_name amount_due amount_paid").lean();
+  const names = new Map();
+  if (studentIds?.length) {
+    const students = await mongoose.model("Student").find({
+      school_id: String(schoolId),
+      student_id: { $in: studentIds },
+    }).select("student_id full_name").lean();
+    students.forEach((item) => names.set(String(item.student_id), item.full_name));
+  }
+  const totals = new Map();
+  bills.forEach((bill) => {
+    const id = String(bill.user_id || "");
+    if (!id) return;
+    if (!totals.has(id)) totals.set(id, { due: 0, paid: 0, name: names.get(id) || bill.user_name || "Student" });
+    const row = totals.get(id);
+    row.due += Number(bill.amount_due) || 0;
+    row.paid += Number(bill.amount_paid) || 0;
+    if (!row.name && bill.user_name) row.name = bill.user_name;
+  });
+  const balances = [...totals.entries()].map(([id, row]) => ({
+    student_id: id,
+    full_name: names.get(id) || row.name || "Student",
+    balance: Math.round((row.due - row.paid) * 100) / 100,
+  }));
+  const owing = balances.filter((row) => row.balance > 0);
+  const where = className ? ` in ${className}` : "";
+  const enrolled = studentIds ? studentIds.length : balances.length;
+  logAssistant("fees", { className: className || null, enrolled, withFee: balances.length, owing: owing.length });
+  const wantsList = /\b(list|each|names?|who|show|give|balance|ballance|outstanding)\b/i.test(question);
+  if (!wantsList) {
+    const message = balances.length
+      ? `${balances.length} of ${enrolled} student${enrolled === 1 ? "" : "s"}${where} ${balances.length === 1 ? "has" : "have"} a fee. ${owing.length} still ${owing.length === 1 ? "has" : "have"} an outstanding balance.`
+      : `No student${where} has a fee yet.`;
+    return { success: true, kind: "chat", message };
+  }
+  const onlyOwing = /\b(outstanding|owe|owing|unpaid)\b/i.test(question);
+  const shown = onlyOwing ? owing : balances;
+  shown.sort((a, b) => b.balance - a.balance || a.full_name.localeCompare(b.full_name));
+  const title = className ? `Fee balances in ${className}` : "Fee balances";
+  const countLabel = `${shown.length} student${shown.length === 1 ? "" : "s"}`;
+  const message = shown.length
+    ? (onlyOwing
+      ? `${countLabel}${where} still ${shown.length === 1 ? "owes" : "owe"} a fee.`
+      : `Fee balances for ${countLabel}${where}. ${owing.length} still ${owing.length === 1 ? "owes" : "owe"} money.`)
+    : `No student${where} has an outstanding fee balance.`;
+  if (!shown.length) return { success: true, kind: "chat", message };
+  const columns = [
+    { key: "full_name", label: "Student" },
+    { key: "balance", label: "Balance" },
+    ...(className ? [{ key: "class_name", label: "Class" }] : []),
+  ];
+  const rows = shown.map((row) => ({ full_name: row.full_name, balance: row.balance, class_name: className }));
+  return {
+    success: true,
+    kind: "query",
+    title,
+    message: `${message.replace(/[.?\s]+$/, "")}. Should I give you the PDF?`,
+    columns,
+    rows,
+    truncated: false,
+    offerPdf: true,
+    report: reportSnapshot(title, columns, rows),
+  };
+}
+
+function formatStoredDate(value) {
+  const text = String(value || "").trim();
+  const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return text;
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const month = months[Number(match[2]) - 1];
+  const day = Number(match[3]);
+  if (!month || !day) return text;
+  return `${month} ${day}, ${match[1]}`;
+}
+
+function periodDateSentence(label, name, start, end, which) {
+  if (!name) return `This school has no active ${label} right now.`;
+  const startText = formatStoredDate(start);
+  const endText = formatStoredDate(end);
+  if (which.end && !which.start) {
+    return endText ? `${name} ends on ${endText}.` : `${name} has no end date recorded.`;
+  }
+  if (which.start && !which.end) {
+    return startText ? `${name} starts on ${startText}.` : `${name} has no start date recorded.`;
+  }
+  if (which.start && which.end) {
+    if (startText && endText) return `${name} runs from ${startText} to ${endText}.`;
+    return `The active ${label} in this school is ${name}.`;
+  }
+  return `The active ${label} in this school is ${name}.`;
 }
 
 async function answerActivePeriod(schoolId, which) {
   const period = await activePeriod(schoolId);
   logAssistant("period", {
     session: period.session?.session_name || null,
+    sessionEnd: period.session?.end || null,
     term: period.term?.term_name || null,
+    termEnd: period.term?.end || null,
     which,
   });
   const parts = [];
   if (which.session) {
-    parts.push(period.session
-      ? `The active session in this school is ${period.session.session_name}.`
-      : "This school has no active session right now.");
+    parts.push(periodDateSentence("session", period.session?.session_name, period.session?.start, period.session?.end, which));
   }
   if (which.term) {
-    parts.push(period.term
-      ? `The active term in this school is ${period.term.term_name}.`
-      : "This school has no active term right now.");
+    parts.push(periodDateSentence("term", period.term?.term_name, period.term?.start, period.term?.end, which));
   }
   return { success: true, kind: "chat", message: parts.join(" ") };
 }
@@ -927,8 +1068,18 @@ async function activePeriod(schoolId) {
     : [];
   const term = terms.find((item) => periodStatus(item.term_start_date, item.term_end_date, item.is_archived) === "active") || null;
   return {
-    session: session ? { session_id: session.session_id, session_name: session.session_name } : null,
-    term: term ? { term_id: term.term_id, term_name: term.term_name } : null,
+    session: session ? {
+      session_id: session.session_id,
+      session_name: session.session_name,
+      start: session.academic_year_start_date || "",
+      end: session.academic_year_end_date || "",
+    } : null,
+    term: term ? {
+      term_id: term.term_id,
+      term_name: term.term_name,
+      start: term.term_start_date || "",
+      end: term.term_end_date || "",
+    } : null,
   };
 }
 
@@ -970,14 +1121,16 @@ function applyActivePeriod(plan, period, question) {
 function contextText(period, named) {
   const lines = [];
   if (period.session) {
-    lines.push(`Active session: ${period.session.session_name} (session_id ${period.session.session_id}).`);
+    const end = formatStoredDate(period.session.end);
+    lines.push(`Active session: ${period.session.session_name} (session_id ${period.session.session_id})${end ? `, ends ${end}` : ""}. Use this end date only. Do not invent one.`);
   } else {
-    lines.push("No active session. Do not invent a session id.");
+    lines.push("No active session. Do not invent a session id or an end date.");
   }
   if (period.term) {
-    lines.push(`Active term, also called a subsession: ${period.term.term_name} (term_id ${period.term.term_id}). Other collections store this id as subsession_id.`);
+    const end = formatStoredDate(period.term.end);
+    lines.push(`Active term, also called a subsession: ${period.term.term_name} (term_id ${period.term.term_id})${end ? `, ends ${end}` : ""}. Other collections store this id as subsession_id. Use this end date only. Do not invent one.`);
   } else {
-    lines.push("No active term.");
+    lines.push("No active term. Do not invent a term end date.");
   }
   lines.push("Unless the user names another session or says all time, add session_id and subsession_id filters with these ids when the collection has those fields. Scores, attendance, fees, and class membership belong to this session and term.");
   if (named.target && named.classes.length && !named.subjects.length) {
@@ -1024,7 +1177,7 @@ function systemPrompt(pack, context = "") {
     ]).join("\n");
   }
   return base.concat([
-    "Answer the question in one or two short sentences. Set kind to chat and put the reply in answer. Do not query the database.",
+    "Answer the question in one or two short sentences. Set kind to chat and put the reply in answer. Do not query the database. Do not invent a session date, a term date, or a school year end. If you were not given that date, say you do not know it.",
   ]).join("\n");
 }
 
@@ -1113,6 +1266,62 @@ function applyQuestionShape(plan, question) {
   return plan;
 }
 
+function emptyRecordReply(plan, named, period) {
+  const cls = named?.classes?.[0]?.class_name;
+  const term = period?.term?.term_name;
+  const place = [cls, term].filter(Boolean).join(" in ");
+  if (plan?.from === "StudentScore") {
+    return `There are no scores${place ? ` for ${place}` : ""} yet, so I cannot name a best performing student.`;
+  }
+  if (plan?.from === "StudentAttendance") {
+    return `There are no present marks${place ? ` for ${place}` : ""} yet.`;
+  }
+  return `Nothing matched${place ? ` for ${place}` : ""}.`;
+}
+
+function tableEmpty(table) {
+  if (!table) return true;
+  if (table.countOnly) return Number(table.total) === 0;
+  return !(table.rows || []).length;
+}
+
+function reportSnapshot(title, columns, rows) {
+  return {
+    title: String(title || "Records").slice(0, 80),
+    columns: (columns || []).slice(0, 8),
+    rows: (rows || []).slice(0, 40),
+  };
+}
+
+function spokenResult(plan, table, message, { offer = false } = {}) {
+  const text = String(message || "").trim();
+  const payload = queryPayload(plan, table, offer && !/\bpdf\b/i.test(text)
+    ? `${text.replace(/[.?\s]+$/, "")}. Should I give you the PDF?`
+    : text);
+  if (offer && !tableEmpty(table)) {
+    payload.offerPdf = true;
+    payload.report = reportSnapshot(payload.title || plan.title, payload.columns || table.columns, payload.rows || table.rows);
+  }
+  return payload;
+}
+
+async function deliverPdf(schoolId, question, report) {
+  const columns = Array.isArray(report?.columns) ? report.columns.slice(0, 8) : [];
+  const rows = Array.isArray(report?.rows) ? report.rows.slice(0, 40) : [];
+  if (!columns.length || !rows.length) {
+    return { success: true, kind: "chat", message: "There is nothing to put in a PDF." };
+  }
+  const title = String(report.title || "Records").slice(0, 80);
+  const table = { columns, rows, truncated: false };
+  return withReport(
+    schoolId,
+    question,
+    { title, from: "Class", where: [] },
+    table,
+    { success: true, kind: "query", title, message: "Here is the PDF.", columns, rows, truncated: false }
+  );
+}
+
 function queryPayload(plan, table, message) {
   if (table.countOnly) {
     return { success: true, kind: "query", title: plan.title, count: table.total, message };
@@ -1133,7 +1342,7 @@ async function phraseResult(config, question, table) {
   return completeJson(config, [
     {
       role: "system",
-      content: "Turn this query result into the answer a school admin should read. Return one JSON object. Use the numbers and names in the data only. If the rows answer the question, use {\"answer\":\"two or three short sentences\"}. For a count, say the number. For a ranking, name who is first and name the class in the rows. A count of attendance rows is present days, not a score. Rank is not a score. If the rows do not answer the question, use {\"retry\":true,\"reason\":\"what to change\"}.",
+      content: "Turn this query result into the answer a school admin should read. Return one JSON object with answer set to two or three short sentences. Use only the numbers and names in the data. For a count, say the number. For a ranking, name who is first and the class. A count of attendance rows is present days, not a score. Rank is not a score. If the data is empty, say that nothing matched and what that means for the question. Do not repeat a query title. Do not set retry when the list is simply empty. Set retry only when the rows are about the wrong thing.",
     },
     { role: "user", content: `Question: ${question}\nData: ${JSON.stringify(data)}` },
   ], 300);
@@ -1173,15 +1382,19 @@ async function answerFromQuery(config, question, history, schoolId) {
     });
     const table = await runQuery(plan, schoolId);
     logAssistant("result", { rows: (table.rows || []).length, truncated: table.truncated });
-    let message = plan.title;
+    const fallback = tableEmpty(table)
+      ? `There are no present marks for ${named.classes[0].class_name}${period.term ? ` in ${period.term.term_name}` : ""} yet.`
+      : plan.title;
+    let message = fallback;
     try {
       const verdict = await phraseResult(config, continuedQuestion(question, history), table);
-      if (typeof verdict?.answer === "string" && verdict.answer.trim()) message = verdict.answer.trim();
+      const answer = typeof verdict?.answer === "string" ? verdict.answer.trim() : "";
+      if (answer) message = answer;
     } catch (err) {
-      /* the title is enough */
+      /* the fallback sentence is enough */
     }
     const shown = labelClass(table, named.classes[0].class_name);
-    return withReport(schoolId, question, plan, shown, queryPayload(plan, shown, message));
+    return spokenResult(plan, shown, message, { offer: !tableEmpty(shown) });
   }
   const context = contextText(period, named);
   let messages = [
@@ -1224,15 +1437,18 @@ async function answerFromQuery(config, question, history, schoolId) {
       });
       const table = await runQuery(plan, schoolId);
       logAssistant("result", table.countOnly ? { count: table.total } : { rows: (table.rows || []).length, truncated: table.truncated });
+      const fallback = table.countOnly
+        ? countReply(plan, table.total)
+        : (tableEmpty(table) ? emptyRecordReply(plan, named, period) : plan.title);
       let verdict = null;
       try {
         verdict = await phraseResult(config, question, table);
       } catch (err) {
-        const fallback = table.countOnly ? countReply(plan, table.total) : plan.title;
-        return withReport(schoolId, question, plan, table, queryPayload(plan, table, fallback));
+        return spokenResult(plan, table, fallback, { offer: !table.countOnly && !tableEmpty(table) });
       }
-      logAssistant("answer", typeof verdict?.answer === "string" ? verdict.answer : verdict?.retry ? `retry: ${verdict.reason || ""}` : "none");
-      if (verdict?.retry && attempt < 2) {
+      const answer = typeof verdict?.answer === "string" ? verdict.answer.trim() : "";
+      logAssistant("answer", answer || (verdict?.retry ? `retry: ${verdict.reason || ""}` : "none"));
+      if (verdict?.retry && !tableEmpty(table) && attempt < 2) {
         messages = [
           { role: "system", content: `The query ran but did not answer the question. Return a better JSON query, or kind clarify if you need to ask. ${context}` },
           {
@@ -1242,10 +1458,8 @@ async function answerFromQuery(config, question, history, schoolId) {
         ];
         continue;
       }
-      const message = typeof verdict?.answer === "string" && verdict.answer.trim()
-        ? verdict.answer.trim()
-        : (table.countOnly ? countReply(plan, table.total) : plan.title);
-      return withReport(schoolId, question, plan, table, queryPayload(plan, table, message));
+      const message = tableEmpty(table) ? (answer || fallback) : (verdict?.retry ? fallback : (answer || fallback));
+      return spokenResult(plan, table, message, { offer: !table.countOnly && !tableEmpty(table) });
     } catch (err) {
       lastError = err.message;
       logAssistant("rejected", err.message);
@@ -1262,18 +1476,23 @@ async function answerFromQuery(config, question, history, schoolId) {
   if (!backup) throw new Error(lastError);
   logAssistant("backup", { from: backup.from, where: backup.where, shape: backup.shape });
   const table = await runQuery(backup, schoolId);
-  let message = table.countOnly ? `There are ${table.total} students in ${named.classes[0].class_name}.` : backup.title;
+  const fallback = table.countOnly
+    ? `There are ${table.total} students in ${named.classes[0].class_name}.`
+    : (tableEmpty(table) ? emptyRecordReply(backup, named, period) : backup.title);
+  let message = fallback;
   try {
     const verdict = await phraseResult(config, question, table);
-    if (typeof verdict?.answer === "string" && verdict.answer.trim()) message = verdict.answer.trim();
+    const answer = typeof verdict?.answer === "string" ? verdict.answer.trim() : "";
+    if (answer && (tableEmpty(table) || !verdict?.retry)) message = answer;
   } catch (err) {
-    /* the count or title is enough */
+    /* the fallback sentence is enough */
   }
-  return withReport(schoolId, question, backup, table, queryPayload(backup, table, message));
+  return spokenResult(backup, table, message, { offer: !table.countOnly && !tableEmpty(table) });
 }
 
 function backupClassQuery(question, named, period) {
   if (named.classes.length !== 1 || named.subjects.length) return null;
+  if (/\b(fees?|bills?|bal+ances?|ballances?|outstanding)\b/i.test(question)) return null;
   const cls = named.classes[0];
   const ranking = /\b(best|top|highest|perform)\b/i.test(question);
   const aboutStudents = /\bstudent/i.test(question);
@@ -1324,9 +1543,17 @@ exports.ask = async (req, res) => {
     if (!config) return res.status(400).json({ success: false, message: "No active School Assistant model. In AI Config, set Use to School Assistant and turn it on." });
 
     const history = cleanHistory(req.body?.history);
+    if (/^(yes|yeah|yep|ok|okay|sure|please|send it|give me the pdf|the pdf)\b/i.test(question) && Array.isArray(req.body?.report?.rows) && req.body.report.rows.length) {
+      logAssistant("ask", { schoolId, pack: "pdf", question });
+      return res.json(await deliverPdf(schoolId, question, req.body.report));
+    }
     if (missingTimetableQuestion(question)) {
       logAssistant("ask", { schoolId, pack: "timetable-gap", question });
       return res.json(await classesMissingTimetable(schoolId, question));
+    }
+    if (feeQuestion(question)) {
+      logAssistant("ask", { schoolId, pack: "fees", question });
+      return res.json(await studentFeeReport(schoolId, question, history));
     }
     const periodAsk = periodQuestion(question, history);
     if (periodAsk) {
