@@ -22,8 +22,9 @@ async function groqChat({
   messages,
   responseFormat,
   reasoningEffort = "medium",
+  maxRetries,
 }) {
-  const groq = new Groq({ apiKey, timeout: 120000 });
+  const groq = new Groq({ apiKey, timeout: 120000, ...(maxRetries !== undefined ? { maxRetries } : {}) });
   const tokens = Math.max(16, Math.round(Number(maxTokens) || 1024));
   const attempts = [
     { reasoning_effort: reasoningEffort, max_completion_tokens: tokens },
@@ -49,6 +50,7 @@ async function groqChat({
       if (isUnsupportedParam(message) || /tool choice is none/i.test(message)) continue;
       const error = new Error(message);
       error.status = err?.status || err?.statusCode || 500;
+      error.failedGeneration = err?.error?.error?.failed_generation || err?.error?.failed_generation || "";
       throw error;
     }
   }

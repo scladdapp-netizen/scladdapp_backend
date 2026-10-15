@@ -1,3 +1,5 @@
+"use strict";
+
 const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
@@ -5,18 +7,27 @@ const AIConfig = require("../models/AIConfig.model");
 const { USE_SCHOOL_ASSISTANT } = require("../utils/aiConfigUse");
 const { extractJsonFromText, getMessageText } = require("../utils/parseAiJson");
 const { groqChat } = require("../utils/groqChat");
+const { openRouterChat } = require("../utils/openRouterChat");
 const { buildRecordPdf } = require("../utils/simplePdf");
-const SCHEMA_PATH = path.join(__dirname, "../data/assistantSchema.json");
+const { checkAssistantDataAccess } = require("../utils/planLimitCheck");
+const { AccessDenied, resolveAccess } = require("../utils/assistantAccess");
+const {
+  createToolbox, ToolError, keySheet, sheetFor, collectionIndex, present, calendarDate,
+} = require("../utils/assistantData");
+
 const DOCS_PATH = path.join(__dirname, "../data/docsContent.json");
-const OPS = new Set(["eq", "ne", "contains", "gte", "lte", "empty", "notEmpty"]);
-const METRICS = new Set(["count", "sum", "avg", "min", "max"]);
-const MAX_LIMIT = 50;
+const MAX_STEPS = 6;
+const MAX_TOOL_CHARS = 5000;
+const CHAT_ROWS = 50;
+const REPORT_ROWS = 300;
 
 function logAssistant(step, detail) {
   const text = detail == null ? "" : typeof detail === "string" ? detail : JSON.stringify(detail);
   console.log(`[AI-ASSISTANT] ${step}${text ? ` ${text}` : ""}`);
 }
-const MAX_SCAN = 8000;
+
+/* ---------- pages and docs ---------- */
+
 const PAGES = [
   { label: "Academic Sessions", aliases: ["Academic Session"], path: "/acedemic_seasion" },
   { label: "School Directory", path: "/school_directory" },
@@ -40,44 +51,18 @@ const PAGES = [
 ].sort((a, b) => b.label.length - a.label.length);
 const PAGE_NAMES = PAGES.map((page) => page.label).join(", ");
 
-const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, "utf8"));
 const docsRaw = JSON.parse(fs.readFileSync(DOCS_PATH, "utf8"));
-const collectionMap = new Map(schema.collections.map((c) => [c.name, c]));
-
-function loadModels() {
-  const dir = path.join(__dirname, "../models");
-  for (const file of fs.readdirSync(dir)) {
-    if (file.endsWith(".js")) require(path.join(dir, file));
-  }
-}
-loadModels();
-
-function compactDocs(raw) {
-  return (Array.isArray(raw) ? raw : []).map((section) => ({
-    section: section.section,
-    items: (section.items || []).filter((item) => item.id).map((item) => ({
-      id: item.id,
-      title: item.title,
-      content: item.content || "",
-      steps: (item.steps || []).map((step) => ({ step: step.step, desc: step.desc })),
-      callout: item.callout || null,
-    })),
-  }));
-}
-
-const docs = compactDocs(docsRaw);
-
-function compactSchema(source) {
-  return {
-    rules: source.rules,
-    collections: source.collections.map((c) => ({
-      name: c.name,
-      note: c.note || undefined,
-      fields: c.fields.filter((f) => f.name !== "_id").map((f) => `${f.name}:${f.type}`),
-      links: c.links,
-    })),
-  };
-}
+const docs = (Array.isArray(docsRaw) ? docsRaw : []).map((section) => ({
+  section: section.section,
+  items: (section.items || []).filter((item) => item.id).map((item) => ({
+    id: item.id,
+    title: item.title,
+    content: item.content || "",
+    steps: (item.steps || []).map((step) => ({ step: step.step, desc: step.desc })),
+    callout: item.callout || null,
+  })),
+}));
+const DOC_INDEX = docs.flatMap((section) => section.items.map((item) => `${item.id} (${item.title})`)).join("; ");
 
 function findArticle(docId) {
   for (const section of docs) {
@@ -85,41 +70,6 @@ function findArticle(docId) {
     if (item) return { section: section.section, item };
   }
   return null;
-}
-
-function hasField(collection, name) {
-  return collection.fields.some((field) => field.name === name);
-}
-
-function plainValue(value) {
-  if (typeof value === "string") return value.trim().slice(0, 80);
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "boolean") return value;
-  throw new Error("Filter values must be text, a number, or true/false.");
-}
-
-function escapeRegex(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function numericValue(value) {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string" && value.trim() && Number.isFinite(Number(value))) return Number(value);
-  if (Array.isArray(value)) {
-    const total = value.reduce((sum, item) => {
-      if (item && typeof item === "object") return sum + (numericValue(item.amount ?? item.score) || 0);
-      return sum + (numericValue(item) || 0);
-    }, 0);
-    return total;
-  }
-  if (value && typeof value === "object") {
-    return Object.values(value).reduce((sum, item) => sum + (numericValue(item) || 0), 0);
-  }
-  return null;
-}
-
-async function activeConfig() {
-  return AIConfig.findOne({ use: USE_SCHOOL_ASSISTANT, is_active: true });
 }
 
 function findPage(name) {
@@ -170,1051 +120,92 @@ function linkParts(text) {
   return parts;
 }
 
-function cleanItems(raw) {
-  return (Array.isArray(raw) ? raw : [])
-    .slice(0, 8)
-    .map((item) => {
-      const title = typeof item?.title === "string" ? item.title.trim().slice(0, 80) : "";
-      const text = typeof item?.text === "string" ? item.text.trim().slice(0, 400) : "";
-      return text ? { title, text } : null;
-    })
-    .filter(Boolean);
+function stripBrackets(text) {
+  return String(text || "").replace(/\[\[([^\]]+)\]\]/g, "$1");
 }
 
-function validatePlan(raw) {
-  const kind = raw?.kind;
-  if (kind === "chat") {
-    const answer = typeof raw.answer === "string" ? raw.answer.trim().slice(0, 800) : "";
-    return answer ? { kind: "chat", answer } : { kind: "unknown" };
+/* ---------- model ---------- */
+
+// config_id -> time (ms) when that model may be tried again after running out of quota.
+const cooldowns = new Map();
+
+/** Every active School Assistant model, lowest order number first. */
+async function activeConfigs() {
+  const list = await AIConfig.find({ use: USE_SCHOOL_ASSISTANT, is_active: true }).lean();
+  return list.sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100) || new Date(a.created_at) - new Date(b.created_at));
+}
+
+/** How long Groq says to wait ("try again in 8m49.2s"); a sensible guess otherwise. */
+function waitMs(message) {
+  const found = /try again in\s+(?:(\d+)h)?\s*(?:(\d+)m(?!s))?\s*(?:([\d.]+)s)?/i.exec(String(message || ""));
+  if (found && (found[1] || found[2] || found[3])) {
+    return (((+found[1] || 0) * 3600) + ((+found[2] || 0) * 60) + (+found[3] || 0)) * 1000;
   }
-  if (kind === "unknown") return { kind: "unknown" };
-  if (kind === "clarify") {
-    const answer = typeof raw.answer === "string" ? raw.answer.trim().slice(0, 400) : "";
-    return answer ? { kind: "clarify", answer } : { kind: "unknown" };
+  return /per[ -]day|TPD|daily/i.test(String(message || "")) ? 15 * 60000 : 60000;
+}
+
+/**
+ * One chat completion that moves to the next configured model when the current one
+ * is out of quota (or its key or model is no longer valid).
+ */
+async function callModel(pool, params) {
+  const now = Date.now();
+  const ready = pool.filter((config) => (cooldowns.get(config.config_id) || 0) <= now);
+  if (!ready.length) {
+    const soonest = Math.min(...pool.map((config) => cooldowns.get(config.config_id) || 0));
+    const error = new Error("Every assistant model is out of quota right now.");
+    error.status = 429;
+    error.retryAfterMs = Math.max(0, soonest - now);
+    throw error;
   }
-  if (kind === "docs") {
-    const docId = typeof raw.docId === "string" ? raw.docId.trim() : "";
-    const title = typeof raw.title === "string" ? raw.title.trim().slice(0, 80) : "";
-    const answer = typeof raw.answer === "string" ? raw.answer.trim().slice(0, 1800) : "";
-    const items = cleanItems(raw.items);
-    if (!docId) return { kind: "docs", docId: null, title, items, answer };
-    if (!findArticle(docId)) throw new Error("That help article is not in the docs.");
-    return { kind: "docs", docId, title, items, answer };
-  }
-  if (kind !== "query") throw new Error("The assistant must choose a docs article or a data query.");
-
-  const fromName = canonicalCollection(raw.from);
-  if (fromName && fromName !== raw.from) logAssistant("collection", `${raw.from} -> ${fromName}`);
-  const collection = fromName && collectionMap.get(fromName);
-  if (!collection) throw new Error(`Collection "${raw.from || ""}" is not available. Use one of: ${[...collectionMap.keys()].join(", ")}.`);
-
-  const where = Array.isArray(raw.where) ? raw.where.slice(0, 8) : [];
-  const filters = where
-    .filter((clause) => clause && clause.field && clause.field !== "school_id" && clause.field !== "_id")
-    .map((clause) => {
-      let op = clause.op;
-      const missing = clause.value == null || clause.value === "";
-      if (missing && (op === "eq" || op === "empty")) op = "empty";
-      if (missing && (op === "ne" || op === "notEmpty")) op = "notEmpty";
-      if (!OPS.has(op)) throw new Error(`Filter ${clause.field} uses an unsupported comparison.`);
-      if (!hasField(collection, clause.field)) throw new Error(`${clause.field} is not a field on ${collection.name}.`);
-      return { field: clause.field, op, value: op === "empty" || op === "notEmpty" ? "" : plainValue(clause.value) };
-    });
-
-  const limit = Math.max(1, Math.min(MAX_LIMIT, Math.round(Number(raw.limit)) || 10));
-  const sort = raw.sort === "asc" ? "asc" : "desc";
-  const groupBy = typeof raw.groupBy === "string" ? raw.groupBy : "";
-  let metric = null;
-  if (groupBy) {
-    if (!hasField(collection, groupBy) || groupBy === "school_id" || groupBy === "_id") {
-      throw new Error("Group by a listed field.");
-    }
-    const op = raw.metric?.op;
-    const field = raw.metric?.field || "";
-    if (!METRICS.has(op)) throw new Error("Use count, sum, avg, min, or max.");
-    if (op !== "count" && !hasField(collection, field)) throw new Error("The metric field is not on that collection.");
-    metric = { op, field: op === "count" ? "" : field };
-  }
-
-  const requestedLookups = Array.isArray(raw.lookup) ? raw.lookup : raw.lookup ? [raw.lookup] : [];
-  const lookups = requestedLookups.slice(0, 2).map((lookup) => {
-    const link = collection.links.find((item) =>
-      item.to === lookup.from && item.field === lookup.localField && item.toField === lookup.foreignField
-    );
-    if (!link) throw new Error("That join is not a known link.");
-    const target = collectionMap.get(link.to);
-    let pick = (Array.isArray(lookup.pick) ? lookup.pick : []).filter((name) => hasField(target, name) && name !== "_id").slice(0, 6);
-    if (!pick.length) pick = displayFields(target);
-    if (!pick.length) throw new Error(`Choose fields to show from ${link.to}.`);
-    return { from: link.to, localField: link.field, foreignField: link.toField, pick };
-  });
-
-  let pick = (Array.isArray(raw.pick) ? raw.pick : []).filter((name) => hasField(collection, name) && name !== "_id" && name !== "school_id").slice(0, 8);
-  if (!groupBy && !pick.length) {
-    pick = collection.fields
-      .map((field) => field.name)
-      .filter((name) => !["_id", "school_id"].includes(name) && !/Mixed|Array/.test(collection.fields.find((field) => field.name === name)?.type || ""))
-      .slice(0, 6);
-  }
-
-  if (groupBy && lookups.some((lookup) => lookup.localField !== groupBy)) {
-    throw new Error("Join the same field you group by.");
-  }
-
-  const title = typeof raw.title === "string" && raw.title.trim() ? raw.title.trim().slice(0, 80) : "Result";
-  const answer = typeof raw.answer === "string" ? raw.answer.trim().slice(0, 240) : "";
-  const shape = !groupBy && raw.shape === "count" ? "count" : "list";
-  return { kind: "query", shape, title, answer, from: collection.name, where: filters, groupBy, metric, sort, limit, lookup: lookups, pick };
-}
-
-function mongoMatch(plan, schoolId) {
-  const match = { school_id: String(schoolId) };
-  const extra = [];
-  for (const clause of plan.where) {
-    if (clause.op === "eq") match[clause.field] = clause.value;
-    else if (clause.op === "ne") match[clause.field] = { $ne: clause.value };
-    else if (clause.op === "contains") match[clause.field] = new RegExp(escapeRegex(clause.value), "i");
-    else if (clause.op === "gte") match[clause.field] = { $gte: clause.value };
-    else if (clause.op === "lte") match[clause.field] = { $lte: clause.value };
-    else if (clause.op === "empty") extra.push({ $or: [{ [clause.field]: null }, { [clause.field]: "" }] });
-    else if (clause.op === "in") match[clause.field] = { $in: clause.value };
-    else if (clause.op === "className") {
-      const ors = classPatterns(clause.value).flatMap((pattern) => [{ [clause.field]: pattern }]);
-      if (clause.ids?.length) ors.push({ [clause.field]: { $in: clause.ids } });
-      extra.push({ $or: ors });
-    }
-    else extra.push({ [clause.field]: { $nin: [null, ""] } });
-  }
-  if (extra.length) match.$and = extra;
-  return match;
-}
-
-async function classesNamed(schoolId, value) {
-  const patterns = classPatterns(value);
-  return mongoose.model("Class").find({
-    school_id: String(schoolId),
-    $or: patterns.flatMap((pattern) => [{ class_name: pattern }, { class_code: pattern }]),
-  }).select("class_id class_name class_code").limit(12).lean();
-}
-
-async function resolveClauses(plan, schoolId) {
-  const where = [];
-  for (const clause of plan.where) {
-    const next = { ...clause };
-    if (next.field === "is_active" && next.op === "eq") {
-      next.value = next.value === true || String(next.value).toLowerCase() === "true";
-    }
-    if (next.field === "attendance_date" && typeof next.value === "string") {
-      if (/today/i.test(next.value)) next.value = calendarDate(0);
-      else if (/yesterday/i.test(next.value)) next.value = calendarDate(-1);
-    }
-    if ((next.field === "current_class" || next.field === "class_name") && (next.op === "eq" || next.op === "contains") && next.value) {
-      const found = await classesNamed(schoolId, next.value);
-      where.push({ field: next.field, op: "className", value: next.value, ids: found.map((item) => item.class_id) });
-      continue;
-    }
-    if (next.field === "class_id" && (next.op === "eq" || next.op === "contains") && next.value) {
-      const exact = await mongoose.model("Class").findOne({
-        school_id: String(schoolId),
-        class_id: String(next.value),
-      }).select("class_id").lean();
-      if (exact) {
-        where.push({ field: "class_id", op: "eq", value: exact.class_id });
-        continue;
-      }
-      const found = await classesNamed(schoolId, next.value);
-      if (found.length) {
-        where.push({ field: "class_id", op: "in", value: found.map((item) => item.class_id) });
-        continue;
-      }
-    }
-    where.push(next);
-  }
-  return where;
-}
-
-function ensureStudentLookup(plan) {
-  const collection = collectionMap.get(plan.from);
-  const link = collection?.links?.find((item) => item.to === "Student" && item.field === "student_id");
-  if (!link || plan.lookup.some((item) => item.from === "Student")) return plan;
-  const hasName = plan.pick.includes("full_name") || plan.pick.includes("student_name");
-  if (hasName && plan.groupBy !== "student_id") return plan;
-  if (plan.groupBy && plan.groupBy !== "student_id") return plan;
-  plan.lookup = [{ from: "Student", localField: "student_id", foreignField: "student_id", pick: ["full_name"] }, ...plan.lookup].slice(0, 2);
-  return plan;
-}
-
-function showValue(value) {
-  if (value == null || value === "") return "—";
-  if (typeof value === "number") return round(value);
-  if (typeof value === "boolean") return value ? "Yes" : "No";
-  if (value instanceof Date) return value.toISOString().slice(0, 10);
-  if (typeof value === "object") {
-    const total = numericValue(value);
-    return total == null ? "—" : round(total);
-  }
-  return String(value);
-}
-
-function reportPick(collection) {
-  const preferred = ["full_name", "student_name", "class_name", "current_class", "admission_number", "subject_name", "status", "attendance_date", "gender", "session_name"];
-  const names = new Set(collection.fields.map((field) => field.name));
-  const pick = preferred.filter((name) => names.has(name));
-  if (pick.length) return pick.slice(0, 6);
-  return collection.fields
-    .map((field) => field.name)
-    .filter((name) => !["_id", "school_id"].includes(name) && !/Mixed|Array/.test(collection.fields.find((field) => field.name === name)?.type || ""))
-    .slice(0, 6);
-}
-
-async function recordsForReport(plan, schoolId) {
-  const collection = collectionMap.get(plan.from);
-  const pick = reportPick(collection);
-  if (plan.from === "StudentClassAssignment" && hasField(collection, "student_id") && !pick.includes("student_id")) {
-    pick.push("student_id");
-  }
-  const listed = await runQuery(ensureStudentLookup({
-    ...plan,
-    shape: "list",
-    groupBy: "",
-    metric: null,
-    pick,
-    lookup: [],
-    limit: 100,
-    sort: "asc",
-  }), schoolId);
-  if (plan.from !== "StudentClassAssignment") return listed;
-  const seen = new Set();
-  const rows = (listed.rows || []).filter((row) => {
-    const id = String(row.student_id || row.full_name || "");
-    if (!id || seen.has(id)) return false;
-    seen.add(id);
-    return true;
-  }).map((row) => {
-    const next = { ...row };
-    delete next.student_id;
-    return next;
-  });
-  return presentTable({ ...listed, rows });
-}
-
-function pdfFileName(title) {
-  const slug = String(title || "records").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
-  return `${slug || "records"}.pdf`;
-}
-
-async function withReport(schoolId, question, plan, table, payload) {
-  try {
-    const report = table.countOnly ? await recordsForReport(plan, schoolId) : table;
-    const school = await mongoose.model("School").findOne({ school_id: String(schoolId) }).select("school_name").lean();
-    const columns = report.columns || [];
-    const rows = (report.rows || []).map((row) => {
-      const next = {};
-      columns.forEach((col) => { next[col.key] = showValue(row[col.key]); });
-      return next;
-    });
-    const summary = table.countOnly
-      ? `${table.total} matching record${table.total === 1 ? "" : "s"}.`
-      : `${rows.length} record${rows.length === 1 ? "" : "s"}.`;
-    const note = report.truncated || (table.countOnly && table.total > rows.length)
-      ? "This file shows the first matching records, not every row in the school."
-      : "";
-    const buffer = buildRecordPdf({
-      schoolName: school?.school_name || "School",
-      title: payload.title || plan.title || "Records",
-      question,
-      summary: payload.message || summary,
-      columns,
-      rows,
-      note,
-    });
-    return {
-      ...payload,
-      pdf: { filename: pdfFileName(payload.title || plan.title), base64: buffer.toString("base64") },
-    };
-  } catch (err) {
-    console.warn("[AI-ASSISTANT] pdf", err.message);
-    return payload;
-  }
-}
-
-function metricValue(docs, metric) {
-  if (metric.op === "count") return docs.length;
-  const nums = docs.map((doc) => numericValue(doc[metric.field])).filter((n) => n != null);
-  if (!nums.length) return 0;
-  if (metric.op === "sum") return nums.reduce((sum, n) => sum + n, 0);
-  if (metric.op === "min") return Math.min(...nums);
-  if (metric.op === "max") return Math.max(...nums);
-  return nums.reduce((sum, n) => sum + n, 0) / nums.length;
-}
-
-function metricKey(metric) {
-  if (metric.op === "count") return "count";
-  return `${metric.op}_${metric.field}`;
-}
-
-function round(value) {
-  return typeof value === "number" ? Math.round(value * 100) / 100 : value;
-}
-
-async function attachLookups(rows, lookups, schoolId) {
-  for (const lookup of lookups) {
-    const ids = [...new Set(rows.map((row) => row[lookup.localField]).filter((id) => id != null && id !== ""))];
-    if (!ids.length) continue;
-    const Model = mongoose.model(lookup.from);
-    const related = await Model.find({
-      school_id: String(schoolId),
-      [lookup.foreignField]: { $in: ids },
-    }).select([...lookup.pick, lookup.foreignField].join(" ")).lean();
-    const byId = new Map(related.map((doc) => [String(doc[lookup.foreignField]), doc]));
-    rows.forEach((row) => {
-      const match = byId.get(String(row[lookup.localField]));
-      lookup.pick.forEach((name) => { row[name] = match?.[name] ?? "—"; });
-    });
-  }
-  return rows;
-}
-
-function toColumns(rows) {
-  const keys = rows[0] ? Object.keys(rows[0]) : [];
-  return keys.map((key) => ({
-    key,
-    label: key.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
-  }));
-}
-
-function presentTable(table) {
-  const rowsIn = table.rows || [];
-  if (!rowsIn.length) return table;
-  const keys = Object.keys(rowsIn[0]);
-  const nameKey = keys.includes("full_name") ? "full_name" : keys.includes("student_name") ? "student_name" : "";
-  const classKey = keys.includes("class_name") ? "class_name" : keys.includes("current_class") ? "current_class" : "";
-  const show = keys.includes("rank") && nameKey && classKey
-    ? ["rank", nameKey, classKey]
-    : keys.filter((key) => !/_id$/.test(key) && key !== "stream");
-  const labels = {
-    rank: "Rank",
-    full_name: "Student",
-    student_name: "Student",
-    class_name: "Class",
-    current_class: "Class",
-  };
-  const columns = show.map((key) => ({
-    key,
-    label: labels[key] || key.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
-  }));
-  const rows = rowsIn.map((row) => {
-    const next = {};
-    show.forEach((key) => { next[key] = row[key]; });
-    return next;
-  });
-  return { ...table, columns, rows };
-}
-
-function countReply(plan, total) {
-  const number = String(total);
-  let text = (plan.answer || "").replaceAll("{n}", number).trim();
-  if (!text) text = `${plan.title}: ${number}. Do you want the list?`;
-  if (!/\blist\b/i.test(text)) text = `${text.replace(/[.?\s]+$/, "")}. Do you want the list?`;
-  return text;
-}
-
-function describe(plan) {
-  const filters = plan.where.map((clause) => (
-    clause.op === "empty" || clause.op === "notEmpty" ? `${clause.field} ${clause.op}` : `${clause.field} ${clause.op} ${clause.value}`
-  )).join(", ");
-  const where = filters ? ` where ${filters}` : "";
-  if (plan.shape === "count") return `Count from ${plan.from}${where}.`;
-  if (plan.groupBy) {
-    const what = plan.metric.op === "count" ? "count rows" : `${plan.metric.op} ${plan.metric.field}`;
-    return `From ${plan.from}${where}, ${what} for each ${plan.groupBy}, ${plan.sort === "asc" ? "lowest" : "highest"} first, limit ${plan.limit}.`;
-  }
-  return `From ${plan.from}${where}, show ${plan.pick.join(", ")}, limit ${plan.limit}.`;
-}
-
-async function runQuery(plan, schoolId) {
-  const Model = mongoose.model(plan.from);
-  const match = mongoMatch(plan, schoolId);
-  const docs = await Model.find(match).limit(MAX_SCAN).lean();
-
-  if (plan.shape === "count") {
-    const seen = new Set();
-    const counted = plan.from === "StudentClassAssignment"
-      ? docs.filter((doc) => {
-        const id = String(doc.student_id || doc._id);
-        if (seen.has(id)) return false;
-        seen.add(id);
-        return true;
-      })
-      : docs;
-    const total = plan.metric && plan.metric.op !== "count" ? metricValue(counted, plan.metric) : counted.length;
-    return { countOnly: true, total: round(total), truncated: docs.length >= MAX_SCAN };
-  }
-
-  if (plan.groupBy) {
-    const groups = new Map();
-    docs.forEach((doc) => {
-      const key = doc[plan.groupBy];
-      if (key == null || key === "") return;
-      const id = String(key);
-      if (!groups.has(id)) groups.set(id, []);
-      groups.get(id).push(doc);
-    });
-    const valueKey = metricKey(plan.metric);
-    let rows = [...groups.entries()].map(([id, group]) => ({
-      [plan.groupBy]: id,
-      [valueKey]: round(metricValue(group, plan.metric)),
-      records: group.length,
-    }));
-    rows.sort((a, b) => plan.sort === "asc" ? a[valueKey] - b[valueKey] : b[valueKey] - a[valueKey]);
-    rows = rows.slice(0, plan.limit);
-    await attachLookups(rows, plan.lookup, schoolId);
-    rows = rows.map((row, index) => {
-      const next = { rank: index + 1 };
-      Object.keys(row).forEach((key) => { next[key] = showValue(row[key]); });
-      return next;
-    });
-    return presentTable({ columns: toColumns(rows), rows, truncated: docs.length >= MAX_SCAN });
-  }
-
-  const sortField = plan.pick.find((name) => docs[0] && docs[0][name] != null) || plan.pick[0];
-  const sorted = [...docs].sort((a, b) => {
-    const av = a[sortField];
-    const bv = b[sortField];
-    if (av === bv) return 0;
-    return plan.sort === "asc" ? (av > bv ? 1 : -1) : (av < bv ? 1 : -1);
-  });
-  let rows = sorted.slice(0, plan.limit).map((doc) => {
-    const row = {};
-    plan.pick.forEach((name) => { row[name] = doc[name]; });
-    plan.lookup.forEach((lookup) => { row[lookup.localField] = doc[lookup.localField]; });
-    return row;
-  });
-  if (plan.lookup.length) await attachLookups(rows, plan.lookup, schoolId);
-  rows = rows.map((row, index) => {
-    const next = { rank: index + 1 };
-    plan.pick.forEach((name) => { next[name] = showValue(row[name]); });
-    plan.lookup.forEach((lookup) => {
-      lookup.pick.forEach((name) => { next[name] = showValue(row[name]); });
-    });
-    return next;
-  });
-  return presentTable({ columns: toColumns(rows), rows, truncated: docs.length >= MAX_SCAN });
-}
-
-function cleanHistory(raw) {
-  if (!Array.isArray(raw)) return [];
-  return raw
-    .slice(-8)
-    .map((item) => {
-      const role = item?.role === "assistant" ? "assistant" : item?.role === "user" ? "user" : "";
-      const text = String(item?.text || "").trim().slice(0, 500);
-      return role && text ? { role, content: text } : null;
-    })
-    .filter(Boolean);
-}
-
-function packFor(question, history = []) {
-  const q = question.trim();
-  const detailFollow = /\b(in detail|explain more|more detail|tell me more|go on)\b/i.test(q);
-  const greeting = /^(hi|hello|hey|yo|thanks|thank you|how are you|how r you|how u doing|how's it going|whats up|what's up|good morning|good afternoon|good evening)\b/i.test(q) && q.length < 60;
-  const howTo = /\b(how do i|how to|how can i|where do i|where can i|what is|help me)\b/i.test(q);
-  const records = /\b(how many|number of|count|which|who has|who is|best|highest|lowest|top|average|present|absent|student|staff|teacher|class|score|fee|record|attendance|perform)\b/i.test(q);
-  const listFollow = /^(yes|yeah|yep|ok|okay|sure|list|list them|list it|show them|show the list|give me the list|the list)\b/i.test(q);
-  if (detailFollow && !records) return "docs";
-  if (greeting) return "chat";
-  if (howTo && !/\bhow many\b|\bnumber of\b|\bcount of\b/i.test(q)) return "docs";
-  if (listFollow) {
-    const previous = [...history].reverse().find((item) => item.role === "assistant");
-    if (previous && /\b(list|student|staff|teacher|class|score|record|attendance|fee|jss|sss)\b/i.test(previous.content)) return "query";
-  }
-  if (classMentions(q).length) return "query";
-  const earlier = history.map((item) => item.content || "").join("\n");
-  const continuesRecords = /\b(student|attendance|present|class|score|jss|sss|rank|list)\b/i.test(earlier);
-  if (continuesRecords && /\b(give me|i want|for jss|for sss|that is|instead|not that|wrong class|switch)\b/i.test(q)) return "query";
-  if (records) return "query";
-  return "chat";
-}
-
-function mentionsTerm(question) {
-  return /\b(sub\s?se[a-z]{2,12}|terms?)\b/i.test(question);
-}
-
-function mentionsSession(question) {
-  const withoutTerm = String(question || "").replace(/\bsub\s?se[a-z]{2,12}\b/ig, " ");
-  return /\b(seasi?ons?|seasions?|seassions?|sessions?|academic years?)\b/i.test(withoutTerm);
-}
-
-function periodIdentity(question) {
-  const q = String(question || "").trim();
-  const askedSession = mentionsSession(q);
-  const askedTerm = mentionsTerm(q);
-  if (!askedSession && !askedTerm) return null;
-  if (/\b(class|student|staff|teacher|timetable|time\s*table|attendance|score|fee|bill|subject|how many|who)\b/i.test(q)) return null;
-  if (!/\b(what|which|when|current|active|now|today|end|start|begin)\b/i.test(q) && q.split(/\s+/).length > 8) return null;
-  return {
-    session: askedSession,
-    term: askedTerm,
-    end: /\b(end|ends|ending|finish|finishes|over|until|close|closes)\b/i.test(q),
-    start: /\b(start|starts|starting|begin|begins)\b/i.test(q),
-  };
-}
-
-function periodQuestion(question, history = []) {
-  const direct = periodIdentity(question);
-  if (direct) return direct;
-  const q = String(question || "").trim();
-  const correction = /^(no|nope|wrong|not that|that is not|in my school|this school|my school)\b/i.test(q) && q.length < 80;
-  if (!correction) return null;
-  const previous = [...history].reverse().find((item) => item.role === "assistant");
-  const text = previous?.content || "";
-  if (!/active (session|term)/i.test(text)) return null;
-  return { session: /session/i.test(text), term: /term/i.test(text) };
-}
-
-function missingTimetableQuestion(question) {
-  const q = String(question || "");
-  return /\b(timetables?|time\s*tables?)\b/i.test(q)
-    && /\b(not|no|without|don'?t|do not|missing|yet|lack|haven'?t|has no|have no|does not|doesn'?t)\b/i.test(q);
-}
-
-function joinNames(names) {
-  if (names.length <= 1) return names[0] || "";
-  if (names.length === 2) return `${names[0]} and ${names[1]}`;
-  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
-}
-
-async function classesMissingTimetable(schoolId, question) {
-  const period = await activePeriod(schoolId);
-  const termName = period.term?.term_name || "";
-  if (!period.term) {
-    return { success: true, kind: "chat", message: "This school has no active term, so I cannot check class timetables." };
-  }
-  const [classes, timetables] = await Promise.all([
-    mongoose.model("Class").find({ school_id: String(schoolId), is_active: { $ne: false } }).select("class_id class_name").lean(),
-    mongoose.model("ClassTimetable").find({ school_id: String(schoolId), subsession_id: period.term.term_id }).select("class_id entries").lean(),
-  ]);
-  const covered = new Set(
-    timetables
-      .filter((item) => !Array.isArray(item.entries) || item.entries.length > 0)
-      .map((item) => String(item.class_id))
-  );
-  const missing = classes
-    .filter((item) => item.class_id && !covered.has(String(item.class_id)))
-    .map((item) => String(item.class_name || "").trim())
-    .filter(Boolean)
-    .sort((a, b) => a.localeCompare(b));
-  logAssistant("timetable-gap", { term: termName, classes: classes.length, withTimetable: covered.size, missing: missing.length });
-  const title = `Classes without a timetable in ${termName}`;
-  const message = missing.length
-    ? `${missing.length === 1 ? joinNames(missing) + " does" : `${missing.length} classes do`} not have a timetable for ${termName} yet${missing.length > 1 && missing.length <= 6 ? `: ${joinNames(missing)}` : ""}.`
-    : `Every active class already has a timetable for ${termName}.`;
-  const columns = [{ key: "class_name", label: "Class" }];
-  const rows = missing.map((name) => ({ class_name: name }));
-  if (!rows.length) return { success: true, kind: "chat", message };
-  const payload = { success: true, kind: "query", title, message, columns, rows, truncated: false, offerPdf: true, report: reportSnapshot(title, columns, rows) };
-  payload.message = `${message.replace(/[.?\s]+$/, "")}. Should I give you the PDF?`;
-  return payload;
-}
-
-function feeQuestion(question) {
-  return /\b(fees?|bills?|bal+ances?|ballances?|outstanding|owe|owing)\b/i.test(question);
-}
-
-function classHint(question, history = []) {
-  const direct = wantedClass(question);
-  if (direct) return direct;
-  const previous = [...history].reverse().find((item) => classMentions(item.content || "").length);
-  const earlier = previous ? classMentions(previous.content).slice(-1)[0] : "";
-  return earlier || "";
-}
-
-async function studentFeeReport(schoolId, question, history) {
-  const period = await activePeriod(schoolId);
-  const hint = classHint(question, history);
-  let className = "";
-  let studentIds = null;
-  if (hint) {
-    const found = await mongoose.model("Class").find({
-      school_id: String(schoolId),
-      $or: classPatterns(hint).flatMap((pattern) => [{ class_name: pattern }, { class_code: pattern }]),
-    }).select("class_id class_name").limit(6).lean();
-    if (found.length !== 1) {
-      return { success: true, kind: "chat", message: found.length ? `"${hint}" matches more than one class. Which class do you mean?` : `I could not find a class called ${hint}.` };
-    }
-    className = found[0].class_name;
-    const assignmentQuery = { school_id: String(schoolId), class_id: found[0].class_id, is_active: true };
-    if (period.session) assignmentQuery.session_id = period.session.session_id;
-    const assignments = await mongoose.model("StudentClassAssignment").find(assignmentQuery).select("student_id").lean();
-    studentIds = [...new Set(assignments.map((item) => String(item.student_id || "")).filter(Boolean))];
-    if (!studentIds.length) {
-      return { success: true, kind: "chat", message: `${className} has no students in the current session.` };
+  let lastError;
+  for (const config of ready) {
+    try {
+      const viaOpenRouter = /^sk-or-/i.test(String(config.api_key || "").trim());
+      const completion = viaOpenRouter
+        ? await openRouterChat({
+          apiKey: config.api_key.trim(),
+          model: config.model,
+          maxTokens: params.maxTokens,
+          temperature: params.temperature,
+          messages: params.messages,
+          responseFormat: params.responseFormat,
+        })
+        : await groqChat({
+          ...params,
+          apiKey: config.api_key,
+          model: config.model,
+          maxRetries: pool.length > 1 ? 0 : undefined,
+        });
+      if (config !== pool[0]) logAssistant("model", { using: config.model, via: viaOpenRouter ? "openrouter" : "groq" });
+      if (completion && typeof completion === "object") completion.config_id = config.config_id;
+      return completion;
+    } catch (error) {
+      lastError = error;
+      const message = String(error.message || "");
+      const noCredit = error.status === 402;
+      const outOfQuota = noCredit || error.status === 429 || /rate limit|quota|too many requests|free-models-per-day/i.test(message);
+      // A model that cannot do this job at all (bad key, wrong model name, a classifier, a tiny
+      // context) is skipped. A reply that is merely badly formatted JSON is not the model's fault here.
+      const badOutput = Boolean(error.failedGeneration) || /failed to validate json|parsing failed/i.test(message);
+      const unusable = !badOutput && (
+        [400, 401, 403, 404, 422].includes(error.status)
+        || /invalid api key|model .*(not found|does not exist|decommissioned)|text classification|max_tokens|context length/i.test(message)
+      );
+      if (!outOfQuota && !unusable) throw error;
+      const wait = outOfQuota ? (error.retryAfterMs || (noCredit ? 30 * 60000 : waitMs(message))) : 5 * 60000;
+      cooldowns.set(config.config_id, Date.now() + wait);
+      logAssistant(outOfQuota ? "model-out-of-quota" : "model-unusable", { model: config.model, retry_in_s: Math.round(wait / 1000) });
+      if (!error.retryAfterMs) error.retryAfterMs = wait;
     }
   }
-  const billQuery = { school_id: String(schoolId) };
-  if (studentIds) billQuery.user_id = { $in: studentIds };
-  else billQuery.user_type = /^student$/i;
-  const bills = await mongoose.model("UserBill").find(billQuery).select("user_id user_name amount_due amount_paid").lean();
-  const names = new Map();
-  if (studentIds?.length) {
-    const students = await mongoose.model("Student").find({
-      school_id: String(schoolId),
-      student_id: { $in: studentIds },
-    }).select("student_id full_name").lean();
-    students.forEach((item) => names.set(String(item.student_id), item.full_name));
-  }
-  const totals = new Map();
-  bills.forEach((bill) => {
-    const id = String(bill.user_id || "");
-    if (!id) return;
-    if (!totals.has(id)) totals.set(id, { due: 0, paid: 0, name: names.get(id) || bill.user_name || "Student" });
-    const row = totals.get(id);
-    row.due += Number(bill.amount_due) || 0;
-    row.paid += Number(bill.amount_paid) || 0;
-    if (!row.name && bill.user_name) row.name = bill.user_name;
-  });
-  const balances = [...totals.entries()].map(([id, row]) => ({
-    student_id: id,
-    full_name: names.get(id) || row.name || "Student",
-    balance: Math.round((row.due - row.paid) * 100) / 100,
-  }));
-  const owing = balances.filter((row) => row.balance > 0);
-  const where = className ? ` in ${className}` : "";
-  const enrolled = studentIds ? studentIds.length : balances.length;
-  logAssistant("fees", { className: className || null, enrolled, withFee: balances.length, owing: owing.length });
-  const wantsList = /\b(list|each|names?|who|show|give|balance|ballance|outstanding)\b/i.test(question);
-  if (!wantsList) {
-    const message = balances.length
-      ? `${balances.length} of ${enrolled} student${enrolled === 1 ? "" : "s"}${where} ${balances.length === 1 ? "has" : "have"} a fee. ${owing.length} still ${owing.length === 1 ? "has" : "have"} an outstanding balance.`
-      : `No student${where} has a fee yet.`;
-    return { success: true, kind: "chat", message };
-  }
-  const onlyOwing = /\b(outstanding|owe|owing|unpaid)\b/i.test(question);
-  const shown = onlyOwing ? owing : balances;
-  shown.sort((a, b) => b.balance - a.balance || a.full_name.localeCompare(b.full_name));
-  const title = className ? `Fee balances in ${className}` : "Fee balances";
-  const countLabel = `${shown.length} student${shown.length === 1 ? "" : "s"}`;
-  const message = shown.length
-    ? (onlyOwing
-      ? `${countLabel}${where} still ${shown.length === 1 ? "owes" : "owe"} a fee.`
-      : `Fee balances for ${countLabel}${where}. ${owing.length} still ${owing.length === 1 ? "owes" : "owe"} money.`)
-    : `No student${where} has an outstanding fee balance.`;
-  if (!shown.length) return { success: true, kind: "chat", message };
-  const columns = [
-    { key: "full_name", label: "Student" },
-    { key: "balance", label: "Balance" },
-    ...(className ? [{ key: "class_name", label: "Class" }] : []),
-  ];
-  const rows = shown.map((row) => ({ full_name: row.full_name, balance: row.balance, class_name: className }));
-  return {
-    success: true,
-    kind: "query",
-    title,
-    message: `${message.replace(/[.?\s]+$/, "")}. Should I give you the PDF?`,
-    columns,
-    rows,
-    truncated: false,
-    offerPdf: true,
-    report: reportSnapshot(title, columns, rows),
-  };
+  const error = new Error(lastError?.message || "Every assistant model is out of quota right now.");
+  error.status = 429;
+  error.retryAfterMs = lastError?.retryAfterMs;
+  throw error;
 }
 
-function formatStoredDate(value) {
-  const text = String(value || "").trim();
-  const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (!match) return text;
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const month = months[Number(match[2]) - 1];
-  const day = Number(match[3]);
-  if (!month || !day) return text;
-  return `${month} ${day}, ${match[1]}`;
-}
-
-function periodDateSentence(label, name, start, end, which) {
-  if (!name) return `This school has no active ${label} right now.`;
-  const startText = formatStoredDate(start);
-  const endText = formatStoredDate(end);
-  if (which.end && !which.start) {
-    return endText ? `${name} ends on ${endText}.` : `${name} has no end date recorded.`;
-  }
-  if (which.start && !which.end) {
-    return startText ? `${name} starts on ${startText}.` : `${name} has no start date recorded.`;
-  }
-  if (which.start && which.end) {
-    if (startText && endText) return `${name} runs from ${startText} to ${endText}.`;
-    return `The active ${label} in this school is ${name}.`;
-  }
-  return `The active ${label} in this school is ${name}.`;
-}
-
-async function answerActivePeriod(schoolId, which) {
-  const period = await activePeriod(schoolId);
-  logAssistant("period", {
-    session: period.session?.session_name || null,
-    sessionEnd: period.session?.end || null,
-    term: period.term?.term_name || null,
-    termEnd: period.term?.end || null,
-    which,
-  });
-  const parts = [];
-  if (which.session) {
-    parts.push(periodDateSentence("session", period.session?.session_name, period.session?.start, period.session?.end, which));
-  }
-  if (which.term) {
-    parts.push(periodDateSentence("term", period.term?.term_name, period.term?.start, period.term?.end, which));
-  }
-  return { success: true, kind: "chat", message: parts.join(" ") };
-}
-
-function calendarDate(offsetDays = 0) {
-  const date = new Date();
-  date.setDate(date.getDate() + offsetDays);
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${date.getFullYear()}-${month}-${day}`;
-}
-
-function flexibleRegex(value) {
-  const compact = String(value).toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (!compact) return /$^/;
-  const body = [...compact].map((ch) => escapeRegex(ch)).join("[^a-z0-9]*");
-  return new RegExp(`${body}${/\d$/.test(compact) ? "(?!\\d)" : ""}`, "i");
-}
-
-function nameForms(value) {
-  const raw = String(value || "").trim();
-  const forms = new Set([raw]);
-  forms.add(raw.replace(/\bjss\b/ig, "junior secondary school").replace(/\bsss\b/ig, "senior secondary school"));
-  forms.add(raw.replace(/junior\s+secondary\s+school/ig, "JSS").replace(/senior\s+secondary\s+school/ig, "SSS"));
-  return [...forms].filter((item) => item.length > 1);
-}
-
-function classPatterns(value) {
-  return nameForms(value).map(flexibleRegex);
-}
-
-function canonicalCollection(name) {
-  const raw = String(name || "").trim();
-  if (collectionMap.has(raw)) return raw;
-  const key = raw.toLowerCase().replace(/[^a-z]/g, "");
-  const aliases = {
-    student: "Student",
-    students: "Student",
-    class: "Class",
-    classes: "Class",
-    subject: "Subject",
-    subjects: "Subject",
-    attendance: "StudentAttendance",
-    studentattendance: "StudentAttendance",
-    score: "StudentScore",
-    scores: "StudentScore",
-    studentscore: "StudentScore",
-    studentscores: "StudentScore",
-    studentclassassignment: "StudentClassAssignment",
-    classassignment: "StudentClassAssignment",
-    session: "Session",
-    sessions: "Session",
-    subsession: "Subsession",
-    subsessions: "Subsession",
-    term: "Subsession",
-    terms: "Subsession",
-    bill: "Bill",
-    bills: "Bill",
-    fee: "Bill",
-    fees: "Bill",
-    payment: "Payment",
-    payments: "Payment",
-    staff: "Staff",
-    teacher: "Teacher",
-    teachers: "Teacher",
-  };
-  if (aliases[key] && collectionMap.has(aliases[key])) return aliases[key];
-  return [...collectionMap.keys()].find((item) => item.toLowerCase() === key) || null;
-}
-
-function periodStatus(startDate, endDate, archived) {
-  if (archived) return "archived";
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  start.setHours(0, 0, 0, 0);
-  end.setHours(0, 0, 0, 0);
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return "draft";
-  if (today < start) return "draft";
-  if (today <= end) return "active";
-  return "completed";
-}
-
-function displayFields(collection) {
-  const preferred = ["full_name", "student_name", "class_name", "name", "subject_name", "session_name", "term_name", "title"];
-  const names = new Set((collection?.fields || []).map((field) => field.name));
-  const picked = preferred.filter((name) => names.has(name));
-  if (picked.length) return picked.slice(0, 4);
-  return (collection?.fields || [])
-    .map((field) => field.name)
-    .filter((name) => !["_id", "school_id"].includes(name))
-    .slice(0, 4);
-}
-
-function classMentions(text) {
-  const source = String(text || "");
-  const found = [];
-  [
-    /junior\s+secondary\s+school\s*\d+/ig,
-    /senior\s+secondary\s+school\s*\d+/ig,
-    /\bjss\s*\d+\b/ig,
-    /\bsss\s*\d+\b/ig,
-  ].forEach((pattern) => {
-    (source.match(pattern) || []).forEach((item) => found.push(item.replace(/\s+/g, " ").trim()));
-  });
-  return [...new Set(found)];
-}
-
-function wantedClass(question) {
-  const source = String(question || "");
-  const directed = source.match(/\b(?:for|want(?:\s+for)?|switch to|instead(?:\s+of)?)\s+(?:the\s+)?((?:junior|senior)\s+secondary\s+school\s*\d+|jss\s*\d+|sss\s*\d+)/i);
-  if (directed) return directed[1].replace(/\s+/g, " ").trim();
-  const mentions = classMentions(source);
-  if (mentions.length > 1 && /\b(that is|not|wrong|instead)\b/i.test(source)) return mentions[mentions.length - 1];
-  return mentions[0] || "";
-}
-
-function questionTarget(question) {
-  const wanted = wantedClass(question);
-  if (wanted) return wanted;
-  const match = String(question || "").match(/\b(?:in|for|of|from)\s+(.+?)(?:\?|$)/i);
-  const tail = (match ? match[1] : "").replace(/^(the|a|an|that|this)\s+/i, "").trim();
-  return tail.split(/\b(?:like|who|that|which|with)\b/i)[0].trim();
-}
-
-function continuedQuestion(question, history) {
-  const wanted = wantedClass(question);
-  if (!wanted) return question;
-  const previous = [...history].reverse().find((item) => item.role === "user" && /\b(attend|present|score|student|best|top|how many|rank)\b/i.test(item.content || ""));
-  if (!previous) return question;
-  const previousClass = classMentions(previous.content)[0] || "";
-  const same = previousClass && previousClass.replace(/\s+/g, "").toLowerCase() === wanted.replace(/\s+/g, "").toLowerCase();
-  if (same) return question;
-  return `${question}\nRun the same request again for ${wanted} only. Use that class. Do not use the previous class or the previous student names.`;
-}
-
-function wantsAttendanceRank(question, history) {
-  if (/\bhow many\b|\bnumber of\b|\bcount of\b/i.test(question)) return false;
-  const earlier = history.filter((item) => item.role === "user").map((item) => item.content || "").join("\n");
-  const blob = `${question}\n${earlier}`;
-  if (!/\b(attendance|attendace|present)\b/i.test(blob) || !/\b(most|highest|who|rank|top)\b/i.test(blob)) return false;
-  const askingNow = /\b(attendance|attendace|present|most)\b/i.test(question);
-  const switching = Boolean(wantedClass(question)) && /\b(give me|i want|that is|instead|for jss|for sss|wrong)\b/i.test(question);
-  return askingNow || switching;
-}
-
-function attendanceRankPlan(named) {
-  const cls = named.classes[0];
-  return {
-    kind: "query",
-    shape: "list",
-    title: `Most present in ${cls.class_name}`,
-    answer: "",
-    from: "StudentAttendance",
-    where: [
-      { field: "class_id", op: "eq", value: cls.class_id },
-      { field: "status", op: "eq", value: "present" },
-    ],
-    groupBy: "student_id",
-    metric: { op: "count", field: "" },
-    sort: "desc",
-    limit: 10,
-    lookup: [],
-    pick: [],
-  };
-}
-
-function pinClass(plan, named) {
-  if (named.classes.length !== 1) return plan;
-  const cls = named.classes[0];
-  const collection = collectionMap.get(plan.from);
-  if (!collection) return plan;
-  const has = (name) => collection.fields.some((field) => field.name === name);
-  if (has("class_id")) {
-    plan.where = plan.where.filter((clause) => clause.field !== "class_id" && clause.field !== "class_name");
-    plan.where.push({ field: "class_id", op: "eq", value: cls.class_id });
-  } else if (has("class_name")) {
-    plan.where = plan.where.filter((clause) => clause.field !== "class_name");
-    plan.where.push({ field: "class_name", op: "eq", value: cls.class_name });
-  }
-  return plan;
-}
-
-function labelClass(table, className) {
-  if (!className || !table?.rows?.length) return table;
-  const rows = table.rows.map((row) => ({ ...row, class_name: row.class_name && row.class_name !== "—" ? row.class_name : className }));
-  return presentTable({ ...table, rows });
-}
-
-function lookupText(question, history = []) {
-  if (classMentions(question).length) return question;
-  const follow = /^(yes|yeah|yep|ok|okay|sure|list|list them|list it|show them|show the list|give me the list|the list)\b/i.test(String(question || "").trim());
-  if (!follow) return question;
-  const previous = [...history].reverse().find((item) => item.role === "user" && classMentions(item.content).length);
-  return previous ? previous.content : question;
-}
-
-async function activePeriod(schoolId) {
-  const sessions = await mongoose.model("Session").find({ school_id: String(schoolId) }).lean();
-  const session = sessions.find((item) => periodStatus(item.academic_year_start_date, item.academic_year_end_date, item.is_archived) === "active") || null;
-  const terms = session
-    ? await mongoose.model("Subsession").find({ school_id: String(schoolId), session_id: session.session_id }).lean()
-    : [];
-  const term = terms.find((item) => periodStatus(item.term_start_date, item.term_end_date, item.is_archived) === "active") || null;
-  return {
-    session: session ? {
-      session_id: session.session_id,
-      session_name: session.session_name,
-      start: session.academic_year_start_date || "",
-      end: session.academic_year_end_date || "",
-    } : null,
-    term: term ? {
-      term_id: term.term_id,
-      term_name: term.term_name,
-      start: term.term_start_date || "",
-      end: term.term_end_date || "",
-    } : null,
-  };
-}
-
-async function namedThings(schoolId, question, history = []) {
-  const target = questionTarget(lookupText(question, history));
-  if (!target) return { target: "", classes: [], subjects: [] };
-  const patterns = classPatterns(target);
-  const [classes, subjects] = await Promise.all([
-    mongoose.model("Class").find({
-      school_id: String(schoolId),
-      $or: patterns.flatMap((pattern) => [{ class_name: pattern }, { class_code: pattern }]),
-    }).select("class_id class_name").limit(6).lean(),
-    mongoose.model("Subject").find({
-      school_id: String(schoolId),
-      $or: patterns.flatMap((pattern) => [{ subject_name: pattern }, { subject_code: pattern }]),
-    }).select("subject_id subject_name").limit(6).lean(),
-  ]);
-  return { target, classes, subjects };
-}
-
-function applyActivePeriod(plan, period, question) {
-  if (/\b(all time|every session|all sessions|past sessions|history)\b/i.test(question)) return plan;
-  const collection = collectionMap.get(plan.from);
-  if (!collection) return plan;
-  const has = (name) => collection.fields.some((field) => field.name === name);
-  if (period.session && has("session_id") && !plan.where.some((clause) => clause.field === "session_id")) {
-    plan.where.push({ field: "session_id", op: "eq", value: period.session.session_id });
-  }
-  if (plan.from === "StudentClassAssignment") {
-    plan.where = plan.where.filter((clause) => clause.field !== "subsession_id");
-    return plan;
-  }
-  if (period.term && has("subsession_id") && !plan.where.some((clause) => clause.field === "subsession_id")) {
-    plan.where.push({ field: "subsession_id", op: "eq", value: period.term.term_id });
-  }
-  return plan;
-}
-
-function contextText(period, named) {
-  const lines = [];
-  if (period.session) {
-    const end = formatStoredDate(period.session.end);
-    lines.push(`Active session: ${period.session.session_name} (session_id ${period.session.session_id})${end ? `, ends ${end}` : ""}. Use this end date only. Do not invent one.`);
-  } else {
-    lines.push("No active session. Do not invent a session id or an end date.");
-  }
-  if (period.term) {
-    const end = formatStoredDate(period.term.end);
-    lines.push(`Active term, also called a subsession: ${period.term.term_name} (term_id ${period.term.term_id})${end ? `, ends ${end}` : ""}. Other collections store this id as subsession_id. Use this end date only. Do not invent one.`);
-  } else {
-    lines.push("No active term. Do not invent a term end date.");
-  }
-  lines.push("Unless the user names another session or says all time, add session_id and subsession_id filters with these ids when the collection has those fields. Scores, attendance, fees, and class membership belong to this session and term.");
-  if (named.target && named.classes.length && !named.subjects.length) {
-    const listed = named.classes.map((item) => `${item.class_name} (class_id ${item.class_id})`).join("; ");
-    lines.push(`"${named.target}" is a class: ${listed}. It is not a subject. Students in that class are StudentClassAssignment rows with that class_id.`);
-  } else if (named.target && named.subjects.length && !named.classes.length) {
-    const listed = named.subjects.map((item) => `${item.subject_name} (subject_id ${item.subject_id})`).join("; ");
-    lines.push(`"${named.target}" is a subject: ${listed}. It is not a class.`);
-  } else if (!named.target) {
-    lines.push("If a name could be a class, a subject, staff, or an admin and you cannot tell from the schema, set kind to clarify and ask one question.");
-  }
-  return lines.join(" ");
-}
-
-function systemPrompt(pack, context = "") {
-  const base = [
-    "You answer a school admin by returning one JSON object and nothing else.",
-    "Earlier messages are the conversation. A short follow-up continues the last topic. Do not ask them to repeat it.",
-  ];
-  if (pack === "docs") {
-    return base.concat([
-      "The question is how to use the product. Read the docs and set kind to docs. Set docId to the article you used. Do not invent an id. Set title to a short heading. Set items to a list of steps, each with a short title and one sentence in text. A first answer is two or three items. If they ask for detail, add a few more items from that same article. Do not paste the article.",
-      `When a step names a dashboard page, wrap that name in [[double brackets]]. Use only these names: ${PAGE_NAMES}. Example: go to [[Academic Sessions]].`,
-      `Docs: ${JSON.stringify(docs)}`,
-    ]).join("\n");
-  }
-  if (pack === "query") {
-    return base.concat([
-      "The question asks for this school's records. Read the schema first. Set kind to query only when you know which collection answers it. Use only the collection names in the schema.",
-      "Query fields: kind, shape, title, answer, from, where (field, op eq|ne|contains|gte|lte|empty|notEmpty, value), groupBy, metric {op count|sum|avg|min|max, field}, sort asc|desc, limit, lookup {from, localField, foreignField, pick}, pick.",
-      "If you are not sure what a name refers to, or you do not understand the question, set kind to clarify and put one short question in answer. Do not query.",
-      "A clarify reply is {\"kind\":\"clarify\",\"answer\":\"Is JSS 1 a class or a subject?\"}.",
-      context,
-      `Today is ${calendarDate()}. Attendance dates are YYYY-MM-DD. When they say today, set attendance_date eq ${calendarDate()}.`,
-      "How many students in a class uses shape count, from StudentClassAssignment, where class_name or class_id matches that class and is_active eq true. JSS 1 and Junior Secondary School 1 are the same class.",
-      "Students present today: from StudentAttendance, where status eq present and attendance_date eq the date above, lookup Student, pick full_name.",
-      "Who was present the most: from StudentAttendance, where status eq present and class_id is the class they named, groupBy student_id, metric count, sort desc, lookup Student, pick full_name. Do not use StudentClassAssignment for attendance.",
-      "Best or top students: from StudentScore, groupBy student_id, metric avg of scores, sort desc, limit 10, lookup Student, pick full_name. Limit it to the class and to the active session and term.",
-      "Fees use Bill or Payment. Read the schema fields before you choose.",
-      "If the user then says yes, list them, or names another class, repeat the same request for that class. Do not ask again. Do not copy the previous students into the new answer.",
-      "A blank or missing value uses op empty and no value. A filled value uses op notEmpty.",
-      "Do not include school_id. Do not write database code.",
-      `Schema: ${JSON.stringify(compactSchema(schema))}`,
-    ]).join("\n");
-  }
-  return base.concat([
-    "Answer the question in one or two short sentences. Set kind to chat and put the reply in answer. Do not query the database. Do not invent a session date, a term date, or a school year end. If you were not given that date, say you do not know it.",
-  ]).join("\n");
-}
-
-async function askModel(config, question, history) {
-  const pack = packFor(question, history);
-  const messages = [
-    { role: "system", content: systemPrompt(pack) },
-    ...history,
-    { role: "user", content: question },
-  ];
-  const ceiling = 700;
-  const maxTokens = pack === "chat" ? Math.min(400, ceiling) : ceiling;
-  let thread = messages;
-  let lastText = "";
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    const completion = await groqChat({
-      apiKey: config.api_key,
-      model: config.model,
-      maxTokens,
-      temperature: 0.1,
-      messages: thread,
-      reasoningEffort: "low",
-    });
-    lastText = planText(completion?.choices?.[0]?.message);
-    const parsed = extractJsonFromText(lastText);
-    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
-    thread = [
-      ...messages,
-      { role: "assistant", content: String(lastText || "").slice(0, 800) },
-      { role: "user", content: "Reply again with one JSON object only." },
-    ];
-  }
-  if (lastText.trim()) return { kind: "chat", answer: lastText.trim().slice(0, 800) };
-  throw new Error("Please try again.");
-}
-
-function planText(message) {
+function modelText(message) {
   const content = getMessageText(message);
   if (content) return content;
   if (typeof message?.reasoning === "string" && message.reasoning.trim()) return message.reasoning.trim();
@@ -1224,313 +215,637 @@ function planText(message) {
   return "";
 }
 
-async function completeJson(config, messages, maxTokens) {
+async function completeJson(pool, messages, maxTokens) {
   let thread = messages;
-  let lastText = "";
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    const completion = await groqChat({
-      apiKey: config.api_key,
-      model: config.model,
-      maxTokens,
-      temperature: 0.1,
-      messages: thread,
-      reasoningEffort: "low",
-      responseFormat: { type: "json_object" },
-    });
+  let spoken = "";
+  const ATTEMPTS = 3;
+  for (let attempt = 0; attempt < ATTEMPTS; attempt += 1) {
+    let completion;
+    try {
+      completion = await callModel(pool, {
+        maxTokens,
+        temperature: 0.1,
+        messages: thread,
+        reasoningEffort: "low",
+        // Strict JSON mode rejects slightly malformed output; later attempts drop it.
+        responseFormat: attempt === 0 ? { type: "json_object" } : undefined,
+      });
+    } catch (error) {
+      if (error.status === 429 || error.status === 401) throw error;
+      const rescued = extractJsonFromText(error.failedGeneration || "");
+      if (rescued && typeof rescued === "object" && !Array.isArray(rescued)) return rescued;
+      console.warn(`[AI-ASSISTANT] model call failed (attempt ${attempt + 1}): ${error.message}`);
+      if (attempt === ATTEMPTS - 1) throw error;
+      continue;
+    }
     const message = completion?.choices?.[0]?.message;
-    lastText = planText(message);
-    const parsed = extractJsonFromText(lastText);
+    const text = modelText(message);
+    spoken = getMessageText(message) || spoken;
+    const parsed = extractJsonFromText(text);
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
-    console.warn(`[AI-ASSISTANT] unusable plan, finish=${completion?.choices?.[0]?.finish_reason || "none"}, chars=${lastText.length}`);
+    const finish = completion?.choices?.[0]?.finish_reason || "none";
+    console.warn(`[AI-ASSISTANT] unusable reply, finish=${finish}, chars=${text.length}`);
+    // A model that answers in plain text, with no JSON at all, is not following the format
+    // (for example a safety classifier). Skip it for a while when another model can take over.
+    if (pool.length > 1 && finish === "stop" && !text.includes("{") && completion?.config_id) {
+      cooldowns.set(completion.config_id, Date.now() + 10 * 60000);
+      logAssistant("model-benched", { reason: "reply was not JSON", minutes: 10 });
+    }
     thread = [
       ...messages,
-      { role: "assistant", content: String(lastText || "").slice(0, 800) },
-      { role: "user", content: "Reply again with one JSON object only. Put the JSON in the answer, not in your reasoning." },
+      { role: "assistant", content: String(text || "").slice(0, 600) },
+      { role: "user", content: "Reply again with one JSON object only, with an \"action\"." },
     ];
   }
-  throw new Error("The model did not return a usable plan.");
-}
-
-function fieldHint(errorMessage) {
-  const name = String(errorMessage).match(/from ([A-Za-z0-9_]+)/)?.[1];
-  const collection = name && collectionMap.get(name);
-  if (!collection) return "";
-  const fields = collection.fields.map((field) => field.name).filter((field) => !["_id", "school_id"].includes(field));
-  return ` Use only these ${name} fields: ${fields.join(", ")}.`;
-}
-
-function applyQuestionShape(plan, question) {
-  if (plan.kind !== "query") return plan;
-  if (/\bhow many\b|\bnumber of\b|\bcount of\b/i.test(question) && !plan.groupBy) plan.shape = "count";
-  if (/^(yes|yeah|yep|ok|okay|sure|list|list them|list it|show them|show the list|give me the list)\b/i.test(question)) plan.shape = "list";
-  return plan;
-}
-
-function emptyRecordReply(plan, named, period) {
-  const cls = named?.classes?.[0]?.class_name;
-  const term = period?.term?.term_name;
-  const place = [cls, term].filter(Boolean).join(" in ");
-  if (plan?.from === "StudentScore") {
-    return `There are no scores${place ? ` for ${place}` : ""} yet, so I cannot name a best performing student.`;
+  // Plain words from the model can stand in as the answer, unless they are clearly not one
+  // (too short, or the verdict line of a safety classifier).
+  // Never show a half-written action or tool-call text as if it were the answer.
+  const words = spoken.trim();
+  const looksLikeAction = /^[\[{`]|"action"\s*:|<\|[a-z_]+\|>|\bquery\(|\bfrom\s*=/i.test(words);
+  if (words.length > 20 && !looksLikeAction && !/^(user|response) safety|^(un)?safe\b/i.test(words)) {
+    return { action: "answer", answer: words.slice(0, 900), spoken: true };
   }
-  if (plan?.from === "StudentAttendance") {
-    return `There are no present marks${place ? ` for ${place}` : ""} yet.`;
+  throw new Error("The model did not return a usable reply.");
+}
+
+function normalizeAction(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  let action = String(raw.action || raw.kind || "").trim().toLowerCase();
+  if (!action) {
+    if (raw.from) action = "query";
+    else if (raw.question && !raw.answer) action = "ask";
+    else if (raw.answer) action = "answer";
   }
-  return `Nothing matched${place ? ` for ${place}` : ""}.`;
+  const aliases = { final: "answer", chat: "answer", reply: "answer", clarify: "ask", question: "ask", search: "find", lookup: "find", schema: "describe", periods: "period", doc: "docs", help: "docs" };
+  action = aliases[action] || action;
+  if (!action) return null;
+  return { ...raw, action };
 }
 
-function tableEmpty(table) {
-  if (!table) return true;
-  if (table.countOnly) return Number(table.total) === 0;
-  return !(table.rows || []).length;
+/* ---------- prompt ---------- */
+
+function dateLine(label, item) {
+  if (!item) return `${label}: none right now.`;
+  const name = item.session_name || item.term_name;
+  const id = item.session_id || item.term_id;
+  return `${label}: ${name} (id ${id}), ${item.start} to ${item.end}, ${item.days_total ?? "?"} days long, ${item.days_left ?? "?"} days left.`;
 }
 
-function reportSnapshot(title, columns, rows) {
+function buildSystemPrompt(box, collections) {
+  const { session, term } = box.periods;
+  return [
+    "You are the assistant inside a school admin dashboard. You help the admin of ONE school. You can read this school's records and explain how to use the app. You cannot change records or send anything.",
+    "Reply with exactly ONE JSON object per turn and nothing else. It must have an \"action\".",
+    "",
+    "ACTIONS (one per turn, or several in order as {\"actions\":[{...},{...}]} to save time)",
+    "- {\"action\":\"find\",\"from\":\"Class\",\"text\":\"jss 1\"} finds a student, class, subject, staff, session or term by name and returns ids. JSS 1 and Junior Secondary School 1 are the same class.",
+    "- {\"action\":\"query\",...} reads records (see QUERY).",
+    "- {\"action\":\"describe\",\"collections\":[\"UserBill\"]} lists all fields of collections. {\"action\":\"period\"} lists every session and term with ids and dates. {\"action\":\"docs\",\"text\":\"how to promote students\"} returns the matching how-to help article.",
+    "- {\"action\":\"ask\",\"question\":\"...\"} asks the admin one short question, only when the request has two real meanings the data cannot settle.",
+    "- {\"action\":\"answer\",\"answer\":\"...\",\"table\":null,\"steps\":null} is your final reply (see ANSWER).",
+    "Every find and query result gets a ref in the order it runs in THIS request: r1, r2, r3... so you can chain them inside one batch. Refs start again at r1 for every new message: never use a ref from an earlier message, run the step again instead.",
+    "Class names: SS 2, SSS 2 and Senior Secondary School 2 are the same class; JSS 2 is the junior one. Do not ask which when the admin wrote SS or SSS.",
+    "",
+    "QUERY",
+    "{\"action\":\"query\",\"from\":\"UserBill\",\"where\":[{\"field\":\"user_id\",\"op\":\"in\",\"fromResult\":\"r2\",\"resultField\":\"student_id\"}],\"groupBy\":[\"user_id\"],\"metrics\":[{\"name\":\"due\",\"op\":\"sum\",\"field\":\"amount_due\"},{\"name\":\"paid\",\"op\":\"sum\",\"field\":\"amount_paid\"}],\"compute\":[{\"name\":\"balance\",\"op\":\"subtract\",\"left\":\"due\",\"right\":\"paid\"}],\"having\":[{\"field\":\"balance\",\"op\":\"gt\",\"value\":0}],\"join\":[{\"from\":\"Student\",\"localField\":\"user_id\",\"foreignField\":\"student_id\",\"pick\":[\"full_name\"]}],\"sort\":{\"by\":\"balance\",\"dir\":\"desc\"},\"limit\":10,\"scope\":\"term\"}",
+    "- unwind: add \"unwind\":\"payments\" to expand a list stored inside each record into one row per item (see the collection's hint).",
+    "- where ops: eq ne gt gte lt lte contains in notIn empty notEmpty. fromResult+resultField takes a column of an earlier result. notIn with fromResult finds what is missing.",
+    "- metrics ops: count sum avg min max distinct (a metric may have its own where). groupBy alone gives a count. Metrics without groupBy give one overall row. compute ops: subtract add multiply divide percent. having filters grouped rows. select picks fields when not grouping. join adds fields from another collection.",
+    "- scope: term (default) adds the current session_id and subsession_id when the collection has them; session adds only session_id; all adds nothing. For another term, find its id with period and put subsession_id in where.",
+    "",
+    "ANSWER",
+    "{\"action\":\"answer\",\"answer\":\"one to three short sentences\",\"table\":{\"result\":\"r4\",\"title\":\"Short title\",\"columns\":[{\"key\":\"full_name\",\"label\":\"Student\"},{\"key\":\"balance\",\"label\":\"Balance\"}],\"rank\":false},\"steps\":null}",
+    "- table: for a list or ranking of several rows; result is an earlier ref; columns are keys of it (names and amounts, never ids); rank true adds a Rank column; null for a single fact. For one person's record (several details) also pass a table with the detail columns, and write the details in your answer text (Name, Gender, Date of birth...): the app shows your text and offers a PDF of the record.",
+    `- steps: only for how-to answers, 2 to 6 items [{"title":"...","text":"..."}]. Wrap dashboard page names in [[double brackets]] using only these: ${PAGE_NAMES}.`,
+    "",
+    "RULES",
+    "1. Never guess a number, name, date or id. State only what a tool result or CONTEXT shows; otherwise look it up or say you do not know.",
+    "2. Find a named class, student, staff member or subject with find before filtering by it. If several match, ask which.",
+    "3. A short follow-up continues the previous request; [data used: ...] shows what the last turn queried. If the admin names a different class, term or student, repeat the same request for the new one. A correction (\"or no, I mean the names, ages and gender\") keeps the same class, term and filter and changes only what is shown: list every person that matches, never just one.",
+    "4. Defaults: current session and term, all classes and students. Do not ask about what you can assume; state the assumption.",
+    "5. Do the reasoning with the tools (group, count, sum, sort), batching dependent steps, then name the result from the data. At most 6 turns.",
+    "6. An empty result does not prove nothing exists: say what you checked, and check another collection if one could hold the answer.",
+    "7. You cannot send emails, SMS or notifications or change records; say so in one sentence and point to the page, e.g. [[Notifications]].",
+    "8. Plain words for a school admin: no ids, field names or JSON. Thousands separators for money, no currency unless the data has one.",
+    "9. Be short. Do not repeat the table in the text; say what stands out. Do not mention PDFs; the app offers that itself.",
+    "10. Greetings, thanks and small talk (hi, thanks, ok): answer in one friendly sentence with action answer and no tools. Do not repeat or continue the previous request unless the admin asks.",
+    "",
+    "CONTEXT",
+    `Today: ${calendarDate()}.`,
+    dateLine("Current session", session),
+    dateLine("Current term (also called a subsession; other collections store its id as subsession_id)", term),
+    "",
+    "COLLECTIONS FOR THIS REQUEST (describe lists every field of any collection; an error lists all collection names)",
+    (() => {
+      if (collections === null) return keySheet();
+      const sheet = sheetFor(collections);
+      if (sheet) return sheet;
+      return collections.length ? keySheet() : "(none: this is a how-to question, use docs)";
+    })(),
+  ].join("\n");
+}
+
+/* ---------- step 1: decide what data is needed (small prompt) ---------- */
+
+/**
+ * Free, Basic and no active subscription: no record look-ups, only how-to help.
+ * No school data (not even the dates of the session) goes into this prompt.
+ */
+function buildHelpPrompt() {
+  return [
+    "You are the assistant inside a school admin dashboard. On this plan you can only explain how to use the app. You cannot read or look up any of the school's records.",
+    "Reply with exactly ONE JSON object per turn and nothing else. It must have an \"action\".",
+    "",
+    "ACTIONS",
+    "- {\"action\":\"docs\",\"text\":\"how to promote students\"} returns the matching how-to help article. Use it for every how-to question.",
+    "- {\"action\":\"answer\",\"answer\":\"one to three short sentences\",\"steps\":null} is your final reply. For how-to answers, steps is 2 to 6 items [{\"title\":\"...\",\"text\":\"...\"}]; copy them from the article.",
+    `  Wrap dashboard page names in [[double brackets]] using only these: ${PAGE_NAMES}.`,
+    "- {\"action\":\"upgrade\"} when the request needs any of this school's records: students, staff, classes, fees, payments, scores, attendance, results, counts, lists, dates of sessions or terms, or anything to look up or total up.",
+    "",
+    "RULES",
+    "1. Never state any fact about this school. Only explain how the app works, from the help article.",
+    "2. Greetings, thanks and small talk: answer in one friendly sentence with action answer.",
+    "3. Plain words for a school admin. Be short.",
+  ].join("\n");
+}
+
+function routePrompt(box, restricted = false) {
+  return [
+    "You route requests for the assistant of a school admin dashboard. Reply with ONE JSON object only.",
+    `Today: ${calendarDate()}.`,
+    restricted
+      ? "On this plan the assistant can only explain how to use the dashboard. It cannot read the school's records."
+      : "The assistant can read this school's records and explain how to use the dashboard. It cannot change anything.",
+    "- {\"kind\":\"chat\",\"answer\":\"...\"} for a greeting, thanks, small talk, or a question about what the assistant can do. One friendly sentence.",
+    "- {\"kind\":\"data\",\"collections\":[\"StudentScore\",\"Class\"]} for anything about this school's records, or a how-to question. List the 1 to 4 collections the request needs (use [] for a how-to question). A short follow-up continues the previous request, so reuse what it used.",
+    "Fee bills (how many, active or inactive, amounts) are in Bill. What each student owes or paid, and when, is in UserBill (and Bill). The Payment collection is only the school's subscription to the platform, never student fees.",
+    `Collections: ${collectionIndex()}`,
+  ].join("\n");
+}
+
+const ASKS_FOR_WORK = /\b(list|show|give|get|find|display|how many|count|total|who|which|students?|pupils?|teachers?|staff|fees?|paid|unpaid|owe|owing|balance|scores?|results?|attendance|class(es)?|jss|sss?)\b/i;
+const ABOUT_ASSISTANT = /\b(what can you|what do you do|who are you|can you help|how can you help)\b/i;
+
+async function planRequest(pool, question, history, box, restricted = false) {
+  const lines = history.slice(-4).map((item) => {
+    const who = item.role === "assistant" ? "Assistant" : "Admin";
+    const used = item.used && item.used.length ? ` (looked at: ${item.used.join(", ")})` : "";
+    return `${who}: ${item.brief.slice(0, 250)}${used}`;
+  });
+  const content = `${lines.length ? `Conversation so far:\n${lines.join("\n")}\n\n` : ""}New message from the admin: ${question}`;
+  try {
+    const raw = await completeJson(pool, [
+      { role: "system", content: routePrompt(box, restricted) },
+      { role: "user", content },
+    ], 700);
+    // Small talk is only believed when the message does not ask for anything to be looked up.
+    const asksForWork = ASKS_FOR_WORK.test(question) && !ABOUT_ASSISTANT.test(question);
+    if (raw && String(raw.kind || "").toLowerCase() === "chat" && String(raw.answer || "").trim() && !asksForWork) {
+      return { kind: "chat", answer: String(raw.answer).trim().slice(0, 400) };
+    }
+    if (raw && String(raw.kind || "").toLowerCase() === "chat" && asksForWork) {
+      logAssistant("route-overruled", "chat reply to a request for records");
+      return { kind: "data", collections: null };
+    }
+    if (raw && Array.isArray(raw.collections)) {
+      return { kind: "data", collections: raw.collections.map(String).slice(0, 5) };
+    }
+    // Loose plain text here is not a real decision: carry on and look at the data.
+    if (raw && String(raw.action || "") === "answer" && String(raw.answer || "").trim() && !raw.spoken && !asksForWork) {
+      return { kind: "chat", answer: String(raw.answer).trim().slice(0, 400) };
+    }
+  } catch (error) {
+    if (error.status === 429) throw error;
+    logAssistant("route-failed", error.message);
+  }
+  return { kind: "data", collections: null };
+}
+
+/* ---------- history and memory ---------- */
+
+function memoCollections(memo) {
+  const names = [];
+  (Array.isArray(memo) ? memo : []).forEach((item) => {
+    const found = /"from":"([A-Za-z]+)"/.exec(String(item?.args || ""));
+    if (found && !names.includes(found[1])) names.push(found[1]);
+  });
+  return names;
+}
+
+/**
+ * Last few turns, kept short. `content` is what the query step sees (the latest turn that
+ * looked at data also carries a short note of what it queried); `brief` and `used` feed step 1.
+ */
+function cleanHistory(raw) {
+  const list = (Array.isArray(raw) ? raw : []).slice(-8).map((item) => {
+    const role = item?.role === "assistant" ? "assistant" : item?.role === "user" ? "user" : "";
+    const text = String(item?.text || "").trim().slice(0, role === "assistant" ? 700 : 400);
+    if (!role || !text) return null;
+    const memo = role === "assistant" && Array.isArray(item?.memo) && item.memo.length ? item.memo : null;
+    return { role, content: text, brief: text, memo, used: memo ? memoCollections(memo) : [] };
+  }).filter(Boolean);
+  for (let i = list.length - 1; i >= 0; i -= 1) {
+    if (!list[i].memo) continue;
+    try {
+      list[i].content = `${list[i].content}\n[data used: ${JSON.stringify(list[i].memo).slice(0, 1200)}]`;
+    } catch (err) {
+      /* ignore a memo that cannot be read */
+    }
+    break;
+  }
+  return list;
+}
+
+function sampleRows(rows) {
+  return rows.slice(0, 3).map((row) => {
+    const next = {};
+    Object.keys(row).slice(0, 6).forEach((key) => { next[key] = present(row[key]); });
+    return next;
+  });
+}
+
+function buildMemo(trace) {
+  const items = trace.slice(-4).map((item) => ({
+    tool: item.tool,
+    args: item.args,
+    ref: item.ref,
+    total: item.total,
+    sample: item.sample,
+  }));
+  while (items.length > 1 && JSON.stringify(items).length > 2400) items.shift();
+  return items;
+}
+
+function briefArgs(action) {
+  const { action: name, ...rest } = action;
+  const text = JSON.stringify(rest);
+  return text.length > 450 ? text.slice(0, 450) : text;
+}
+
+/* ---------- answers ---------- */
+
+function humanize(key) {
+  return String(key).replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function buildTable(spec, box) {
+  if (!spec || typeof spec !== "object") return null;
+  let result = box.results.get(String(spec.result || spec.ref || spec.from || ""));
+  if (!result) {
+    const refs = [...box.results.values()].filter((item) => item.rows.length > 0);
+    result = refs[refs.length - 1];
+  }
+  if (!result || !result.rows.length) return null;
+  const available = new Set(result.columns);
+  let columns = (Array.isArray(spec.columns) ? spec.columns : [])
+    .map((col) => (typeof col === "string" ? { key: col, label: humanize(col) } : { key: String(col?.key || ""), label: String(col?.label || humanize(col?.key || "")) }))
+    .filter((col) => col.key && available.has(col.key))
+    .slice(0, 8);
+  if (!columns.length) {
+    columns = result.columns
+      .filter((key) => !/_id$/.test(key) && key !== "stream")
+      .slice(0, 6)
+      .map((key) => ({ key, label: humanize(key) }));
+  }
+  if (!columns.length) return null;
+  const withRank = spec.rank === true;
+  const rows = result.rows.slice(0, REPORT_ROWS).map((row, index) => {
+    const next = {};
+    if (withRank) next.rank = index + 1;
+    columns.forEach((col) => { next[col.key] = present(row[col.key]); });
+    return next;
+  });
+  const finalColumns = withRank ? [{ key: "rank", label: "Rank" }, ...columns] : columns;
+  if (rows.length === 1 && !withRank && finalColumns.length > 2) {
+    // One record (a single student, say): shown as text in the chat, and as Detail / Value lines in the PDF.
+    return {
+      title: String(spec.title || "").trim().slice(0, 80) || "Record",
+      columns: [{ key: "detail", label: "Detail" }, { key: "value", label: "Value" }],
+      rows: finalColumns.map((col) => ({ detail: col.label, value: rows[0][col.key] })),
+      total: 1,
+      record: true,
+    };
+  }
   return {
-    title: String(title || "Records").slice(0, 80),
-    columns: (columns || []).slice(0, 8),
-    rows: (rows || []).slice(0, 40),
+    title: String(spec.title || "").trim().slice(0, 80) || "Result",
+    columns: finalColumns,
+    rows,
+    total: result.total,
   };
 }
 
-function spokenResult(plan, table, message, { offer = false } = {}) {
-  const text = String(message || "").trim();
-  const payload = queryPayload(plan, table, offer && !/\bpdf\b/i.test(text)
-    ? `${text.replace(/[.?\s]+$/, "")}. Should I give you the PDF?`
-    : text);
-  if (offer && !tableEmpty(table)) {
-    payload.offerPdf = true;
-    payload.report = reportSnapshot(payload.title || plan.title, payload.columns || table.columns, payload.rows || table.rows);
+function finishAnswer(action, box, trace, question) {
+  const memo = buildMemo(trace);
+  const text = String(action.answer || "").replace(/\s+\n/g, "\n").trim().slice(0, 1200);
+
+  // A help article was read: show its own steps in full and in order, not a retelling.
+  const article = box.article;
+  if (article && Array.isArray(article.steps) && article.steps.length >= 2 && !action.table) {
+    const articleItems = article.steps
+      .map((item) => {
+        const body = String(item.desc || "").trim();
+        const title = String(item.step || "").trim();
+        return body || title ? { title, text: body || title, parts: linkParts(body || title) } : null;
+      })
+      .filter(Boolean);
+    if (article.callout) {
+      const note = String(article.callout).trim();
+      articleItems.push({ title: "Good to know", text: note, parts: linkParts(note) });
+    }
+    return {
+      success: true,
+      kind: "docs",
+      title: String(article.title || "").slice(0, 80),
+      intro: "Follow these steps in order, in detail:",
+      items: articleItems,
+      memo,
+    };
   }
-  return payload;
+
+  const steps = Array.isArray(action.steps) ? action.steps : [];
+  const items = steps.slice(0, 8).map((item) => {
+    const title = typeof item?.title === "string" ? item.title.trim().slice(0, 80) : "";
+    const body = typeof item?.text === "string" ? item.text.trim().slice(0, 400) : "";
+    return body ? { title, text: body, parts: linkParts(body) } : null;
+  }).filter(Boolean);
+  if (items.length) {
+    const title = String(action.title || "").trim().slice(0, 80);
+    return { success: true, kind: "docs", title, items, memo };
+  }
+
+  const table = buildTable(action.table, box);
+  if (table) {
+    const offer = table.rows.length > 0;
+    let message = stripBrackets(text) || table.title;
+    if (table.record) {
+      // The details are written out in the chat; add any the model left out.
+      const lowered = message.toLowerCase();
+      const missing = table.rows.filter((row) => row.value !== "—" && !lowered.includes(String(row.value).toLowerCase()));
+      if (missing.length) {
+        message = `${message.replace(/[.\s]+$/, "")}.\n${missing.map((row) => `${row.detail}: ${row.value}`).join("\n")}`;
+      }
+    }
+    const spoken = offer && !/\bpdf\b/i.test(message) ? `${message.replace(/[.?\s]+$/, "")}.\nShould I give you the PDF?` : message;
+    const payload = {
+      success: true,
+      kind: "query",
+      title: table.title,
+      message: spoken,
+      columns: table.record ? [] : table.columns,
+      rows: table.record ? [] : table.rows.slice(0, CHAT_ROWS),
+      total: table.total,
+      truncated: table.record ? false : table.rows.length > CHAT_ROWS,
+      memo,
+    };
+    if (offer) {
+      payload.offerPdf = true;
+      payload.report = {
+        title: table.title,
+        question: String(question || "").slice(0, 200),
+        summary: stripBrackets(text).slice(0, 240),
+        columns: table.columns,
+        rows: table.rows,
+      };
+    }
+    return payload;
+  }
+
+  const message = text || "I could not work that out. Try asking it another way.";
+  return { success: true, kind: "chat", message, parts: linkParts(message), memo };
 }
 
-async function deliverPdf(schoolId, question, report) {
-  const columns = Array.isArray(report?.columns) ? report.columns.slice(0, 8) : [];
-  const rows = Array.isArray(report?.rows) ? report.rows.slice(0, 40) : [];
+/* ---------- pdf ---------- */
+
+const PDF_REPLY = /^(yes|yeah|yep|yup|y|ok|okay|sure|please|pls|send( it)?|give( it| me)?( the)?( pdf)?|the pdf|pdf|download( it)?|go ahead)([\s,.!?]+(please|pls|yes))?[\s.!?]*$/i;
+
+function isPdfRequest(question) {
+  const q = String(question || "").trim();
+  return PDF_REPLY.test(q) || (/\bpdf\b/i.test(q) && q.split(/\s+/).length <= 8);
+}
+
+function pdfFileName(title) {
+  const slug = String(title || "records").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
+  return `${slug || "records"}.pdf`;
+}
+
+async function deliverPdf(schoolId, report) {
+  const columns = (Array.isArray(report?.columns) ? report.columns : [])
+    .map((col) => ({ key: String(col?.key || ""), label: String(col?.label || col?.key || "") }))
+    .filter((col) => col.key)
+    .slice(0, 8);
+  const rows = (Array.isArray(report?.rows) ? report.rows : []).slice(0, REPORT_ROWS).map((row) => {
+    const next = {};
+    columns.forEach((col) => { next[col.key] = present(row?.[col.key]); });
+    return next;
+  });
   if (!columns.length || !rows.length) {
     return { success: true, kind: "chat", message: "There is nothing to put in a PDF." };
   }
   const title = String(report.title || "Records").slice(0, 80);
-  const table = { columns, rows, truncated: false };
-  return withReport(
-    schoolId,
-    question,
-    { title, from: "Class", where: [] },
-    table,
-    { success: true, kind: "query", title, message: "Here is the PDF.", columns, rows, truncated: false }
-  );
-}
-
-function queryPayload(plan, table, message) {
-  if (table.countOnly) {
-    return { success: true, kind: "query", title: plan.title, count: table.total, message };
-  }
+  const school = await mongoose.model("School").findOne({ school_id: String(schoolId) }).select("school_name").lean();
+  const buffer = buildRecordPdf({
+    schoolName: school?.school_name || "School",
+    title,
+    question: String(report.question || ""),
+    summary: String(report.summary || `${rows.length} record${rows.length === 1 ? "" : "s"}.`),
+    columns,
+    rows,
+    note: "",
+  });
   return {
     success: true,
     kind: "query",
-    title: plan.title,
-    message,
-    columns: table.columns,
-    rows: table.rows,
-    truncated: table.truncated,
+    title,
+    message: `Here is the PDF for "${title}" (${rows.length} row${rows.length === 1 ? "" : "s"}).`,
+    pdf: { filename: pdfFileName(title), base64: buffer.toString("base64") },
   };
 }
 
-async function phraseResult(config, question, table) {
-  const data = table.countOnly ? { count: table.total } : { rows: (table.rows || []).slice(0, 12) };
-  return completeJson(config, [
-    {
-      role: "system",
-      content: "Turn this query result into the answer a school admin should read. Return one JSON object with answer set to two or three short sentences. Use only the numbers and names in the data. For a count, say the number. For a ranking, name who is first and the class. A count of attendance rows is present days, not a score. Rank is not a score. If the data is empty, say that nothing matched and what that means for the question. Do not repeat a query title. Do not set retry when the list is simply empty. Set retry only when the rows are about the wrong thing.",
-    },
-    { role: "user", content: `Question: ${question}\nData: ${JSON.stringify(data)}` },
-  ], 300);
+/* ---------- the loop ---------- */
+
+function searchArticles(text) {
+  const words = String(text || "").toLowerCase().split(/[^a-z0-9]+/).filter((word) => word.length > 2);
+  if (!words.length) return [];
+  const scored = [];
+  docs.forEach((section) => section.items.forEach((item) => {
+    const title = String(item.title || "").toLowerCase();
+    const body = JSON.stringify([item.content, item.steps, item.callout]).toLowerCase();
+    const score = words.reduce((sum, word) => sum + (title.includes(word) ? 3 : 0) + (body.includes(word) ? 1 : 0), 0);
+    if (score > 0) scored.push({ id: item.id, title: item.title, score });
+  }));
+  return scored.sort((a, b) => b.score - a.score).slice(0, 4);
 }
 
-async function answerFromQuery(config, question, history, schoolId) {
-  const period = await activePeriod(schoolId);
-  const named = await namedThings(schoolId, question, history);
-  logAssistant("context", {
-    question,
-    session: period.session?.session_name || null,
-    term: period.term?.term_name || null,
-    target: named.target || null,
-    classes: named.classes.map((item) => item.class_name),
-    subjects: named.subjects.map((item) => item.subject_name),
-  });
-  if (named.classes.length && named.subjects.length) {
-    logAssistant("clarify", "name matches both a class and a subject");
-    const classNames = named.classes.map((item) => item.class_name).join(", ");
-    const subjectNames = named.subjects.map((item) => item.subject_name).join(", ");
-    return {
-      success: true,
-      kind: "chat",
-      message: `"${named.target}" matches the class ${classNames} and the subject ${subjectNames}. Which one do you mean?`,
-    };
-  }
-  if (wantsAttendanceRank(question, history) && named.classes.length === 1) {
-    const plan = applyActivePeriod(ensureStudentLookup(attendanceRankPlan(named)), period, question);
-    logAssistant("query", {
-      from: plan.from,
-      shape: plan.shape,
-      where: plan.where,
-      groupBy: plan.groupBy || null,
-      metric: plan.metric,
-      pick: plan.pick,
-      forced: "attendance-rank",
-    });
-    const table = await runQuery(plan, schoolId);
-    logAssistant("result", { rows: (table.rows || []).length, truncated: table.truncated });
-    const fallback = tableEmpty(table)
-      ? `There are no present marks for ${named.classes[0].class_name}${period.term ? ` in ${period.term.term_name}` : ""} yet.`
-      : plan.title;
-    let message = fallback;
-    try {
-      const verdict = await phraseResult(config, continuedQuestion(question, history), table);
-      const answer = typeof verdict?.answer === "string" ? verdict.answer.trim() : "";
-      if (answer) message = answer;
-    } catch (err) {
-      /* the fallback sentence is enough */
+function docsTool(action) {
+  const wanted = String(action.docId || action.id || "");
+  if (!wanted && action.text) {
+    const matches = searchArticles(action.text);
+    if (!matches.length) throw new ToolError("No help article matches that.", "Try other words.");
+    if (matches.length > 1 && matches[0].score === matches[1].score) {
+      return { matches: matches.map(({ id, title }) => ({ id, title })), note: "Pick one and call docs again with its docId." };
     }
-    const shown = labelClass(table, named.classes[0].class_name);
-    return spokenResult(plan, shown, message, { offer: !tableEmpty(shown) });
+    action = { ...action, docId: matches[0].id };
   }
-  const context = contextText(period, named);
-  let messages = [
-    { role: "system", content: systemPrompt("query", context) },
-    ...history,
-    { role: "user", content: continuedQuestion(question, history) },
-  ];
-  let lastError = "The assistant could not build that query.";
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    const parsed = await completeJson(config, messages, attempt === 0 ? 700 : 500);
-    logAssistant("plan", { attempt: attempt + 1, kind: parsed?.kind || null, from: parsed?.from || null, shape: parsed?.shape || null });
-    try {
-      if (parsed?.kind === "clarify") {
-        const answer = String(parsed.answer || "").trim();
-        if (answer) {
-          logAssistant("clarify", answer);
-          return { success: true, kind: "chat", message: answer };
-        }
-      }
-      let plan = validatePlan(parsed);
-      if (plan.kind === "clarify") {
-        logAssistant("clarify", plan.answer);
-        return { success: true, kind: "chat", message: plan.answer };
-      }
-      if (plan.kind !== "query") throw new Error("Return a query for this question, or kind clarify if you need to ask.");
-      plan = ensureStudentLookup(applyQuestionShape(plan, question));
-      plan.where = await resolveClauses(plan, schoolId);
-      if (plan.from === "StudentClassAssignment" && !/\b(all time|past|former|previous|history)\b/i.test(question) && !plan.where.some((clause) => clause.field === "is_active")) {
-        plan.where.push({ field: "is_active", op: "eq", value: true });
-      }
-      applyActivePeriod(plan, period, question);
-      pinClass(plan, named);
-      logAssistant("query", {
-        from: plan.from,
-        shape: plan.shape,
-        where: plan.where,
-        groupBy: plan.groupBy || null,
-        metric: plan.metric,
-        pick: plan.pick,
-      });
-      const table = await runQuery(plan, schoolId);
-      logAssistant("result", table.countOnly ? { count: table.total } : { rows: (table.rows || []).length, truncated: table.truncated });
-      const fallback = table.countOnly
-        ? countReply(plan, table.total)
-        : (tableEmpty(table) ? emptyRecordReply(plan, named, period) : plan.title);
-      let verdict = null;
-      try {
-        verdict = await phraseResult(config, question, table);
-      } catch (err) {
-        return spokenResult(plan, table, fallback, { offer: !table.countOnly && !tableEmpty(table) });
-      }
-      const answer = typeof verdict?.answer === "string" ? verdict.answer.trim() : "";
-      logAssistant("answer", answer || (verdict?.retry ? `retry: ${verdict.reason || ""}` : "none"));
-      if (verdict?.retry && !tableEmpty(table) && attempt < 2) {
-        messages = [
-          { role: "system", content: `The query ran but did not answer the question. Return a better JSON query, or kind clarify if you need to ask. ${context}` },
-          {
-            role: "user",
-            content: `Question: ${question}\nProblem: ${verdict.reason || "wrong result"}\nPrevious query: ${JSON.stringify({ from: plan.from, where: plan.where, groupBy: plan.groupBy, metric: plan.metric, lookup: plan.lookup, pick: plan.pick }).slice(0, 800)}`,
-          },
-        ];
-        continue;
-      }
-      const message = tableEmpty(table) ? (answer || fallback) : (verdict?.retry ? fallback : (answer || fallback));
-      return spokenResult(plan, table, message, { offer: !table.countOnly && !tableEmpty(table) });
-    } catch (err) {
-      lastError = err.message;
-      logAssistant("rejected", err.message);
-      messages = [
-        { role: "system", content: `Rewrite one JSON query, or set kind to clarify and ask a question. from must be a schema collection name. ${context}` },
-        {
-          role: "user",
-          content: `Question: ${question}\nRejected query: ${JSON.stringify(parsed).slice(0, 1200)}\nError: ${err.message}.${fieldHint(err.message)}`,
-        },
-      ];
-    }
-  }
-  const backup = await backupClassQuery(question, named, period);
-  if (!backup) throw new Error(lastError);
-  logAssistant("backup", { from: backup.from, where: backup.where, shape: backup.shape });
-  const table = await runQuery(backup, schoolId);
-  const fallback = table.countOnly
-    ? `There are ${table.total} students in ${named.classes[0].class_name}.`
-    : (tableEmpty(table) ? emptyRecordReply(backup, named, period) : backup.title);
-  let message = fallback;
+  const found = findArticle(String(action.docId || action.id || ""));
+  if (!found) throw new ToolError("That help article does not exist.", `Article ids: ${DOC_INDEX}`);
+  return {
+    id: found.item.id,
+    section: found.section,
+    title: found.item.title,
+    content: found.item.content,
+    // Just the title and text of each step: the full blocks repeat the same words.
+    steps: (found.item.steps || []).map((item) => ({ step: item.step, desc: item.desc })),
+    callout: found.item.callout,
+  };
+}
+
+function toolMessage(name, result, limit = MAX_TOOL_CHARS) {
+  let text = JSON.stringify(result);
+  if (text.length > limit) text = `${text.slice(0, limit)}...`;
+  return `TOOL RESULT (${name}): ${text}`;
+}
+
+async function runTool(box, action, trace) {
   try {
-    const verdict = await phraseResult(config, question, table);
-    const answer = typeof verdict?.answer === "string" ? verdict.answer.trim() : "";
-    if (answer && (tableEmpty(table) || !verdict?.retry)) message = answer;
+    const result = action.action === "docs" ? docsTool(action) : await box.run(action);
+    // Remember the help article that was read, so the answer can show its steps as written.
+    if (action.action === "docs" && result.id) box.article = result;
+    if (action.action === "query" || action.action === "find") {
+      const stored = box.results.get(result.ref);
+      trace.push({
+        tool: action.action,
+        args: briefArgs(action),
+        ref: result.ref,
+        total: result.total ?? result.matches,
+        sample: stored ? sampleRows(stored.rows) : [],
+      });
+    }
+    logAssistant("result", { action: action.action, ref: result.ref, total: result.total ?? result.matches ?? null, note: result.note || null });
+    return { result, failed: false };
   } catch (err) {
-    /* the fallback sentence is enough */
+    if (!(err instanceof ToolError)) throw err;
+    logAssistant("tool-error", err.message);
+    return { result: { error: err.message, hint: err.hint || undefined }, failed: true };
   }
-  return spokenResult(backup, table, message, { offer: !table.countOnly && !tableEmpty(table) });
 }
 
-function backupClassQuery(question, named, period) {
-  if (named.classes.length !== 1 || named.subjects.length) return null;
-  if (/\b(fees?|bills?|bal+ances?|ballances?|outstanding)\b/i.test(question)) return null;
-  const cls = named.classes[0];
-  const ranking = /\b(best|top|highest|perform)\b/i.test(question);
-  const aboutStudents = /\bstudent/i.test(question);
-  if (!ranking && !aboutStudents) return null;
-  const plan = ranking
-    ? {
-      kind: "query",
-      shape: "list",
-      title: `Top students in ${cls.class_name}`,
-      answer: "",
-      from: "StudentScore",
-      where: [{ field: "class_id", op: "eq", value: cls.class_id }],
-      groupBy: "student_id",
-      metric: { op: "avg", field: "scores" },
-      sort: "desc",
-      limit: 10,
-      lookup: [],
-      pick: [],
-    }
-    : {
-      kind: "query",
-      shape: "count",
-      title: `Students in ${cls.class_name}`,
-      answer: "",
-      from: "StudentClassAssignment",
-      where: [
-        { field: "class_id", op: "eq", value: cls.class_id },
-        { field: "is_active", op: "eq", value: true },
-      ],
-      groupBy: "",
-      metric: null,
-      sort: "desc",
-      limit: 10,
-      lookup: [],
-      pick: ["class_name"],
-    };
-  return applyActivePeriod(ensureStudentLookup(plan), period, question);
+function upgradeReply(access) {
+  const message = access.message;
+  logAssistant("plan-blocked", { plan: access.plan_name || "none" });
+  return { success: true, kind: "chat", upgrade: true, message, parts: linkParts(message), memo: [] };
 }
+
+const DATA_ACTIONS = ["find", "query", "describe", "period"];
+
+/** A sub-admin asked for data their permissions do not cover. */
+function deniedReply(error) {
+  logAssistant("permission-denied", { sections: error.sections });
+  return { success: true, kind: "chat", denied: true, message: error.message, parts: linkParts(error.message), memo: [] };
+}
+
+async function converse(pool, question, history, schoolId, permissions) {
+  try {
+    return await runConversation(pool, question, history, schoolId, permissions);
+  } catch (error) {
+    if (error instanceof AccessDenied) return deniedReply(error);
+    throw error;
+  }
+}
+
+async function runConversation(pool, question, history, schoolId, permissions) {
+  // Free, Basic or no active subscription: general answers and how-to help only.
+  const access = await checkAssistantDataAccess(schoolId);
+  const restricted = !access.allowed;
+  const box = await createToolbox(schoolId, permissions);
+
+  // Step 1 (small prompt): is this small talk, or which data does it need?
+  const plan = await planRequest(pool, question, history, box, restricted);
+  logAssistant("plan", plan.kind === "chat" ? { kind: "chat" } : { kind: "data", collections: plan.collections });
+  if (plan.kind === "chat") {
+    return { success: true, kind: "chat", message: plan.answer, parts: linkParts(plan.answer), memo: [] };
+  }
+  // Records were asked for: stop here, no data call is made.
+  if (restricted && Array.isArray(plan.collections) && plan.collections.length) return upgradeReply(access);
+
+  // Step 2+: only the chosen collections go into the prompt.
+  const messages = [
+    { role: "system", content: restricted ? buildHelpPrompt() : buildSystemPrompt(box, plan.collections) },
+    ...history.map(({ role, content }) => ({ role, content })),
+    { role: "user", content: question },
+  ];
+  const trace = [];
+  const repeats = new Map();
+  logAssistant("prompt", { chars: messages[0].content.length });
+
+  for (let step = 0; step < MAX_STEPS; step += 1) {
+    const raw = await completeJson(pool, messages, 1800);
+    const batch = Array.isArray(raw?.actions)
+      ? raw.actions.map(normalizeAction).filter((item) => item && !["answer", "ask"].includes(item.action)).slice(0, 5)
+      : [];
+    // Hard stop on a restricted plan: whatever the model says, no record is ever read.
+    if (restricted && batch.some((item) => item.action === "upgrade" || DATA_ACTIONS.includes(item.action))) {
+      return upgradeReply(access);
+    }
+    if (batch.length) {
+      logAssistant("step", { n: step + 1, batch: batch.map((item) => item.action).join(",") });
+      messages.push({ role: "assistant", content: JSON.stringify({ actions: batch }).slice(0, 2500) });
+      const outputs = [];
+      for (const item of batch) {
+        const { result, failed } = await runTool(box, item, trace);
+        outputs.push(toolMessage(item.action, result, Math.floor(MAX_TOOL_CHARS / batch.length)));
+        if (failed) break;
+      }
+      messages.push({ role: "user", content: outputs.join("\n") });
+      continue;
+    }
+    const action = normalizeAction(raw);
+    if (!action) {
+      logAssistant("step", { n: step + 1, problem: "no action" });
+      messages.push({ role: "assistant", content: JSON.stringify(raw).slice(0, 600) });
+      messages.push({ role: "user", content: "That was not a valid action. Reply with one JSON object that has an \"action\"." });
+      continue;
+    }
+    logAssistant("step", { n: step + 1, action: action.action, args: briefArgs(action).slice(0, 220) });
+    if (restricted && (action.action === "upgrade" || DATA_ACTIONS.includes(action.action))) return upgradeReply(access);
+
+    if (action.action === "answer") {
+      const payload = finishAnswer(action, box, trace, question);
+      logAssistant("answer", { kind: payload.kind, rows: payload.rows ? payload.rows.length : 0, text: String(payload.message || payload.title || "").slice(0, 160) });
+      return payload;
+    }
+    if (action.action === "ask") {
+      const message = String(action.question || action.answer || "").trim().slice(0, 400);
+      if (message) {
+        logAssistant("ask-user", message);
+        return { success: true, kind: "chat", message, parts: linkParts(message), memo: buildMemo(trace) };
+      }
+    }
+
+    const signature = JSON.stringify(action);
+    const times = (repeats.get(signature) || 0) + 1;
+    repeats.set(signature, times);
+    messages.push({ role: "assistant", content: signature.slice(0, 1500) });
+    if (times > 1) {
+      messages.push({ role: "user", content: "You already ran exactly this. Use the earlier result, change the request, or give the final answer." });
+      if (times > 2) break;
+      continue;
+    }
+
+    const { result } = await runTool(box, action, trace);
+    messages.push({ role: "user", content: toolMessage(action.action, result) });
+  }
+
+  messages.push({
+    role: "user",
+    content: "Stop using tools. Give the final answer now as {\"action\":\"answer\",...} using only the results above. If you could not get the data, say exactly what you checked.",
+  });
+  const last = normalizeAction(await completeJson(pool, messages, 1200));
+  if (last && last.action === "answer") return finishAnswer(last, box, trace, question);
+  const message = "I could not finish working that out. Please try asking it a little differently.";
+  return { success: true, kind: "chat", message, parts: linkParts(message), memo: buildMemo(trace) };
+}
+
+/* ---------- route ---------- */
 
 exports.ask = async (req, res) => {
   try {
@@ -1539,61 +854,34 @@ exports.ask = async (req, res) => {
     if (!question) return res.status(400).json({ success: false, message: "Type a question first." });
     if (question.length > 400) return res.status(400).json({ success: false, message: "Keep the question under 400 characters." });
 
-    const config = await activeConfig();
-    if (!config) return res.status(400).json({ success: false, message: "No active School Assistant model. In AI Config, set Use to School Assistant and turn it on." });
+    // Who is asking: only admins of this school, and a sub-admin only reads what their
+    // permissions allow.
+    const who = await resolveAccess(req, schoolId);
+    if (who.error) return res.status(who.error.status).json({ success: false, message: who.error.message });
+
+    const pool = await activeConfigs();
+    if (!pool.length) return res.status(400).json({ success: false, message: "No active School Assistant model. In AI Config, set Use to School Assistant and turn it on." });
+
+    const report = req.body?.report;
+    if (isPdfRequest(question) && Array.isArray(report?.rows) && report.rows.length) {
+      logAssistant("ask", { schoolId, mode: "pdf", question });
+      return res.json(await deliverPdf(schoolId, report));
+    }
 
     const history = cleanHistory(req.body?.history);
-    if (/^(yes|yeah|yep|ok|okay|sure|please|send it|give me the pdf|the pdf)\b/i.test(question) && Array.isArray(req.body?.report?.rows) && req.body.report.rows.length) {
-      logAssistant("ask", { schoolId, pack: "pdf", question });
-      return res.json(await deliverPdf(schoolId, question, req.body.report));
-    }
-    if (missingTimetableQuestion(question)) {
-      logAssistant("ask", { schoolId, pack: "timetable-gap", question });
-      return res.json(await classesMissingTimetable(schoolId, question));
-    }
-    if (feeQuestion(question)) {
-      logAssistant("ask", { schoolId, pack: "fees", question });
-      return res.json(await studentFeeReport(schoolId, question, history));
-    }
-    const periodAsk = periodQuestion(question, history);
-    if (periodAsk) {
-      logAssistant("ask", { schoolId, pack: "period", question });
-      return res.json(await answerActivePeriod(schoolId, periodAsk));
-    }
-    const pack = packFor(question, history);
-    logAssistant("ask", { schoolId, pack, question });
-    if (pack === "query") {
-      const payload = await answerFromQuery(config, question, history, schoolId);
-      return res.json(payload);
-    }
-    const parsed = await askModel(config, question, history);
-    const plan = validatePlan(parsed);
-
-    if (plan.kind === "chat") {
-      return res.json({ success: true, kind: "chat", message: plan.answer, parts: linkParts(plan.answer) });
-    }
-
-    if (plan.kind === "unknown") {
-      return res.json({
-        success: true,
-        kind: "unknown",
-        message: "Please try again.",
-      });
-    }
-
-    if (plan.kind === "docs") {
-      const items = (plan.items.length ? plan.items : plan.answer ? [{ title: "", text: plan.answer }] : [])
-        .map((item) => ({ title: item.title, text: item.text, parts: linkParts(item.text) }));
-      if (!plan.docId || !items.length) {
-        return res.json({ success: true, kind: "docs", message: plan.answer || "That is not covered in the docs.", parts: linkParts(plan.answer || "") });
-      }
-      return res.json({ success: true, kind: "docs", title: plan.title, items });
-    }
-
-    const reply = typeof plan.answer === "string" && plan.answer.trim() ? plan.answer.trim() : "Please try again.";
-    return res.json({ success: true, kind: "chat", message: reply });
+    logAssistant("ask", { schoolId, question, history: history.length });
+    return res.json(await converse(pool, question, history, schoolId, who.access));
   } catch (error) {
     logAssistant("error", error.message);
-    return res.status(200).json({ success: true, kind: "chat", message: "Please try again." });
+    const busy = error.status === 429 || /rate limit|too many requests/i.test(error.message || "");
+    const minutes = error.retryAfterMs ? Math.max(1, Math.ceil(error.retryAfterMs / 60000)) : 0;
+    const busyText = minutes
+      ? `The assistant's AI models are out of quota right now. Please try again in about ${minutes} minute${minutes === 1 ? "" : "s"}, or ask an admin to add another model.`
+      : "The assistant is busy right now. Please try again in a moment.";
+    return res.status(200).json({
+      success: true,
+      kind: "chat",
+      message: busy ? busyText : "Please try again.",
+    });
   }
 };

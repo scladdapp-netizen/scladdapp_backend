@@ -21,6 +21,15 @@ const router = express.Router();
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
+/** Models that are not general chat models (safety classifiers, speech, voice). */
+function notAChatModel(model) {
+  const id = String(model || "").trim();
+  if (/guard|whisper|tts|orpheus|playai|embed|rerank/i.test(id)) {
+    return `"${id}" is not a chat model (it is a safety filter, speech or voice model) and cannot be used here. Pick a chat model such as openai/gpt-oss-120b.`;
+  }
+  return "";
+}
+
 function makeId() {
   return "aic_" + Date.now().toString() + Math.floor(Math.random() * 10000).toString();
 }
@@ -93,7 +102,7 @@ router.get("/", verifyToken, async (req, res) => {
 router.post("/", verifyToken, async (req, res) => {
   const tag = "[AI-CONFIG-CREATE]";
   try {
-    const { label, use, api_key, model, temperature, is_active } = req.body;
+    const { label, use, api_key, model, temperature, is_active, priority } = req.body;
     const { portal_admin_id } = req.jwtPayload;
 
     console.log(`${tag} Creating config — use: ${use}, model: ${model}, by: ${portal_admin_id}`);
@@ -114,6 +123,9 @@ router.post("/", verifyToken, async (req, res) => {
       });
     }
 
+    const modelProblem = notAChatModel(model);
+    if (modelProblem) return res.status(400).json({ success: false, message: modelProblem });
+
     // if this new config is active, deactivate others that share the same feature(s)
     if (is_active !== false) {
       await AIConfig.updateMany(
@@ -131,6 +143,7 @@ router.post("/", verifyToken, async (req, res) => {
       model:       model.trim(),
       temperature: temperature ?? 0.7,
       is_active:   is_active !== false,
+      priority:    Number.isFinite(Number(priority)) && priority !== "" && priority != null ? Number(priority) : 100,
       created_by:  portal_admin_id,
       updated_by:  portal_admin_id,
     });
@@ -155,7 +168,7 @@ router.patch("/:configId", verifyToken, async (req, res) => {
   try {
     const { configId } = req.params;
     const { portal_admin_id } = req.jwtPayload;
-    const { label, use, api_key, model, temperature, is_active } = req.body;
+    const { label, use, api_key, model, temperature, is_active, priority } = req.body;
 
     console.log(`${tag} Updating config_id: ${configId} by: ${portal_admin_id}`);
 
@@ -189,10 +202,16 @@ router.patch("/:configId", verifyToken, async (req, res) => {
       config.is_active = false;
     }
 
+    if (model !== undefined) {
+      const modelProblem = notAChatModel(model);
+      if (modelProblem) return res.status(400).json({ success: false, message: modelProblem });
+    }
+
     if (label       !== undefined) config.label       = label.trim();
     if (api_key     !== undefined) config.api_key     = api_key.trim();
     if (model       !== undefined) config.model       = model.trim();
     if (temperature !== undefined) config.temperature = temperature;
+    if (priority !== undefined && priority !== "" && Number.isFinite(Number(priority))) config.priority = Number(priority);
     config.updated_by = portal_admin_id;
 
     await config.save();
@@ -250,7 +269,9 @@ router.post("/:configId/test", verifyToken, async (req, res) => {
       return res.status(400).json({ success: false, message: "No API key stored for this config" });
     }
 
-    const siteCreation = config.use === "template_image";
+    // Image always uses OpenRouter. The School Assistant uses it when the key is an OpenRouter key.
+    const siteCreation = config.use === "template_image"
+      || (config.use === "school_assistant" && /^sk-or-/i.test(String(config.api_key).trim()));
     const chat = siteCreation ? openRouterChat : groqChat;
     let completion;
     try {

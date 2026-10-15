@@ -5,7 +5,7 @@ const { USE_TEMPLATE_IMAGE, USE_TEMPLATE_CODE, usesForFeature } = require("../ut
 const { getMessageText, hasReasoningOnly, extractJsonFromText } = require("../utils/parseAiJson");
 const { openRouterChat } = require("../utils/openRouterChat");
 const { groqChat } = require("../utils/groqChat");
-const siteDescriptionPrompts = require("../data/siteDescriptionPrompts");
+const { siteBriefFor } = require("../utils/siteBrief");
 
 async function activeConfig(use) {
   const config = await AIConfig.findOne({ use: usesForFeature(use), is_active: true });
@@ -443,13 +443,77 @@ function pickPage(text) {
   return null;
 }
 
-exports.randomSitePrompt = (req, res) => {
-  const except = String(req.query.except || "");
-  const pool = siteDescriptionPrompts.filter((item) => item.id !== except);
-  const list = pool.length ? pool : siteDescriptionPrompts;
-  const pick = list[Math.floor(Math.random() * list.length)];
-  return res.json({ success: true, data: { id: pick.id, text: pick.text } });
+// "Generate description": what the page should say, from this school's own details. Content
+// only, no layout words; the look comes from the template.
+exports.siteBrief = async (req, res) => {
+  try {
+    const text = await siteBriefFor(req.params.schoolId);
+    return res.json({ success: true, data: { id: "school", text } });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message || "Could not generate a description." });
+  }
 };
+
+/**
+ * Step 1 of building a site: read the template picture and write down how it is built,
+ * section by section. Step 2 builds the page from this map and the picture, so the whole
+ * page follows the template and not only the first screen. Returns null when the model
+ * could not produce a usable map (the build then goes on from the picture alone).
+ */
+const LAYOUT_MAP_SYSTEM = `You study one website template image and write a layout map of it. Return one JSON object and nothing else.
+Do not write HTML, CSS or JavaScript. Never write hex codes or color names: describe a tone only as "light", "tinted", "dark" or "photo".
+The picture may be a long page cut into pieces and placed side by side. Read the pieces in order: left piece first, each from top to bottom, as one long page.
+List EVERY section you can see, in order, from just under the navbar to the footer. Do not skip small ones (numbers, logos, banners, quotes). Do not invent sections that are not visible. If you cannot tell something, write "unknown".
+Be specific about shape: say how many columns, what a card is made of (image or icon, title, text, link), how round the corners are, whether there is a border or shadow, how big the headings feel, and how much space there is around things.
+Use this shape:
+{
+ "arrangement": "one page" or "pieces side by side",
+ "navbar": {"present": true or false, "arrangement": "where the logo, links and button sit", "height": "slim, regular or tall", "sits": "on top of the hero, or a solid bar", "link_style": "...", "button": "shape and style of its button"},
+ "hero": {"arrangement": "...", "heading": "size, weight, case, alignment", "buttons": "...", "extras": "anything else in the first screen"},
+ "sections": [{"order": 1, "purpose": "what this section is for", "arrangement": "e.g. image left and text right, or a row of 4 cards", "columns": 3, "card": "what a card is made of and its shape", "images": "shape and crop of pictures, or none", "tone": "light, tinted, dark or photo", "alignment": "left or centred", "spacing": "airy, regular or tight", "heading": "how its heading looks"}],
+ "footer": {"present": true or false, "columns": 4, "arrangement": "..."},
+ "typography": {"headings": "serif or sans, weight, case", "body": "..."},
+ "shape_language": "corner radius, borders, shadows, dividers, decorations",
+ "rhythm": "how the sections alternate in tone and spacing down the page",
+ "small_screen": "how the template would fold on a phone"
+}`;
+
+async function describeTemplate({ config, image, tag }) {
+  const messages = [
+    { role: "system", content: LAYOUT_MAP_SYSTEM },
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "Write the layout map of this template as JSON." },
+        { type: "image_url", image_url: { url: image } },
+      ],
+    },
+  ];
+  try {
+    let text = await completeText({ config, tag: `${tag} MAP`, maxTokens: 3500, messages });
+    let map = parseDesign(text);
+    if (!map) {
+      const first = text;
+      text = await completeText({
+        config,
+        tag: `${tag} MAP-RETRY`,
+        maxTokens: 3500,
+        messages: [
+          ...messages,
+          { role: "assistant", content: text.slice(0, 1500) },
+          { role: "user", content: "Finish that as one valid JSON object. Do not use markdown." },
+        ],
+      });
+      map = parseDesign(text) || parseDesign(first);
+    }
+    if (!map) return null;
+    // Colors come from the school's scheme, never from the template.
+    return JSON.stringify(map).replace(/#[0-9a-f]{3,8}\b/gi, "");
+  } catch (err) {
+    console.warn(`${tag} MAP failed, building from the picture alone: ${err.message}`);
+    return null;
+  }
+}
 
 exports.createSite = async (req, res) => {
   const tag = "[AI-SITE-CREATE]";
@@ -490,20 +554,25 @@ exports.createSite = async (req, res) => {
     const applyHref = `${origin}/school/${schoolId}/apply`;
 
     const imageConfig = await activeConfig(USE_TEMPLATE_IMAGE);
+    // Step 1: how the template is built, section by section.
+    const layoutMap = await describeTemplate({ config: imageConfig, image, tag: `${tag} IMAGE` });
+    console.log(`${tag} layout map ${layoutMap ? `${layoutMap.length} chars` : "not available, using the picture alone"}`);
     const codeSystem = `You look at one template image and write one school website page. Return the HTML document immediately. Do not plan, list rules, or explain.
 Start with <!doctype html> and end with </html>.
 The picture is a template, not a photo of one finished screen. It may show a long page cut into pieces and placed side by side. Do not copy that side-by-side arrangement. Use the layout and the design style, then stack those pieces in reading order into one scrolling page.
 Rules:
 - Do not copy the template's business or product words. Keep its layout and design style.
 - School name: ${schoolName}.${motto ? ` Motto: ${motto}.` : ""}
-${sitePrompt ? `- The school asked for these sections and this content. Follow it, and keep the template's layout and design style.\n${sitePrompt}` : "- No extra content was written. Build the page from the template's layout and design style."}
+${sitePrompt ? `- Content for the page: the words, facts and topics only. How each part looks comes from the template, never from this text.\n${sitePrompt}` : "- No extra content was written. Build the page from the template's own sections."}
+- MATCH THE TEMPLATE IN EVERY SECTION, not only the hero. ${layoutMap ? "You get the picture and a layout map of it. Use both. " : ""}Keep the template's section order. For each section copy its arrangement, number of columns, card shape (corners, border, shadow, where the icon or image sits, title and text size), picture shapes, alignment, tone (light, tinted or dark) and spacing. Copy how its headings look and the shape of its buttons. Do not fall back to a generic school page. Do not use a plain row of three cards unless the template has one.
+- The page also needs About, Academics, Team, Fees and Contact sections. Where the template has a section that fits (for example its courses or services section for Academics, its people section for Team), use that section's design for it. If the template has nothing like one of them, add it in the same design language as the rest and put it where it fits. Template sections a school does not need (numbers, testimonials, partners, newsletter, gallery) stay on the page, rewritten for this school. Do not drop them.
 - Browser header: the browser tab must show the school logo. In <head> set <title>${schoolName}</title> and <link rel="icon" href="${logo || `https://placehold.co/64x64?text=${encodeURIComponent(schoolName)}`}">. Do not use any other icon.
 - This is one page only. Do not make a second page. Do not link to about.html, contact.html, or any other file.
 - Include a School Fees section with id="fees". Show the fees in Nigerian naira, using the ₦ sign, in a simple table or list.
 - Include a Team section with id="team". Introduce the people who run and teach at the school, with a name, a role, and a short note for each person.
 - Navbar header, on desktop and on a phone: the school logo image, then the school name, then at most 5 links that scroll to sections on this same page, then Apply and Login. Those five links are About, Academics, Team, Fees, and Contact. Do not add a sixth section link. Admissions can stay on the page, but it is not a navbar link. Each section has an id. Each header link uses that id, like href="#fees" for <section id="fees">. Those links must not open another page. The logo is required in the header. Use this exact image and do not replace it: ${logo ? `<img src="${logo}" alt="${schoolName} logo" style="height:40px;width:auto;object-fit:contain">` : `<img src="https://placehold.co/120x40?text=${encodeURIComponent(schoolName)}" alt="${schoolName} logo" style="height:40px;width:auto;object-fit:contain">`}
 - Always include one <header> at the top and one <footer> at the bottom.
-- If the template has a header, match its arrangement, spacing, and shape. If it has no header, still write one and style it so it belongs with the rest of the page.
+- Navbar look: if the template shows a navbar, copy it closely: where the logo, links and button sit, its height and spacing, how the links look, the shape of its button, and whether it sits over the hero or is a solid bar. The logo, school name, links, Apply and Login take the place of its content. If the template shows no navbar, write a simple one that belongs with the rest of the page. Either way it stays fixed to the top as described below.
 - If the template has a footer, match its columns and spacing. If it has no footer, still write one with the school name${school?.email || school?.phone_number || school?.address ? `, ${[school.email, school.phone_number, school.address].filter(Boolean).join(", ")}` : ""} and style it so it belongs with the rest of the page.
 - Put the header and footer colors, spacing, and type in style="" attributes on those elements.
 - The desktop navbar can stay as a row. Tablet and phone are where it usually breaks, so spend real care there. Do not leave the desktop link row squeezed onto a tablet or a phone. At max-width 1024px and at max-width 720px the navbar is one calm row: the school logo, the school name, and a 44px menu button on the right. The five section links, Apply, and Login are not in that row. Put the desktop links in <nav class="sclad-nav-desktop"> and hide that nav at max-width 1024px. Put the same links inside the menu as full-width rows with padding, and the menu drops under the bar. The bar does not wrap, overflow, or stack the links into a messy second line. Colors, type, and spacing still match the desktop navbar. Use this exact control:
@@ -529,7 +598,7 @@ ${sitePrompt ? `- The school asked for these sections and this content. Follow i
       { type: "image_url", image_url: { url: image } },
       {
         type: "text",
-        text: `The image is a template. It may not be one straight website. A long site may be divided into two and placed side by side. Use the layout and the design style, then write one scrolling page. Rewrite the words for ${schoolName}.${sitePrompt ? ` Include these sections and this content:\n${sitePrompt}` : ""} This is one page. Include a Team section and a School Fees section, and show fee amounts in ₦. The navbar has at most 5 section links: About, Academics, Team, Fees, and Contact. and each one scrolls to a section on this page with href="#section-id". They must not open another page. The browser tab header must show the school logo as its icon. The navbar header must show the school logo and it is position:fixed at the top, not absolute. Never use --sclad-primary as a text color. Titles and paragraphs use --sclad-ink. Words on a primary background are #ffffff. Do not put a title in the main color on a main-color background. Put every color in the variables --sclad-primary, --sclad-secondary, --sclad-accent, --sclad-background, and --sclad-ink, and use those variables in the styles so the scheme can be changed later. Include a header and a footer. The first section is the hero and it must be 100vh. Content images use object-fit:cover so they fill their frame. The school logo stays object-fit:contain. The page must be mobile responsive, and each section must slide up into view when the page loads. Desktop navbar: school logo, name, links that scroll to sections on this page, Apply (${applyHref}), Login (${loginHref}). On a tablet and on a phone, do not squeeze that desktop bar. Restyle it: one row with the school logo, the school name, and a menu button, and the section links, Apply, and Login open underneath as full rows. The tablet navbar needs the same care as the phone navbar. Start with <!doctype html>.`,
+        text: `The image is a template. It may not be one straight website. A long site may be divided into two and placed side by side. Use the layout and the design style of EVERY section, in the template's order, then write one scrolling page. Not only the hero: the cards, titles, columns, spacing and picture shapes of each section must look like the template's. Rewrite the words for ${schoolName}.${layoutMap ? `\n\nLayout map of the template (colors in it are ignored; use the school's color variables):\n${layoutMap}\n\n` : ""}${sitePrompt ? ` Content to include (words and topics only, the look comes from the template):\n${sitePrompt}\n` : ""} This is one page. Include a Team section and a School Fees section, and show fee amounts in ₦. The navbar has at most 5 section links: About, Academics, Team, Fees, and Contact. and each one scrolls to a section on this page with href="#section-id". They must not open another page. The browser tab header must show the school logo as its icon. The navbar header must show the school logo and it is position:fixed at the top, not absolute. Never use --sclad-primary as a text color. Titles and paragraphs use --sclad-ink. Words on a primary background are #ffffff. Do not put a title in the main color on a main-color background. Put every color in the variables --sclad-primary, --sclad-secondary, --sclad-accent, --sclad-background, and --sclad-ink, and use those variables in the styles so the scheme can be changed later. Include a header and a footer. The first section is the hero and it must be 100vh. Content images use object-fit:cover so they fill their frame. The school logo stays object-fit:contain. The page must be mobile responsive, and each section must slide up into view when the page loads. Desktop navbar: school logo, name, links that scroll to sections on this page, Apply (${applyHref}), Login (${loginHref}). On a tablet and on a phone, do not squeeze that desktop bar. Restyle it: one row with the school logo, the school name, and a menu button, and the section links, Apply, and Login open underneath as full rows. The tablet navbar needs the same care as the phone navbar. Start with <!doctype html>.`,
       },
     ];
     let codeText = await completeText({

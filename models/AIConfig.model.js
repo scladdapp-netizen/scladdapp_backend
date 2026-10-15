@@ -33,6 +33,10 @@ const aiConfigSchema = new mongoose.Schema(
     // Only one config per use should be active at a time
     is_active:   { type: Boolean, default: true },
 
+    // Order for features that allow several active models (School Assistant).
+    // Lowest number is tried first; the next one takes over when it runs out.
+    priority:    { type: Number, default: 100 },
+
     // Who created / last updated it
     created_by:  { type: String, default: null },
     updated_by:  { type: String, default: null },

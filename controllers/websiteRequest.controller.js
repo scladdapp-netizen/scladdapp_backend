@@ -3,6 +3,8 @@ const School           = require("../models/School.model");
 const { uploadToCloudinary } = require("../utils/cloudinary");
 const { buildSiteUrl, rewriteStoredSiteUrl } = require("../utils/siteUrl");
 const cloudinary       = require("cloudinary").v2;
+const jwt              = require("jsonwebtoken");
+const PortalAdmin      = require("../models/PortalAdmin.model");
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -263,11 +265,28 @@ function websiteDeleteUnlocksAt(doc) {
   return new Date(new Date(created).getTime() + WEBSITE_DELETE_WAIT_MS);
 }
 
+// A portal admin (the platform team, signed in to the admin portal) can delete a school's website
+// at any time. Their login token carries portal_admin_id; school logins never do. Schools
+// themselves still wait the 30 days.
+async function isPortalAdminRequest(req) {
+  const header = req.headers?.authorization || "";
+  if (!header.startsWith("Bearer ") || !process.env.JWT_SECRET) return false;
+  try {
+    const payload = jwt.verify(header.slice(7), process.env.JWT_SECRET);
+    if (!payload.portal_admin_id) return false;
+    const admin = await PortalAdmin.findOne({ portal_admin_id: String(payload.portal_admin_id) }).select("is_active").lean();
+    return !!admin && admin.is_active !== false;
+  } catch (_) {
+    return false;
+  }
+}
+
 exports.purge = async (req, res) => {
   try {
     const { schoolId } = req.params;
     const existing = await WebsiteRequest.findOne({ school_id: schoolId });
-    const unlocksAt = websiteDeleteUnlocksAt(existing);
+    const byPortalAdmin = await isPortalAdminRequest(req);
+    const unlocksAt = byPortalAdmin ? null : websiteDeleteUnlocksAt(existing);
 
     if (unlocksAt && Date.now() < unlocksAt.getTime()) {
       const when = unlocksAt.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });

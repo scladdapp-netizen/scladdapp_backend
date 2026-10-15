@@ -17,10 +17,16 @@ function cut(value, max) {
 }
 
 function layout({ title, schoolName, question, summary, columns, rows, note }) {
-  const cols = (columns || []).slice(0, 6);
+  const cols = (columns || []).slice(0, 8);
   const data = rows || [];
   const inner = PAGE_W - MARGIN * 2;
-  const widths = cols.map(() => (cols.length ? inner / cols.length : inner));
+  // Give each column room for its longest value (within limits) instead of equal slices.
+  const weights = cols.map((col) => {
+    const longest = data.slice(0, 200).reduce((max, row) => Math.max(max, String(row[col.key] ?? "").length), String(col.label || col.key || "").length);
+    return Math.min(34, Math.max(6, longest));
+  });
+  const weightTotal = weights.reduce((sum, value) => sum + value, 0) || 1;
+  const widths = weights.map((value) => (inner * value) / weightTotal);
   const pages = [];
   let lines = [];
   let y = PAGE_H - MARGIN;

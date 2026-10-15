@@ -110,8 +110,30 @@ const checkAIWebsiteEditorAccess = async (schoolId) => {
   return { allowed: true, plan_name: plan.plan_name };
 };
 
+/**
+ * School Assistant record look-ups (anything that reads the school's data) need a plan with
+ * ai_assistant switched on (Standard and Premium). Free, Basic and no active subscription
+ * only get how-to help.
+ */
+const checkAssistantDataAccess = async (schoolId) => {
+  const plan = await getPlan(schoolId);
+  const allowed = plan
+    ? (typeof plan.ai_assistant === "boolean" ? plan.ai_assistant : isStandardOrAbove(plan))
+    : false;
+  if (!allowed) {
+    return {
+      allowed: false,
+      code: "upgrade_required",
+      message: "That is advanced work and it is not supported in your current plan. Upgrade to Standard or Premium in [[Settings]] to use it.",
+      plan_name: plan?.plan_name || null,
+    };
+  }
+  return { allowed: true, plan_name: plan.plan_name };
+};
+
 module.exports = {
   getPlan,
+  checkAssistantDataAccess,
   checkStudentLimit,
   checkStaffLimit,
   checkSubAdminLimit,

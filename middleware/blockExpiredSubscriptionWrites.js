@@ -25,6 +25,10 @@ const ALLOW_PREFIXES = [
   "/uploads",
 ];
 
+// The School Assistant only reads data (it is a POST just to carry the question), and it
+// applies its own plan rules: no subscription behaves like the Free plan (help answers only).
+const ALLOW_PATTERNS = [/^\/api\/schools\/[^/]+\/ai-assistant(\/|$)/];
+
 const extractSchoolId = (req) => {
   const body = req.body || {};
   const params = req.params || {};
@@ -55,6 +59,7 @@ const extractSchoolIdFromAuth = (req) => {
 
 const isAllowlisted = (req) => {
   const url = String(req.originalUrl || req.url || "").split("?")[0];
+  if (ALLOW_PATTERNS.some((pattern) => pattern.test(url))) return true;
   return ALLOW_PREFIXES.some(
     (prefix) => url === prefix || url.startsWith(`${prefix}/`) || url.startsWith(prefix)
   );

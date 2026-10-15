@@ -16,15 +16,20 @@ async function openRouterChat({
   maxTokens,
   temperature = 0.2,
   messages,
+  responseFormat,
 }) {
   const tokens = Number(maxTokens);
   const limited = Number.isFinite(tokens) && tokens > 0;
-  const attempts = limited
+  const base = limited
     ? [
         { max_tokens: Math.max(16, Math.round(tokens)) },
         { max_completion_tokens: Math.max(16, Math.round(tokens)) },
       ]
     : [{}];
+  // Ask for JSON first; some models reject that, so the same attempts follow without it.
+  const attempts = responseFormat
+    ? [...base.map((extra) => ({ ...extra, response_format: responseFormat })), ...base]
+    : base;
   let lastErr;
   for (const extra of attempts) {
     try {
@@ -49,15 +54,24 @@ async function openRouterChat({
     } catch (err) {
       lastErr = err;
       const message = openRouterErrorMessage(err);
-      if (extra.max_tokens && /max_tokens|unsupported|not supported/i.test(message)) continue;
-      const error = new Error(message);
-      error.status = err?.response?.status || 500;
-      throw error;
+      const retriable = /max_tokens|unsupported|not supported|response_format|json mode|structured/i.test(message);
+      if (retriable && attempts.indexOf(extra) < attempts.length - 1) continue;
+      throw withStatus(err, message);
     }
   }
-  const error = new Error(openRouterErrorMessage(lastErr));
-  error.status = lastErr?.response?.status || 500;
-  throw error;
+  throw withStatus(lastErr, openRouterErrorMessage(lastErr));
+}
+
+/** Error with the HTTP status and, when OpenRouter says so, how long until the limit resets. */
+function withStatus(err, message) {
+  const error = new Error(message);
+  error.status = err?.response?.status || 500;
+  const headers = err?.response?.data?.error?.metadata?.headers || err?.response?.headers || {};
+  const reset = Number(headers["X-RateLimit-Reset"] ?? headers["x-ratelimit-reset"]);
+  const retryAfter = Number(headers["retry-after"] ?? headers["Retry-After"]);
+  if (Number.isFinite(reset) && reset > Date.now()) error.retryAfterMs = reset - Date.now();
+  else if (Number.isFinite(retryAfter) && retryAfter > 0) error.retryAfterMs = retryAfter * 1000;
+  return error;
 }
 
 module.exports = { openRouterChat };

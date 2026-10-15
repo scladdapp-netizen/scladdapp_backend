@@ -811,6 +811,19 @@ const sendReportResultEmail = async (studentId, subsessionId) => {
       replyTo: school?.email || undefined,
     });
 
+    try {
+      await StudentReportCard.updateOne(
+        { student_id: studentId, subsession_id: subsessionId },
+        { $set: {
+          result_emailed_at: new Date(),
+          result_email_status: result.sent ? "sent" : "queued",
+          result_email_to: recipient.email,
+        } }
+      );
+    } catch (logErr) {
+      console.warn("sendReportResultEmail: could not record the send:", logErr.message);
+    }
+
     return {
       success: true,
       data: {

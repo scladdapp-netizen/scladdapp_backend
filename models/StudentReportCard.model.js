@@ -22,6 +22,9 @@ const studentReportCardSchema = new mongoose.Schema(
     teacher_remark: { type: String, default: null },
     principal_remark: { type: String, default: null },
     is_published: { type: Boolean, default: false },
+    result_emailed_at: { type: Date, default: null },
+    result_email_status: { type: String, default: null }, // "sent" | "queued"
+    result_email_to: { type: String, default: null },
     updated_at: { type: Date, default: Date.now },
   },
   { timestamps: { createdAt: "created_at", updatedAt: false } }
