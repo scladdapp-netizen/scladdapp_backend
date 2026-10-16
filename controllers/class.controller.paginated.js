@@ -5,7 +5,7 @@ const Admission = require("../models/Admission.model");
 const getClassesBySchoolIdPaginated = async (req, res) => {
   try {
     const { schoolId } = req.params;
-    const { page = 1, limit = 20, search = "", searchField = "", sortBy = "created_at", sortOrder = "desc" } = req.query;
+    const { page = 1, limit = 20, search = "", searchField = "", sortBy = "created_at", sortOrder = "desc", status = "all" } = req.query;
 
     console.log(`Fetching paginated classes - School: ${schoolId}, Page: ${page}, Limit: ${limit}, Search: "${search}"`);
 
@@ -17,6 +17,17 @@ const getClassesBySchoolIdPaginated = async (req, res) => {
         ? regex
         : [{ class_name: regex }, { class_code: regex }, { class_section: regex }, { class_type: regex }];
     }
+
+    // Active / Inactive switch: counts (ignore search) + status filter
+    const baseScope = { school_id: schoolId };
+    const [activeCount, inactiveCount] = await Promise.all([
+      Class.countDocuments({ ...baseScope, is_active: { $ne: false } }),
+      Class.countDocuments({ ...baseScope, is_active: false }),
+    ]);
+    const counts = { active: activeCount, inactive: inactiveCount };
+    const statusFilter = String(status || "all").toLowerCase();
+    if (statusFilter === "active")   query.is_active = { $ne: false };
+    if (statusFilter === "inactive") query.is_active = false;
 
     const currentPage = parseInt(page);
     const recordsPerPage = parseInt(limit);
@@ -60,6 +71,7 @@ const getClassesBySchoolIdPaginated = async (req, res) => {
 
     return res.json({
       success: true,
+      counts,
       data: enriched,
       pagination: {
         currentPage,

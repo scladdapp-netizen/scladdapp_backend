@@ -847,6 +847,10 @@ async function runConversation(pool, question, history, schoolId, permissions) {
 
 /* ---------- route ---------- */
 
+// The assistant's model pool, shared with the website editor so both use the same free models.
+exports.activeConfigs = activeConfigs;
+exports.callModel = callModel;
+
 exports.ask = async (req, res) => {
   try {
     const { schoolId } = req.params;

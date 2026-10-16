@@ -473,6 +473,105 @@ exports.publish = async (req, res) => {
   }
 };
 
+// ── Edit the published HTML (portal admin only) ───────────────────────────────
+
+async function requirePortalAdmin(req, res) {
+  if (await isPortalAdminRequest(req)) return true;
+  res.status(403).json({ success: false, message: "Only the platform admin can edit a published site." });
+  return false;
+}
+
+/** Every published page with where its file lives. Older sites only have the home page mirror. */
+function publishedPageList(doc) {
+  const list = (doc?.published_pages || [])
+    .filter((p) => p?.html_cloudinary_url)
+    .map((p, i) => ({
+      id: p.id || `page_${i}`,
+      title: p.title || "Page",
+      slug: normalizePathSlug(p.slug),
+      order: p.order ?? i,
+      url: p.html_cloudinary_url,
+      publicId: p.html_cloudinary_public_id || null,
+    }));
+  if (!list.length && doc?.html_cloudinary_url) {
+    list.push({ id: "home", title: "Home", slug: "/", order: 0, url: doc.html_cloudinary_url, publicId: doc.html_cloudinary_public_id || null });
+  }
+  return list.sort((a, b) => a.order - b.order);
+}
+
+// GET  /api/schools/:schoolId/website-request/pages
+// The HTML of each published page, exactly as stored (before the serve-time additions).
+exports.getPages = async (req, res) => {
+  try {
+    if (!(await requirePortalAdmin(req, res))) return;
+    const doc = await WebsiteRequest.findOne({ school_id: req.params.schoolId }).lean();
+    const list = publishedPageList(doc);
+    const pages = await Promise.all(list.map(async (page) => {
+      const response = await fetch(page.url);
+      if (!response.ok) throw new Error(`Could not load the "${page.title}" page (${response.status}).`);
+      return { id: page.id, title: page.title, slug: page.slug, html: await response.text() };
+    }));
+    res.json({ success: true, data: { pages } });
+  } catch (err) {
+    console.error("[websiteRequest.getPages error]", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// PUT  /api/schools/:schoolId/website-request/pages   body: { slug, html }
+// Replaces one published page. The new file is uploaded first, then the pointer is switched, then
+// the old file is removed, so the live site is never left without a page.
+exports.savePage = async (req, res) => {
+  try {
+    if (!(await requirePortalAdmin(req, res))) return;
+    const { schoolId } = req.params;
+    const slug = normalizePathSlug(req.body?.slug);
+    const html = typeof req.body?.html === "string" ? req.body.html : "";
+    if (!html.trim()) {
+      return res.status(400).json({ success: false, message: "The page cannot be empty." });
+    }
+    if (Buffer.byteLength(html, "utf8") > 8 * 1024 * 1024) {
+      return res.status(413).json({ success: false, message: "That page is too large to save (over 8 MB)." });
+    }
+
+    const doc = await WebsiteRequest.findOne({ school_id: schoolId }).lean();
+    const list = publishedPageList(doc);
+    const current = list.find((p) => p.slug === slug);
+    if (!current) {
+      return res.status(404).json({ success: false, message: "That page is not published for this school." });
+    }
+
+    const { url, public_id } = await uploadToCloudinary(
+      Buffer.from(html, "utf8"),
+      `scladapp/websites/${schoolId}`,
+      "raw",
+      slugToFilename(slug)
+    );
+
+    const stored = (doc.published_pages || []).length > 0;
+    const set = {};
+    if (stored) {
+      set.published_pages = doc.published_pages.map((p) => (
+        normalizePathSlug(p.slug) === slug
+          ? { ...p, html_cloudinary_url: url, html_cloudinary_public_id: public_id || null }
+          : p
+      ));
+    }
+    if (slug === "/") {
+      set.html_cloudinary_url = url;
+      set.html_cloudinary_public_id = public_id || null;
+    }
+    await WebsiteRequest.updateOne({ school_id: schoolId }, { $set: set });
+
+    await destroyCloudinaryRawAsset({ url: current.url, publicId: current.publicId });
+
+    res.json({ success: true, message: "Page saved.", slug });
+  } catch (err) {
+    console.error("[websiteRequest.savePage error]", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 // GET  /sites/:slug  and  /sites/:slug/*pagePath  (also used for custom domain / subdomain hosts)
 // Fixes the hamburger menu toggle on mobile (iOS Safari / Android WebKit).
 // The old CSS used `pointer-events: none` on the hidden checkbox input, which

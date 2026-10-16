@@ -863,6 +863,8 @@ const getStudentDetail = async (studentId, schoolId) => {
           subsession_id:   sub.term_id,
           subsession_name: sub.term_name,
           term_status:     sub.term_status,
+          subsession_start_date: sub.term_start_date,
+          subsession_end_date:   sub.term_end_date,
         })),
       });
     }

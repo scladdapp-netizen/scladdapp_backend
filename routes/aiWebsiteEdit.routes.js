@@ -50,6 +50,7 @@ router.get    ("/:schoolId/ai-website/build-wait",    verifyToken, createCtrl.bu
 router.post   ("/:schoolId/ai-website/create-site",  verifyToken, createCtrl.createSite);
 router.post   ("/:schoolId/ai-website/add-page",     verifyToken, createCtrl.addPage);
 router.post   ("/:schoolId/ai-website/edit-page",    verifyToken, createCtrl.editPage);
+router.post   ("/:schoolId/ai-website/patch-page",   verifyToken, createCtrl.patchPage);
 router.get    ("/:schoolId/ai-website/live",         verifyToken, ctrl.getLiveHtml);
 router.get    ("/:schoolId/ai-website/draft",        verifyToken, ctrl.getDraft);
 router.patch  ("/:schoolId/ai-website/draft",        verifyToken, ctrl.saveDraft);

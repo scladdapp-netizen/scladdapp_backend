@@ -15,6 +15,8 @@ router.post(
   ]),
   ctrl.publish
 );
+router.get   ("/:schoolId/website-request/pages",    ctrl.getPages);           // published HTML (portal admin)
+router.put   ("/:schoolId/website-request/pages",    ctrl.savePage);           // save one page (portal admin)
 router.delete("/:schoolId/website-request",          ctrl.cancel);
 router.delete("/:schoolId/website-request/purge",    ctrl.purge);
 router.post  ("/:schoolId/website-request/custom-domain",        ctrl.setCustomDomain);

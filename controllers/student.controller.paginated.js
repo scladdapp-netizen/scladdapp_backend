@@ -8,7 +8,7 @@ const Session = require("../models/Session.model");
 const getStudentsBySchoolIdPaginated = async (req, res) => {
   try {
     const { schoolId } = req.params;
-    const { page = 1, limit = 20, search = "", searchField = "", sortBy = "admitted_date", sortOrder = "desc" } = req.query;
+    const { page = 1, limit = 20, search = "", searchField = "", sortBy = "admitted_date", sortOrder = "desc", status = "all" } = req.query;
 
     // Get all admissions for this school
     const schoolAdmissions = await Admission.find({ school_id: schoolId }).lean();
@@ -149,6 +149,17 @@ const getStudentsBySchoolIdPaginated = async (req, res) => {
       })
       .filter(Boolean);
 
+    // Counts for the Active / Inactive switch (before status filter and search)
+    const counts = {
+      active:   rows.filter((s) => s.status === "Active").length,
+      inactive: rows.filter((s) => s.status === "Inactive").length,
+    };
+
+    // Status filter: "active" | "inactive" | "all" (default keeps old behaviour)
+    const statusFilter = String(status || "all").toLowerCase();
+    if (statusFilter === "active")   rows = rows.filter((s) => s.status === "Active");
+    if (statusFilter === "inactive") rows = rows.filter((s) => s.status === "Inactive");
+
     // Search
     if (search && search.trim()) {
       const q = search.toLowerCase().trim();
@@ -182,6 +193,7 @@ const getStudentsBySchoolIdPaginated = async (req, res) => {
 
     return res.json({
       success: true,
+      counts,
       data: rows.slice(startIndex, startIndex + recordsPerPage),
       pagination: {
         currentPage, totalPages, totalRecords, recordsPerPage,

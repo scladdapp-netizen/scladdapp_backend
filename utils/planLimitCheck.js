@@ -103,7 +103,7 @@ const checkAIWebsiteEditorAccess = async (schoolId) => {
       allowed: false,
       code: "upgrade_required",
       error: "Plan upgrade required",
-      message: "Upgrade your plan to use AI. Standard Plan or above is required.",
+      message: "Upgrade to the Standard or Premium plan to use AI to edit your site.",
       plan_name: plan?.plan_name || null,
     };
   }

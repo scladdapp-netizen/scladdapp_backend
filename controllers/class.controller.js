@@ -59,6 +59,8 @@ const getClassDetail = async (classId) => {
       const subsessions = await Subsession.find({
         session_id: session.session_id,
         term_end_date: { $gte: classCreatedDate.toISOString().split("T")[0] },
+        // Only terms that have already started (active + past); upcoming terms are hidden
+        $or: [{ term_start_date: { $lte: new Date().toLocaleDateString("en-CA") } }, { term_start_date: null }],
       }).lean();
 
       if (subsessions.length === 0) continue;
@@ -71,6 +73,8 @@ const getClassDetail = async (classId) => {
         subsessions: subsessions.map((sub) => ({
           subsession_id:   sub.term_id,
           subsession_name: sub.term_name,
+          subsession_start_date: sub.term_start_date,
+          subsession_end_date:   sub.term_end_date,
         })),
       });
     }

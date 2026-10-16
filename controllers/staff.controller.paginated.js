@@ -3,7 +3,7 @@ const Staff = require("../models/Staff.model");
 const getStaffBySchoolIdPaginated = async (req, res) => {
   try {
     const { schoolId } = req.params;
-    const { page = 1, limit = 20, search = "", searchField = "", sortBy = "created_at", sortOrder = "desc" } = req.query;
+    const { page = 1, limit = 20, search = "", searchField = "", sortBy = "created_at", sortOrder = "desc", status = "all" } = req.query;
 
     const query = { school_id: schoolId };
     if (search && search.trim()) {
@@ -12,6 +12,17 @@ const getStaffBySchoolIdPaginated = async (req, res) => {
         ? regex
         : [{ full_name: regex }, { email: regex }, { position: regex }, { department: regex }, { staff_id: regex }];
     }
+
+    // Active / Inactive switch: counts (ignore search) + status filter
+    const baseScope = { school_id: schoolId };
+    const [activeCount, inactiveCount] = await Promise.all([
+      Staff.countDocuments({ ...baseScope, is_active: { $ne: false } }),
+      Staff.countDocuments({ ...baseScope, is_active: false }),
+    ]);
+    const counts = { active: activeCount, inactive: inactiveCount };
+    const statusFilter = String(status || "all").toLowerCase();
+    if (statusFilter === "active")   query.is_active = { $ne: false };
+    if (statusFilter === "inactive") query.is_active = false;
 
     const currentPage    = parseInt(page);
     const recordsPerPage = parseInt(limit);
@@ -28,6 +39,7 @@ const getStaffBySchoolIdPaginated = async (req, res) => {
 
     return res.json({
       success: true,
+      counts,
       data: staff,
       pagination: {
         currentPage,

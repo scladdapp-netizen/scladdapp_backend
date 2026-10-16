@@ -15,6 +15,17 @@ const getSubjectsPaginated = async (schoolId, params) => {
       query.$or = [{ subject_name: regex }, { subject_code: regex }, { subject_description: regex }];
     }
 
+    // Active / Inactive switch: counts (ignore search) + status filter
+    const baseScope = { school_id: schoolId };
+    const [activeCount, inactiveCount] = await Promise.all([
+      Subject.countDocuments({ ...baseScope, is_active: { $ne: false } }),
+      Subject.countDocuments({ ...baseScope, is_active: false }),
+    ]);
+    const counts = { active: activeCount, inactive: inactiveCount };
+    const statusFilter = String(params.status || "all").toLowerCase();
+    if (statusFilter === "active")   query.is_active = { $ne: false };
+    if (statusFilter === "inactive") query.is_active = false;
+
     const totalItems = await Subject.countDocuments(query);
     const totalPages = Math.ceil(totalItems / limit);
     const startIndex = (page - 1) * limit;
@@ -48,6 +59,7 @@ const getSubjectsPaginated = async (schoolId, params) => {
 
     return {
       success: true,
+      counts,
       data: enriched,
       pagination: { currentPage: page, totalPages, totalItems, itemsPerPage: limit, hasNextPage: page < totalPages, hasPrevPage: page > 1 },
       message: "Subjects retrieved successfully",

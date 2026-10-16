@@ -12,6 +12,7 @@ const getAdminsBySchoolIdPaginated = async (req, res) => {
       searchField = "",
       sortBy = "created_at",
       sortOrder = "desc",
+      status = "all",
     } = req.query;
 
     console.log(`Fetching paginated admins - School: ${schoolId}, Page: ${page}, Limit: ${limit}, Search: "${search}"`);
@@ -32,6 +33,17 @@ const getAdminsBySchoolIdPaginated = async (req, res) => {
         ];
       }
     }
+
+    // Active / Inactive switch: counts (ignore search) + status filter
+    const baseScope = { school_id: schoolId };
+    const [activeCount, inactiveCount] = await Promise.all([
+      Admin.countDocuments({ ...baseScope, is_active: { $ne: false } }),
+      Admin.countDocuments({ ...baseScope, is_active: false }),
+    ]);
+    const counts = { active: activeCount, inactive: inactiveCount };
+    const statusFilter = String(status || "all").toLowerCase();
+    if (statusFilter === "active")   query.is_active = { $ne: false };
+    if (statusFilter === "inactive") query.is_active = false;
 
     // Step 2: Sort
     const sortDir = sortOrder === "asc" ? 1 : -1;
@@ -86,6 +98,7 @@ const getAdminsBySchoolIdPaginated = async (req, res) => {
 
     return res.json({
       success: true,
+      counts,
       data: enriched,
       pagination: {
         currentPage,

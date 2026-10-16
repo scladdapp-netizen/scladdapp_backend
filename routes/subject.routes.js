@@ -60,6 +60,7 @@ router.get("/school/:schoolId/paginated", async (req, res) => {
       search: req.query.search,
       sortBy: req.query.sortBy,
       sortOrder: req.query.sortOrder,
+      status: req.query.status,
     };
     const result = await getSubjectsPaginated(req.params.schoolId, params);
     res.status(result.success ? 200 : 400).json(result);

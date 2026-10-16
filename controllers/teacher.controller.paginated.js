@@ -5,7 +5,7 @@ const Admin = require("../models/Admin.model");
 const getTeachersBySchoolIdPaginated = async (req, res) => {
   try {
     const { schoolId } = req.params;
-    const { page = 1, limit = 20, search = "", searchField = "", sortBy = "appointed_at", sortOrder = "desc" } = req.query;
+    const { page = 1, limit = 20, search = "", searchField = "", sortBy = "appointed_at", sortOrder = "desc", status = "all" } = req.query;
 
     console.log(`Fetching paginated teachers - School: ${schoolId}, Page: ${page}, Limit: ${limit}, Search: "${search}"`);
 
@@ -40,6 +40,15 @@ const getTeachersBySchoolIdPaginated = async (req, res) => {
       };
     });
 
+    // Active / Inactive switch: counts (ignore search) + status filter
+    const counts = {
+      active:   enriched.filter((t) => t.is_active !== false).length,
+      inactive: enriched.filter((t) => t.is_active === false).length,
+    };
+    const statusFilter = String(status || "all").toLowerCase();
+    if (statusFilter === "active")   enriched = enriched.filter((t) => t.is_active !== false);
+    if (statusFilter === "inactive") enriched = enriched.filter((t) => t.is_active === false);
+
     // Search
     if (search && search.trim()) {
       const q = search.toLowerCase().trim();
@@ -66,6 +75,7 @@ const getTeachersBySchoolIdPaginated = async (req, res) => {
 
     return res.json({
       success: true,
+      counts,
       data: paged,
       pagination: {
         currentPage, totalPages, totalRecords, recordsPerPage,

@@ -6,6 +6,21 @@ const { getMessageText, hasReasoningOnly, extractJsonFromText } = require("../ut
 const { openRouterChat } = require("../utils/openRouterChat");
 const { groqChat } = require("../utils/groqChat");
 const { siteBriefFor } = require("../utils/siteBrief");
+const { splitLines, numberLines, applyOps, isBalanced } = require("../utils/htmlPatch");
+const { checkAIWebsiteEditorAccess } = require("../utils/planLimitCheck");
+
+/** AI editing of a site is for Standard and Premium. Sends the upgrade message and returns false otherwise. */
+async function allowAiEdit(schoolId, res) {
+  const access = await checkAIWebsiteEditorAccess(schoolId);
+  if (access.allowed) return true;
+  res.status(403).json({
+    success: false,
+    code: access.code || "upgrade_required",
+    message: access.message,
+    plan_name: access.plan_name,
+  });
+  return false;
+}
 
 async function activeConfig(use) {
   const config = await AIConfig.findOne({ use: usesForFeature(use), is_active: true });
@@ -1084,10 +1099,186 @@ Do not return the rest of the page or an explanation.`;
   return restoreImages(piece, images);
 }
 
+/** Store one edited page in the school's draft. */
+async function saveDraftPage(schoolId, pageId, nextHtml) {
+  const existing = await WebsiteRequest.findOne({ school_id: schoolId }).lean();
+  const draftPages = Array.isArray(existing?.draft_pages) ? existing.draft_pages : [];
+  const nextPages = draftPages.length
+    ? draftPages.map((item) => (
+        item.id === pageId || item.slug === "/" && pageId === "home"
+          ? { ...item, html: nextHtml }
+          : item
+      ))
+    : [{ id: "home", title: "Home", slug: "/", order: 0, html: nextHtml }];
+  const matched = nextPages.some((item) => item.html === nextHtml);
+  if (!matched) nextPages[0] = { ...nextPages[0], html: nextHtml };
+  await WebsiteRequest.findOneAndUpdate(
+    { school_id: schoolId },
+    { $set: { school_id: schoolId, draft_html: nextPages.find((item) => item.slug === "/" || item.id === "home")?.html || nextHtml, draft_pages: nextPages } },
+    { upsert: true, setDefaultsOnInsert: true, runValidators: false },
+  );
+}
+
+const PATCH_SYSTEM = `You edit ONE selected item on a school website by sending small PATCH operations. You never send back the item or the page.
+You get the item's code cut into numbered lines ("N| code"). The numbers and indentation are only labels, not part of the code.
+Reply with ONE JSON object and nothing else:
+{"ops":[ ... ],"note":"one short sentence saying what you changed"}
+Each operation is one of:
+{"op":"remove","from":A,"to":B}                 delete lines A to B
+{"op":"add","after":N,"html":"<new code>"}      insert new code after line N (0 = before line 1)
+{"op":"replace","from":A,"to":B,"html":"<new code>"}   delete lines A to B and put new code there (remove + add together)
+Rules:
+- Change only what the request asks. Every line you do not name stays exactly as it is, so never remove or rewrite anything else.
+- All line numbers are from the listing you were given. Do not renumber after earlier operations.
+- Line 1 opens the selected item and the last line closes it. To add something next to the item, add after the last line (or after 0 for before it). To add something inside it, add after a line inside it.
+- Keep tags balanced: a remove or replace must run from an element's opening line to its own closing line, never half of an element.
+- To change one element's text or look, replace only that element's lines and keep its other attributes.
+- New code is plain HTML for that spot only. Style it with inline style="" attributes like the lines around it, not with classes you cannot see. Keep every {{IMG_0}} style token exactly as written. Never write base64 or invent image data.
+- Operations must not overlap.
+- If the request is a question or greeting and not an edit, send {"ops":[],"note":"your short reply"}.`;
+
+function patchReplyText(completion) {
+  const message = completion?.choices?.[0]?.message;
+  const text = getMessageText(message);
+  if (text) return text;
+  if (typeof message?.reasoning === "string") return message.reasoning.trim();
+  return "";
+}
+
+function patchError(message, status = 400) {
+  const error = new Error(message);
+  error.status = status;
+  return error;
+}
+
+/**
+ * Ask the School Assistant models for a patch to the selected piece and apply it.
+ * Returns the patched piece (images still parked), or no changes when the AI only replied.
+ */
+async function patchFragment({ prompt, target, original }) {
+  const { activeConfigs, callModel } = require("./schoolAssistant.controller");
+  const pool = await activeConfigs();
+  if (!pool.length) throw patchError("No School Assistant model is turned on. Turn one on in AI Config.", 503);
+
+  const { html: parked, images } = parkImages(original);
+  const lines = splitLines(parked);
+  const listing = numberLines(lines);
+  if (listing.length > 24000) {
+    throw patchError("That part is too large for a quick edit. Click a smaller item inside it.");
+  }
+  const mustBalance = isBalanced(parked);
+  const label = String(target?.label || "").slice(0, 80);
+  const words = String(target?.text || "").replace(/\s+/g, " ").trim().slice(0, 160);
+  const base = [
+    { role: "system", content: PATCH_SYSTEM },
+    {
+      role: "user",
+      content: `Request: ${prompt}\nSelected item: ${label || "element"}${words ? `\nIts words: "${words}"` : ""}\n\nCode (${lines.length} lines):\n${listing}`,
+    },
+  ];
+  const maxTokens = 2500;
+
+  let thread = base;
+  let problem = "";
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const completion = await callModel(pool, {
+      maxTokens,
+      temperature: 0.1,
+      messages: thread,
+      reasoningEffort: "low",
+      responseFormat: attempt === 0 ? { type: "json_object" } : undefined,
+    });
+    const text = patchReplyText(completion);
+    const parsed = extractJsonFromText(text);
+    const reply = parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : null;
+    if (!reply || !Array.isArray(reply.ops)) {
+      problem = "the reply was not the JSON object with an \"ops\" list";
+      thread = [...base, { role: "assistant", content: text.slice(0, 600) }, { role: "user", content: "Reply again with one JSON object only: {\"ops\":[...],\"note\":\"...\"}." }];
+      continue;
+    }
+    const note = String(reply.note || "").trim().slice(0, 240);
+    if (!reply.ops.length) return { changes: [], note, images };
+    try {
+      const result = applyOps(lines, reply.ops);
+      if (mustBalance && !isBalanced(result.html)) {
+        throw new Error("That leaves a tag open or closed without its partner. Remove or replace whole elements, from the opening line to its own closing line.");
+      }
+      if (result.html === parked) throw new Error("That changes nothing.");
+      return { html: result.html, changes: result.changes, note, images };
+    } catch (err) {
+      problem = err.message;
+      console.warn(`[AI-SITE-PATCH] rejected ops (attempt ${attempt + 1}): ${problem}`);
+      thread = [
+        ...base,
+        { role: "assistant", content: JSON.stringify({ ops: reply.ops, note }).slice(0, 1500) },
+        { role: "user", content: `Those operations were rejected: ${problem} Send corrected operations using the original line numbers.` },
+      ];
+    }
+  }
+  throw patchError(`The AI could not make a safe edit (${problem}). Try wording it differently.`);
+}
+
+function describeChanges(changes) {
+  const span = (op) => (op.from === op.to ? `line ${op.from}` : `lines ${op.from} to ${op.to}`);
+  return changes.map((op) => {
+    if (op.op === "remove") return `Removed ${span(op)}`;
+    if (op.op === "replace") return `Replaced ${span(op)}`;
+    return op.after === 0 ? "Added before line 1" : `Added after line ${op.after}`;
+  });
+}
+
+exports.patchPage = async (req, res) => {
+  const tag = "[AI-SITE-PATCH]";
+  try {
+    const { schoolId } = req.params;
+    if (!(await allowAiEdit(schoolId, res))) return;
+    const html = String(req.body.html || "");
+    const prompt = String(req.body.prompt || "").trim().slice(0, 1000);
+    const pageId = String(req.body.pageId || "home");
+    const marker = String(req.body.targetId || "").replace(/[^a-zA-Z0-9_-]/g, "");
+    if (!prompt) throw patchError("Tell the AI what to change.");
+    if (!html.trim()) throw patchError("There is no page to edit.");
+    if (!marker) throw patchError("Click the item you want to change, then send again.");
+
+    const original = elementByMarker(html, marker);
+    if (!original) throw patchError("Select that item again. It is no longer on the page.");
+    const start = html.indexOf(original);
+
+    const patched = await patchFragment({
+      prompt,
+      target: req.body.target,
+      original: stripEditMarkers(original),
+    });
+    if (!patched.changes.length) {
+      return res.json({ success: true, chat: true, message: patched.note || "I did not change anything." });
+    }
+    console.log(`${tag} ${JSON.stringify(patched.changes).slice(0, 600)}`);
+
+    const piece = restoreImages(patched.html, patched.images);
+    // Only the selected piece changes; the rest of the page is spliced back byte for byte.
+    const nextHtml = stripEditMarkers(html.slice(0, start) + piece + html.slice(start + original.length));
+    await saveDraftPage(schoolId, pageId, nextHtml);
+    return res.json({
+      success: true,
+      html: nextHtml,
+      note: patched.note,
+      changes: describeChanges(patched.changes),
+    });
+  } catch (err) {
+    console.error(`${tag}`, err.message);
+    const status = err.status || 500;
+    const message = status === 429
+      ? "The AI models are busy right now. Try again in a minute."
+      : (err.message || "Could not edit the page.");
+    return res.status(status).json({ success: false, message });
+  }
+};
+
 exports.editPage = async (req, res) => {
   const tag = "[AI-SITE-EDIT]";
   try {
     const { schoolId } = req.params;
+    if (!(await allowAiEdit(schoolId, res))) return;
     const html = String(req.body.html || "");
     const prompt = String(req.body.prompt || "").trim();
     const pageId = String(req.body.pageId || "home");
@@ -1119,22 +1310,7 @@ exports.editPage = async (req, res) => {
     }
     nextHtml = stripEditMarkers(ensureMobile(nextHtml));
 
-    const existing = await WebsiteRequest.findOne({ school_id: schoolId }).lean();
-    const draftPages = Array.isArray(existing?.draft_pages) ? existing.draft_pages : [];
-    const nextPages = draftPages.length
-      ? draftPages.map((item) => (
-          item.id === pageId || item.slug === "/" && pageId === "home"
-            ? { ...item, html: nextHtml }
-            : item
-        ))
-      : [{ id: "home", title: "Home", slug: "/", order: 0, html: nextHtml }];
-    const matched = nextPages.some((item) => item.html === nextHtml);
-    if (!matched) nextPages[0] = { ...nextPages[0], html: nextHtml };
-    await WebsiteRequest.findOneAndUpdate(
-      { school_id: schoolId },
-      { $set: { school_id: schoolId, draft_html: nextPages.find((item) => item.slug === "/" || item.id === "home")?.html || nextHtml, draft_pages: nextPages } },
-      { upsert: true, setDefaultsOnInsert: true, runValidators: false },
-    );
+    await saveDraftPage(schoolId, pageId, nextHtml);
     return res.json({ success: true, html: nextHtml });
   } catch (err) {
     console.error(`${tag}`, err);

@@ -63,6 +63,8 @@ const getSubjectDetail = async (subjectId) => {
       const subsessions = await Subsession.find({
         session_id:    session.session_id,
         term_end_date: { $gte: createdStr },
+        // Only terms that have already started (active + past); upcoming terms are hidden
+        $or: [{ term_start_date: { $lte: new Date().toLocaleDateString("en-CA") } }, { term_start_date: null }],
       }).lean();
       if (!subsessions.length) continue;
       validSessions.push({
@@ -70,7 +72,7 @@ const getSubjectDetail = async (subjectId) => {
         session_name:       session.session_name,
         session_start_date: session.academic_year_start_date,
         session_end_date:   session.academic_year_end_date,
-        subsessions: subsessions.map((s) => ({ subsession_id: s.term_id, subsession_name: s.term_name })),
+        subsessions: subsessions.map((s) => ({ subsession_id: s.term_id, subsession_name: s.term_name, subsession_start_date: s.term_start_date, subsession_end_date: s.term_end_date })),
       });
     }
 
