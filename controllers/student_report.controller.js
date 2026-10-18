@@ -91,10 +91,10 @@ const getClassAverage = async (subsessionId, classId) => {
 
     let totalStudentsInClass = 0;
     if (classId) {
-      const classAssignments = await StudentClassAssignment.find({ class_id: classId, session_id: subsession.session_id }).lean();
+      const classAssignments = await StudentClassAssignment.find({ class_id: classId, session_id: subsession.session_id, is_active: true }).lean();
       const studentIdsInClass = new Set(classAssignments.map((a) => a.student_id));
       records = records.filter((s) => studentIdsInClass.has(s.student_id));
-      totalStudentsInClass = classAssignments.length;
+      totalStudentsInClass = studentIdsInClass.size;
     }
 
     if (records.length === 0) return { success: true, data: { average: 0, student_count: 0, class_id: classId || null } };
@@ -480,7 +480,7 @@ const getPreviewData = async (studentId, subsessionId) => {
 
     // Positions
     const classAssignments = classId
-      ? await StudentClassAssignment.find({ class_id: classId, session_id: subsession.session_id }).lean()
+      ? await StudentClassAssignment.find({ class_id: classId, session_id: subsession.session_id, is_active: true }).lean()
       : [];
     const studentIdsInClass = new Set(classAssignments.map((a) => a.student_id));
     const classRecords = await StudentScore.find({ subsession_id: subsessionId, student_id: { $in: [...studentIdsInClass] } }).lean();
@@ -542,7 +542,7 @@ const getPreviewData = async (studentId, subsessionId) => {
       schoolLogo:      school?.logo_url || null,
       subjects,
       attendance:      { opened: attOpened, present: attPresent, absent: attAbsent, excused: attExcused, rate: attRate },
-      position:        overallPos > 0 ? `${overallPos} / ${rankings.length}` : "—",
+      position:        overallPos > 0 ? `${overallPos} / ${studentIdsInClass.size || rankings.length}` : "—",
       traits:          traitRec?.traits || {},
       teacherRemark:   reportCard?.teacher_remark   || null,
       principalRemark: reportCard?.principal_remark || null,
@@ -566,8 +566,11 @@ const getScoresBySubjectSubsession = async (subjectId, subsessionId, params = {}
     const sessionId = subsession?.session_id || null;
 
     const classIdsWithSubject = await ClassSubjectAssignment.distinct("class_id", { subject_id: subjectId, is_active: true });
+    const classIds = params.classId
+      ? classIdsWithSubject.filter((id) => String(id) === String(params.classId))
+      : classIdsWithSubject;
 
-    const query = { class_id: { $in: classIdsWithSubject }, is_active: true };
+    const query = { class_id: { $in: classIds }, is_active: true };
     if (sessionId) query.session_id = sessionId;
     const studentAssignments = await StudentClassAssignment.find(query).lean();
 

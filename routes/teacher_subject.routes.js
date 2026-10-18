@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   assignTeacherToSubject,
+  getTeacherSubjectAssignmentById,
   getTeacherSubjectAssignments,
   getActiveTeacherSubjectAssignmentsBySchool,
   updateTeacherSubjectAssignment,
@@ -9,19 +10,14 @@ const {
   getAssignmentsByTeacher,
   deleteTeacherSubjectAssignment,
 } = require("../controllers/teacher_subject.controller");
-const path = require("path");
-const { readData } = require("../utils/file");
-
 /**
  * GET /teacher-subject/assignment/:assignmentId
  * Get a single assignment by ID
  */
-router.get("/assignment/:assignmentId", (req, res) => {
+router.get("/assignment/:assignmentId", async (req, res) => {
   try {
-    const assignments = readData(path.join(__dirname, "../data/teacher_subject_assignments.json"));
-    const assignment = assignments.find((a) => a.assignment_id === req.params.assignmentId);
-    if (!assignment) return res.status(404).json({ success: false, message: "Assignment not found" });
-    res.json({ success: true, data: assignment });
+    const result = await getTeacherSubjectAssignmentById(req.params.assignmentId);
+    res.status(result.success ? 200 : 404).json(result);
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

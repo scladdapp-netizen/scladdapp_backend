@@ -20,15 +20,18 @@ const assignTeacherToSubject = async (assignmentData) => {
     });
     if (duplicate) return { success: false, error: "Duplicate assignment", message: "This teacher already has an active assignment for this subject in this class." };
 
-    // Block if another teacher already active for this subject+class
-    const classAlreadyTaken = await TeacherSubjectAssignment.findOne({
-      subject_id: assignmentData.subject_id,
-      class_id:   assignmentData.class_id,
-      teacher_id: { $ne: assignmentData.teacher_id },
-      is_active:  true,
-    });
-    if (classAlreadyTaken) {
-      return { success: false, error: "Class already assigned", message: `This class already has an active teacher (${classAlreadyTaken.teacher_name}). Deactivate the current assignment first.` };
+    // Replace any other active teacher on this subject+class
+    if (assignmentData.class_id) {
+      const today = new Date().toISOString().split("T")[0];
+      await TeacherSubjectAssignment.updateMany(
+        {
+          subject_id: assignmentData.subject_id,
+          class_id:   assignmentData.class_id,
+          teacher_id: { $ne: assignmentData.teacher_id },
+          is_active:  true,
+        },
+        { $set: { is_active: false, end_date: today, updated_at: new Date() } }
+      );
     }
 
     const teacher = await Teacher.findOne({ teacher_id: assignmentData.teacher_id }).lean();
@@ -67,6 +70,16 @@ const assignTeacherToSubject = async (assignmentData) => {
   } catch (error) {
     console.error("Assign teacher to subject error:", error);
     return { success: false, error: "Assignment failed", message: error.message || "Failed to assign teacher to subject" };
+  }
+};
+
+const getTeacherSubjectAssignmentById = async (assignmentId) => {
+  try {
+    const assignment = await TeacherSubjectAssignment.findOne({ assignment_id: String(assignmentId) }).lean();
+    if (!assignment) return { success: false, message: "Assignment not found" };
+    return { success: true, data: assignment };
+  } catch (error) {
+    return { success: false, message: error.message || "Failed to retrieve assignment" };
   }
 };
 
@@ -184,6 +197,7 @@ const deleteTeacherSubjectAssignment = async (assignmentId) => {
 
 module.exports = {
   assignTeacherToSubject,
+  getTeacherSubjectAssignmentById,
   getTeacherSubjectAssignments,
   getActiveTeacherSubjectAssignmentsBySchool,
   updateTeacherSubjectAssignment,
