@@ -131,6 +131,23 @@ const checkAssistantDataAccess = async (schoolId) => {
   return { allowed: true, plan_name: plan.plan_name };
 };
 
+/**
+ * Publishing a CBT test is included on Standard and Premium only.
+ * Sitting a test that is already published is not checked here.
+ */
+const checkCbtAccess = async (schoolId) => {
+  const plan = await getPlan(schoolId);
+  if (!isStandardOrAbove(plan)) {
+    return {
+      allowed: false,
+      code: "upgrade_required",
+      message: "Upgrade from Basic Plan to Standard Plan to publish a CBT test.",
+      plan_name: plan?.plan_name || null,
+    };
+  }
+  return { allowed: true, plan_name: plan.plan_name };
+};
+
 module.exports = {
   getPlan,
   checkAssistantDataAccess,
@@ -139,5 +156,6 @@ module.exports = {
   checkSubAdminLimit,
   checkAITimetableAccess,
   checkAIWebsiteEditorAccess,
+  checkCbtAccess,
   isStandardOrAbove,
 };

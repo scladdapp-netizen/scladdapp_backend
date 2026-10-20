@@ -18,6 +18,8 @@ const ALLOW_PREFIXES = [
   "/api/support-tickets",
   "/api/app-feedback",
   "/api/otp",
+  // Students finish a test that was already published even if the plan changes afterwards.
+  "/api/cbt/exam",
   "/api/contact",
   "/api/gmail",
   "/api/download-proxy",

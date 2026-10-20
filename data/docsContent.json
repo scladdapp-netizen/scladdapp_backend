@@ -1057,6 +1057,10 @@
               },
               {
                 "type": "paragraph",
+                "text": "ID card template - publishing a design with Save cards is included on the Standard Plan and the Premium Plan. On the Free plan, the Basic Plan, or with no plan, Save cards shows: Upgrade from Basic Plan to Standard Plan to make changes in the ID card template. The draft stays on screen, and cards already published keep printing."
+              },
+              {
+                "type": "paragraph",
                 "text": "Click Upgrade Plan in the message to jump straight to the Upgrade/Downgrade tab, or Maybe Later to close it."
               }
             ]
@@ -3419,6 +3423,216 @@
             "text": "The School page holds your school's identity, files and photos, and the Settings page holds your subscription and system preferences. This guide covers every tab and field. Required fields are marked with *."
           }
         ]
+      },
+      {
+        "id": "id-cards",
+        "title": "ID Cards",
+        "content": "Design student and staff ID cards, then print them from the school directory. Student ID and Staff ID share one list of designs. Each side can use a different design, and the card is filled from that person's record. If the school has not edited a card yet, both sides start on the Modern Green design.",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Design student and staff ID cards, then print them from the school directory. Student ID and Staff ID share one list of designs. Each side can use a different design, and the card is filled from that person's record. If the school has not edited a card yet, both sides start on the Modern Green design."
+          }
+        ],
+        "steps": [
+          {
+            "step": "Open ID cards",
+            "desc": "In the school directory, open ID Cards. Choose Student or Staff, select the people, and download their cards. Open the template editor to change the design those cards use.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "In the school directory, open ID Cards. Choose Student or Staff, select the people, and download their cards. Open the template editor to change the design those cards use."
+              },
+              {
+                "type": "paragraph",
+                "text": "A card download from a student or staff profile uses the design saved for that side."
+              }
+            ]
+          },
+          {
+            "step": "The first design",
+            "desc": "Until someone saves a custom card, both Student ID and Staff ID use Modern Green. It is a landscape CR80 card with a green header, the school logo, the photograph, the person's name, class or job title, ID number, session, and a QR code.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Until someone saves a custom card, both Student ID and Staff ID use Modern Green. It is a landscape CR80 card with a green header, the school logo, the photograph, the person's name, class or job title, ID number, session, and a QR code."
+              },
+              {
+                "type": "paragraph",
+                "text": "After a design is saved, that saved design stays. Opening the editor again does not replace it with Modern Green."
+              }
+            ]
+          },
+          {
+            "step": "Student ID and Staff ID",
+            "desc": "The header switch chooses which side you are editing. Both sides show the same saved templates and the same starting designs. The outlined row is the design selected for the side you are on.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The header switch chooses which side you are editing. Both sides show the same saved templates and the same starting designs. The outlined row is the design selected for the side you are on."
+              },
+              {
+                "type": "paragraph",
+                "text": "Picking a template assigns it only to the current side. Student cards and staff cards can use different designs, or the same one."
+              },
+              {
+                "type": "paragraph",
+                "text": "On a staff card the title reads STAFF ID. Class becomes the job title, class arm becomes the department, and the admission number becomes the employee ID. A student card shows STUDENT ID, class, class arm, and the admission number."
+              },
+              {
+                "type": "paragraph",
+                "text": "Edits are kept as a draft and do not change the cards people download. Save cards publishes that draft, and printed cards and profile downloads then use it."
+              }
+            ]
+          },
+          {
+            "step": "Plan required to publish a design",
+            "desc": "Publishing an ID card design is included on the Standard Plan and the Premium Plan. On the Free plan, the Basic Plan, or when the school has no plan, Save cards does not publish. The message is: Upgrade from Basic Plan to Standard Plan to make changes in the ID card template.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Publishing an ID card design is included on the Standard Plan and the Premium Plan. On the Free plan, the Basic Plan, or when the school has no plan, Save cards does not publish. The message is: Upgrade from Basic Plan to Standard Plan to make changes in the ID card template."
+              },
+              {
+                "type": "paragraph",
+                "text": "You can still change the draft on screen. Cards that are already published keep printing and downloading. Upgrade from Settings, then Subscriptions, and click Save cards again to make the draft live."
+              }
+            ]
+          },
+          {
+            "step": "Details taken from the record",
+            "desc": "Person fields read the student or staff record. A field stays blank on the card when that record has no value for it. You can place each of these from Elements, under Person, or choose it as the Data field of a text box.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Person fields read the student or staff record. A field stays blank on the card when that record has no value for it. You can place each of these from Elements, under Person, or choose it as the Data field of a text box."
+              },
+              {
+                "type": "paragraph",
+                "text": "Both sides can show full name, photograph, phone number, email, address, date of birth, gender, blood group, emergency contact, and emergency phone."
+              },
+              {
+                "type": "paragraph",
+                "text": "A student card can also show admission number, class, class arm, and academic session."
+              },
+              {
+                "type": "paragraph",
+                "text": "A staff card can also show employee ID, job title, department, qualification, and joining date."
+              },
+              {
+                "type": "paragraph",
+                "text": "School name, school logo, school address, school phone, school website, and the motto come from the school profile. Issue date and expiry date come from the card, not from the person."
+              },
+              {
+                "type": "paragraph",
+                "text": "While you edit, the card shows a real person from the school so you can see the wording. Preview lets you pick which record to check. In the platform template editor the sample student is Amina Adudakar and the sample staff member is Ibrahim Musa."
+              }
+            ]
+          },
+          {
+            "step": "Build the card",
+            "desc": "Elements adds text, school details, person fields, a QR code, a barcode, and shapes. Drag a piece on the card, or click it and set its place, size, colour, and label in Properties.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Elements adds text, school details, person fields, a QR code, a barcode, and shapes. Drag a piece on the card, or click it and set its place, size, colour, and label in Properties."
+              },
+              {
+                "type": "paragraph",
+                "text": "A person field can show its label. The label can sit on the same line, above the value, or beside it."
+              },
+              {
+                "type": "paragraph",
+                "text": "Templates lists the school's saved designs and the Sclad starting designs. Applying a starting design replaces the layout of the side you are editing. New blank template starts an empty card for that side."
+              },
+              {
+                "type": "paragraph",
+                "text": "Front and Back are edited separately. The size can be CR80 landscape, CR80 portrait, A4, or a custom size in millimetres. Zoom only changes the screen. It does not change the printed size."
+              }
+            ]
+          },
+          {
+            "step": "Background and watermark",
+            "desc": "In card properties you can set the background colour and upload a background image. Remove background clears the image. Overlay strength fades the image toward the card colour. Watermark places the school logo, or the school name when there is no logo, behind the card content.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "In card properties you can set the background colour and upload a background image. Remove background clears the image. Overlay strength fades the image toward the card colour. Watermark places the school logo, or the school name when there is no logo, behind the card content."
+              }
+            ]
+          },
+          {
+            "step": "On a phone",
+            "desc": "On a small screen the card stays in view. Student or Staff in the header opens the options: switch side, undo, redo, Preview, and Save cards. Elements, Templates, and Properties open as panels over the card. Close, or tap outside the panel, to return to the card.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "On a small screen the card stays in view. Student or Staff in the header opens the options: switch side, undo, redo, Preview, and Save cards. Elements, Templates, and Properties open as panels over the card. Close, or tap outside the panel, to return to the card."
+              }
+            ]
+          },
+          {
+            "step": "Sclad templates",
+            "desc": "Starting designs that every school can apply are kept in the platform admin, on the ID Card tab. Add creates a design, opening one edits it in the same editor, and delete removes it from the school list. Schools still keep their own saved designs.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Starting designs that every school can apply are kept in the platform admin, on the ID Card tab. Add creates a design, opening one edits it in the same editor, and delete removes it from the school list. Schools still keep their own saved designs."
+              }
+            ]
+          }
+        ],
+        "callout": "Put phone, address, and date of birth on the card only when those fields are filled on the student or staff record. An empty record field prints as an empty line.",
+        "video": null
+      },
+      {
+        "id": "cbt",
+        "title": "CBT",
+        "content": "Teachers and admins can set a computer-based test for a class, subject, and term. Publishing chooses the students who may write it and the date it closes. The score is written into the report field selected on the test.",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Teachers and admins can set a computer-based test for a class, subject, and term. Publishing chooses the students who may write it and the date it closes. The score is written into the report field selected on the test."
+          }
+        ],
+        "steps": [
+          {
+            "step": "Where to open it",
+            "desc": "Admins open a subject, choose the term, and open CBT beside Assessments. Teachers open Tests on the subject, inside the term, next to Assessment. Students open Tests on that same term. A student only sees a test that was published for them.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Admins open a subject, choose the term, and open CBT beside Assessments. Teachers open Tests on the subject, inside the term, next to Assessment. Students open Tests on that same term. A student only sees a test that was published for them."
+              }
+            ]
+          },
+          {
+            "step": "Build and publish",
+            "desc": "Add multiple choice, true or false, and short answer questions, set the duration, and choose the report field the score should fill, such as First Test or Exam. Save draft keeps it private. Publish asks for the students and an end date. After that date the paper closes.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Add multiple choice, true or false, and short answer questions, set the duration, and choose the report field the score should fill, such as First Test or Exam. Save draft keeps it private. Publish asks for the students and an end date. After that date the paper closes."
+              },
+              {
+                "type": "paragraph",
+                "text": "Creating and publishing a test is included on the Standard Plan and the Premium Plan. On the Free plan, the Basic Plan, or with no plan, the message is: Upgrade from Basic Plan to Standard Plan to publish a CBT test. A student can still sit a test that is already published."
+              }
+            ]
+          },
+          {
+            "step": "Where the score goes",
+            "desc": "Multiple choice and true or false are marked when the student submits, or when the time or end date is reached. Short answers wait for a mark on the Results list. When every short answer has a mark, the total is scaled to that report field and written on the subject score sheet for the term. The report card reads it from there.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Multiple choice and true or false are marked when the student submits, or when the time or end date is reached. Short answers wait for a mark on the Results list. When every short answer has a mark, the total is scaled to that report field and written on the subject score sheet for the term. The report card reads it from there."
+              }
+            ]
+          }
+        ],
+        "callout": "Choose the report field before publishing. The score replaces that field for each selected student. Other fields on the score sheet stay as they are.",
+        "video": null
       }
     ]
   },

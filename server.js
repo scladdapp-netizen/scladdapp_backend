@@ -93,6 +93,8 @@ app.use("/api/schools", require("./routes/aiTokenPurchase.routes"));
 app.use("/api/ai-timetable", require("./routes/ai_timetable.routes"));
 app.use("/api/ai-config",    require("./routes/ai_config.routes"));
 app.use("/api/website-templates", require("./routes/websiteTemplate.routes"));
+app.use("/api/id-card-templates", require("./routes/idCardTemplate.routes"));
+app.use("/api/cbt", require("./routes/cbt.routes"));
 app.use("/api/brief-template-images", require("./routes/briefTemplateImage.routes"));
 app.use("/api/contact", require("./routes/contact.routes"));
 app.use("/api/docs", require("./routes/docs.routes"));
@@ -190,6 +192,13 @@ const PORT = Number(process.env.PORT) || 4000;
 const server = app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+// CBT: submit attempts whose time ran out and close tests past their deadline. Reads also do this
+// on demand, so a late sweep never changes who can still answer.
+setInterval(() => {
+  if (mongoose.connection.readyState !== 1) return;
+  require("./utils/cbtService").sweepExpired().catch((err) => console.error("[CBT] sweep failed:", err.message));
+}, 60 * 1000).unref();
+
 server.on("error", (err) => {
   console.error(`Cannot listen on port ${PORT}: ${err.message}`);
   process.exit(1);

@@ -53,15 +53,15 @@ const PAGE_NAMES = PAGES.map((page) => page.label).join(", ");
 
 const docsRaw = JSON.parse(fs.readFileSync(DOCS_PATH, "utf8"));
 const docs = (Array.isArray(docsRaw) ? docsRaw : []).map((section) => ({
-  section: section.section,
-  items: (section.items || []).filter((item) => item.id).map((item) => ({
-    id: item.id,
-    title: item.title,
-    content: item.content || "",
-    steps: (item.steps || []).map((step) => ({ step: step.step, desc: step.desc })),
-    callout: item.callout || null,
-  })),
-}));
+    section: section.section,
+    items: (section.items || []).filter((item) => item.id).map((item) => ({
+      id: item.id,
+      title: item.title,
+      content: item.content || "",
+      steps: (item.steps || []).map((step) => ({ step: step.step, desc: step.desc })),
+      callout: item.callout || null,
+    })),
+  }));
 const DOC_INDEX = docs.flatMap((section) => section.items.map((item) => `${item.id} (${item.title})`)).join("; ");
 
 function findArticle(docId) {
@@ -173,8 +173,8 @@ async function callModel(pool, params) {
         })
         : await groqChat({
           ...params,
-          apiKey: config.api_key,
-          model: config.model,
+      apiKey: config.api_key,
+      model: config.model,
           maxRetries: pool.length > 1 ? 0 : undefined,
         });
       if (config !== pool[0]) logAssistant("model", { using: config.model, via: viaOpenRouter ? "openrouter" : "groq" });
@@ -223,10 +223,10 @@ async function completeJson(pool, messages, maxTokens) {
     let completion;
     try {
       completion = await callModel(pool, {
-        maxTokens,
-        temperature: 0.1,
-        messages: thread,
-        reasoningEffort: "low",
+      maxTokens,
+      temperature: 0.1,
+      messages: thread,
+      reasoningEffort: "low",
         // Strict JSON mode rejects slightly malformed output; later attempts drop it.
         responseFormat: attempt === 0 ? { type: "json_object" } : undefined,
       });
@@ -803,7 +803,7 @@ async function runConversation(pool, question, history, schoolId, permissions) {
       logAssistant("step", { n: step + 1, problem: "no action" });
       messages.push({ role: "assistant", content: JSON.stringify(raw).slice(0, 600) });
       messages.push({ role: "user", content: "That was not a valid action. Reply with one JSON object that has an \"action\"." });
-      continue;
+        continue;
     }
     logAssistant("step", { n: step + 1, action: action.action, args: briefArgs(action).slice(0, 220) });
     if (restricted && (action.action === "upgrade" || DATA_ACTIONS.includes(action.action))) return upgradeReply(access);
