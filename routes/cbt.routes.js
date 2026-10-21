@@ -1,9 +1,15 @@
 const express = require("express");
-const { authenticate, requireStaff, requireStudent } = require("../middleware/cbtAuth");
+const { authenticate, requireStaff, requireStudent, requireExamLink } = require("../middleware/cbtAuth");
 const staff = require("../controllers/cbt.controller");
 const exam = require("../controllers/cbtExam.controller");
 
 const router = express.Router();
+
+// A personal exam link. No student login: the two short codes are the seat.
+router.post("/exam/link", exam.enterByLink);
+router.get("/exam/link/paper", requireExamLink, exam.resumeExam);
+router.put("/exam/link/answers", requireExamLink, exam.saveAnswers);
+router.post("/exam/link/submit", requireExamLink, exam.submitExam);
 
 router.use(authenticate);
 
@@ -24,6 +30,7 @@ router.post("/tests", staff.createTest);
 router.get("/tests/:testId", staff.getTest);
 router.patch("/tests/:testId", staff.updateTest);
 router.delete("/tests/:testId", staff.removeTest);
+router.post("/tests/:testId/reset", staff.resetForEdit);
 router.get("/tests/:testId/validation", staff.getValidation);
 router.get("/tests/:testId/students", staff.listStudents);
 router.post("/tests/:testId/publish", staff.publishTest);
@@ -41,6 +48,8 @@ router.get("/tests/:testId/roster", staff.getRoster);
 router.get("/tests/:testId/analysis", staff.getAnalysis);
 router.get("/tests/:testId/questions/:questionId/answers", staff.getQuestionAnswers);
 router.post("/tests/:testId/sessions", staff.startSessions);
+router.get("/tests/:testId/sessions", staff.listSessions);
+router.post("/tests/:testId/sessions/:sessionCode/cancel", staff.cancelSession);
 router.post("/tests/:testId/reopen", staff.reopenTest);
 router.post("/tests/:testId/attempts/:attemptId/end", staff.endSession);
 router.patch("/tests/:testId/attempts/:attemptId/time", staff.addTime);

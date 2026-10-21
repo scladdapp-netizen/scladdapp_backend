@@ -19,6 +19,9 @@ const cbtAttemptSchema = new mongoose.Schema(
     started_by: { type: String, default: null },
     start_kind: { type: String, enum: ["start", "rewrite", null], default: null },
     added_minutes: { type: Number, default: 0 },
+    // Public exam link /exam/{link_student}/{link_session}. The student does not sign in.
+    link_student: { type: String, default: null },
+    link_session: { type: String, default: null },
 
     auto_graded_at: { type: Date, default: null },
     grading_status: { type: String, enum: ["pending_auto", "pending_manual", "graded"], default: "pending_auto" },
@@ -48,5 +51,9 @@ const cbtAttemptSchema = new mongoose.Schema(
 cbtAttemptSchema.index({ test_id: 1, student_id: 1, attempt_number: 1 }, { unique: true });
 cbtAttemptSchema.index({ school_id: 1, student_id: 1, release_status: 1 });
 cbtAttemptSchema.index({ status: 1, allowed_end_at: 1 });
+cbtAttemptSchema.index(
+  { link_session: 1, link_student: 1 },
+  { unique: true, partialFilterExpression: { link_session: { $type: "string" }, link_student: { $type: "string" } } }
+);
 
 module.exports = mongoose.model("CbtAttempt", cbtAttemptSchema);

@@ -3,6 +3,7 @@
  * exam code their teacher gives them, and the server only opens it for students who were assigned
  * to it. Identity is the signed login token, never an id supplied by the browser.
  */
+const jwt = require("jsonwebtoken");
 const CbtTest = require("../models/CbtTest.model");
 const CbtAssignment = require("../models/CbtAssignment.model");
 const CbtAttempt = require("../models/CbtAttempt.model");
@@ -24,6 +25,7 @@ const wrap = (handler) => async (req, res) => {
 
 const secret = () => process.env.JWT_SECRET;
 const GENERIC_CODE_ERROR = "That exam code is not valid for you. Check it with your teacher.";
+const GENERIC_LINK_ERROR = "This exam link is not valid. Check it with your teacher.";
 
 // ── Throttle wrong codes (in memory; resets when the server restarts) ─────────
 const failures = new Map();
@@ -89,6 +91,43 @@ const settleAttempt = async (test, attempt) => {
   }
   return attempt;
 };
+
+const linkTokenFor = (attempt) => {
+  const leftMs = new Date(attempt.allowed_end_at).getTime() - Date.now();
+  const seconds = Math.max(60, Math.ceil(leftMs / 1000) + 15 * 60);
+  return jwt.sign(
+    { purpose: "cbt_link", attempt_id: attempt.attempt_id, student_id: attempt.student_id, school_id: attempt.school_id },
+    secret(),
+    { expiresIn: seconds }
+  );
+};
+
+/** Open the sitting named by /exam/{studentCode}/{sessionCode}. No account login. */
+const enterByLink = wrap(async (req, res) => {
+  const ip = String(req.ip || "unknown");
+  if (blocked(`link:${ip}`)) return bad(res, 429, "Too many tries. Please wait a few minutes and try again.", { code: "throttled" });
+  const studentCode = logic.normalizeLinkCode(req.body?.student_code);
+  const sessionCode = logic.normalizeLinkCode(req.body?.session_code);
+  if (!studentCode || !sessionCode) {
+    noteFailure(`link:${ip}`);
+    return bad(res, 404, GENERIC_LINK_ERROR, { code: "invalid_link" });
+  }
+  const attempt = await CbtAttempt.findOne({ link_student: studentCode, link_session: sessionCode });
+  if (!attempt) {
+    noteFailure(`link:${ip}`);
+    return bad(res, 404, GENERIC_LINK_ERROR, { code: "invalid_link" });
+  }
+  const test = await CbtTest.findOne({ test_id: attempt.test_id, school_id: attempt.school_id });
+  if (!test) return bad(res, 404, GENERIC_LINK_ERROR, { code: "invalid_link" });
+  await service.closeDueTests({ test_id: test.test_id });
+  const fresh = await CbtTest.findOne({ test_id: test.test_id });
+  const settled = await settleAttempt(fresh, attempt);
+  if (!settled || settled.status !== "in_progress") {
+    return ok(res, { state: "submitted", test: studentTest(fresh), server_now: new Date() });
+  }
+  const payload = await examPayload(fresh, settled);
+  return ok(res, { ...payload, state: "in_progress", student_name: settled.student_name || "", token: linkTokenFor(settled) });
+});
 
 // ── Access, start ─────────────────────────────────────────────────────────────
 const accessExam = wrap(async (req, res) => {
@@ -300,4 +339,4 @@ const getResult = wrap(async (req, res) => {
   });
 });
 
-module.exports = { accessExam, startExam, resumeExam, saveAnswers, submitExam, listResults, getResult };
+module.exports = { enterByLink, accessExam, startExam, resumeExam, saveAnswers, submitExam, listResults, getResult };

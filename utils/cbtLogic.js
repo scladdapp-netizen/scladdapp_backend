@@ -9,6 +9,7 @@ const MAX_QUESTION_MARKS = 1000;
 const MAX_PROMPT = 4000;
 const MAX_ANSWER = 5000;
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const LINK_ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789";
 
 // ── Marks arithmetic (hundredths, so 0.1 + 0.2 never drifts) ──────────────────
 const toHundredths = (value) => Math.round(Number(value) * 100);
@@ -175,6 +176,19 @@ const deriveAccessCode = (secret, testId, version) => {
 const hashAccessCode = (secret, schoolId, code) =>
   crypto.createHmac("sha256", String(secret)).update(`cbt-hash:${schoolId}:${normalizeCode(code)}`).digest("hex");
 
+/** Three characters, like "pa1" or "edd". The pair is the student's exam link. */
+const linkCode = () => {
+  const bytes = crypto.randomBytes(3);
+  let out = "";
+  for (let i = 0; i < 3; i += 1) out += LINK_ALPHABET[bytes[i] % LINK_ALPHABET.length];
+  return out;
+};
+
+const normalizeLinkCode = (value) => {
+  const code = String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  return code.length === 3 ? code : "";
+};
+
 // ── Student-safe views ────────────────────────────────────────────────────────
 const studentQuestion = (question) => ({
   question_id: question.question_id,
@@ -257,6 +271,8 @@ module.exports = {
   normalizeCode,
   deriveAccessCode,
   hashAccessCode,
+  linkCode,
+  normalizeLinkCode,
   studentQuestion,
   attemptDisplayStatus,
 };

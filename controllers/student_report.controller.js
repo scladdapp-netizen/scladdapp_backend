@@ -15,6 +15,7 @@ const Class = require("../models/Class.model");
 const StudentGuardian = require("../models/StudentGuardian.model");
 const { queueEmail, getEmailQuota } = require("../utils/emailQueue");
 const jwt = require("jsonwebtoken");
+const { syncPendingScores } = require("../utils/cbtService");
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -582,6 +583,11 @@ const getScoresBySubjectSubsession = async (subjectId, subsessionId, params = {}
     const uniqueAssignments = Object.values(latestByStudent);
 
     const studentIds = uniqueAssignments.map((a) => a.student_id);
+    try {
+      await syncPendingScores(subjectId, subsessionId);
+    } catch (error) {
+      console.error("[CBT] could not copy marks into assessments:", error.message);
+    }
     const [students, scoreRecords] = await Promise.all([
       Student.find({ student_id: { $in: studentIds } }).lean(),
       StudentScore.find({ subject_id: subjectId, subsession_id: subsessionId, student_id: { $in: studentIds } }).lean(),

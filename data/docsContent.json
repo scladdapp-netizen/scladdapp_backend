@@ -3588,50 +3588,150 @@
       {
         "id": "cbt",
         "title": "CBT",
-        "content": "Teachers and admins can set a computer-based test for a class, subject, and term. Publishing chooses the students who may write it and the date it closes. The score is written into the report field selected on the test.",
+        "content": "A computer-based test is written in the browser. You build it for one class, one subject, and one term, then start a session when the class is ready. Each student gets a personal link and does not sign in. When the paper is marked, the score is written into the report assessment you chose, such as First Test.",
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Teachers and admins can set a computer-based test for a class, subject, and term. Publishing chooses the students who may write it and the date it closes. The score is written into the report field selected on the test."
+            "text": "A computer-based test is written in the browser. You build it for one class, one subject, and one term, then start a session when the class is ready. Each student gets a personal link and does not sign in. When the paper is marked, the score is written into the report assessment you chose, such as First Test."
+          },
+          {
+            "type": "paragraph",
+            "text": "Students never log in for the test. You set how long it lasts at the moment you start them. The timer is kept on the server, so refreshing the page does not give them extra time."
           }
         ],
         "steps": [
           {
             "step": "Where to open it",
-            "desc": "Admins open a subject, choose the term, and open CBT beside Assessments. Teachers open Tests on the subject, inside the term, next to Assessment. Students open Tests on that same term. A student only sees a test that was published for them.",
+            "desc": "Admins open a subject, choose the term, and open CBT beside Assessments. Teachers open the subject, choose the term, and open Tests beside Assessment.",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Admins open a subject, choose the term, and open CBT beside Assessments. Teachers open Tests on the subject, inside the term, next to Assessment. Students open Tests on that same term. A student only sees a test that was published for them."
+                "text": "Admins open a subject, choose the term, and open CBT beside Assessments. Teachers open the subject, choose the term, and open Tests beside Assessment."
+              },
+              {
+                "type": "paragraph",
+                "text": "The list shows the title, class, subject and term, number of questions, total marks, and how many students have finished. Search by title or class. Open a row to run the test. New test starts a paper for this subject and term."
+              },
+              {
+                "type": "paragraph",
+                "text": "A teacher only sees the class on their assignment. An admin can pick any class linked to the subject."
               }
             ]
           },
           {
-            "step": "Build and publish",
-            "desc": "Add multiple choice, true or false, and short answer questions, set the duration, and choose the report field the score should fill, such as First Test or Exam. Save draft keeps it private. Publish asks for the students and an end date. After that date the paper closes.",
+            "step": "Build the test",
+            "desc": "Choose the class and the report assessment this test fills. Add the questions, then save.",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Add multiple choice, true or false, and short answer questions, set the duration, and choose the report field the score should fill, such as First Test or Exam. Save draft keeps it private. Publish asks for the students and an end date. After that date the paper closes."
+                "text": "Choose the class and the report assessment this test fills, such as First Test or Exam. A class can have only one CBT for each assessment. If Junior Secondary School 1 already has a CBT for First Test, First Test is hidden when you pick that class, and a note says there is an existing CBT for First Test."
               },
               {
                 "type": "paragraph",
-                "text": "Creating and publishing a test is included on the Standard Plan and the Premium Plan. On the Free plan, the Basic Plan, or with no plan, the message is: Upgrade from Basic Plan to Standard Plan to publish a CBT test. A student can still sit a test that is already published."
+                "text": "Add multiple choice, true or false, and short answer questions. Set the marks on each question. The total must equal the maximum score of the report assessment, or the test cannot be published. Write the instructions students will see."
+              },
+              {
+                "type": "paragraph",
+                "text": "You do not set the duration here. You choose the hours and minutes when you start the session."
+              },
+              {
+                "type": "paragraph",
+                "text": "Saving a finished test publishes it and assigns every student in that class for the term. You do not pick students one by one. An unfinished test stays a draft until the title, class, assessment, questions, and marks are complete. Opening a finished draft publishes it the same way."
+              },
+              {
+                "type": "paragraph",
+                "text": "Publishing is included on the Standard Plan and the Premium Plan. On the Free plan, the Basic Plan, or with no plan, the message is: Upgrade from Basic Plan to Standard Plan to publish a CBT test. A test that is already published can still be sat."
+              }
+            ]
+          },
+          {
+            "step": "Overview",
+            "desc": "Overview shows the class counts and the buttons that run the test.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The page stays on Opening test until the counts are ready. Under Overview you see Assigned, Not started, Writing now, Awaiting marking, Marked, and Released."
+              },
+              {
+                "type": "paragraph",
+                "text": "Edit CBT, Start test session, and Close test sit on that same row. The card under the counts shows the class, subject, number of questions, total marks, the report assessment the score feeds, and the instructions students see."
+              },
+              {
+                "type": "paragraph",
+                "text": "Start test session asks for hours and minutes, from 1 minute up to 10 hours. It starts everyone in the class who has not started, including students marked absent. Each student gets a link. The first short code is their seat and the second is this session, for example /exam/pa1/edd. Give each student their own link. They open it and write. They do not sign in."
+              },
+              {
+                "type": "paragraph",
+                "text": "Close test submits anything still being written and stops new starts. Results are not released on their own. Reopen lets you start students again. Finished students can be allowed to rewrite from the Students tab."
+              },
+              {
+                "type": "paragraph",
+                "text": "Edit CBT on a test that has already been used warns you first. Every answer, mark, and assessment score recorded for that test is deleted, and the class starts again from the beginning. A draft opens in the editor without that warning."
+              }
+            ]
+          },
+          {
+            "step": "Students",
+            "desc": "The Students tab is the class list for this test.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "A short note at the top explains the page. Read more opens the rest."
+              },
+              {
+                "type": "paragraph",
+                "text": "Filter by All, Not started, Writing now, or Finished. Search by name. Select rows to start several students together, or to allow a rewrite. Actions on one row can start that student, mark them absent, add time, end their sitting now, allow a rewrite, or open their answers."
+              },
+              {
+                "type": "paragraph",
+                "text": "While a student is writing, the row shows their exam link and a copy icon, the time left, and how many questions they have answered. Open a finished student to mark short answers or review what was marked automatically."
+              }
+            ]
+          },
+          {
+            "step": "Test session",
+            "desc": "The Test session tab lists sittings that are still running.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Each row is one session code, the students still writing, and the time left. Cancel stops that sitting. Answers that were still being written are discarded, and those students can be started again. Submitted work from an earlier sitting is kept."
+              }
+            ]
+          },
+          {
+            "step": "What the student sees",
+            "desc": "The student opens their link. There is no login.",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The page shows the test name, subject, and their name, with the time left. Answers save as they go. They move between questions, flag one for review, and submit. If the time runs out, the answers they have are submitted."
+              },
+              {
+                "type": "paragraph",
+                "text": "A theme button on the bar switches light, dark, and system. The same link works again if they refresh, until their time ends or they submit."
               }
             ]
           },
           {
             "step": "Where the score goes",
-            "desc": "Multiple choice and true or false are marked when the student submits, or when the time or end date is reached. Short answers wait for a mark on the Results list. When every short answer has a mark, the total is scaled to that report field and written on the subject score sheet for the term. The report card reads it from there.",
+            "desc": "Marked scores are written onto the subject assessment for the term.",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Multiple choice and true or false are marked when the student submits, or when the time or end date is reached. Short answers wait for a mark on the Results list. When every short answer has a mark, the total is scaled to that report field and written on the subject score sheet for the term. The report card reads it from there."
+                "text": "Multiple choice and true or false are marked when the student submits, or when you end their sitting. Short answers stay on Awaiting marking until you open that student and save the marks."
+              },
+              {
+                "type": "paragraph",
+                "text": "When every question has a mark, the total is scaled to the maximum of the report assessment and written on Assessments for that subject and term. The report card reads it from there. Other fields on the score sheet are left as they are."
+              },
+              {
+                "type": "paragraph",
+                "text": "If you edit the test and confirm the warning, those assessment scores are removed with the answers, so the class can write a fresh paper."
               }
             ]
           }
         ],
-        "callout": "Choose the report field before publishing. The score replaces that field for each selected student. Other fields on the score sheet stay as they are.",
+        "callout": "One class can have only one CBT for each report assessment. The score replaces that field for each student who is marked. Choose the assessment before anyone writes, because editing a used test deletes its answers and scores.",
         "video": null
       }
     ]

@@ -26,6 +26,16 @@ const readyTest = (over = {}) => ({
   ...over,
 });
 
+test("exam link codes are three short characters", () => {
+  const code = logic.linkCode();
+  assert.equal(code.length, 3);
+  assert.match(code, /^[a-z0-9]{3}$/);
+  assert.equal(logic.normalizeLinkCode(code), code);
+  assert.equal(logic.normalizeLinkCode("PA1"), "pa1");
+  assert.equal(logic.normalizeLinkCode("ab"), "");
+  assert.equal(logic.normalizeLinkCode("abcd"), "");
+});
+
 test("a complete test has no publish problems", () => {
   assert.deepEqual(logic.publishProblems(readyTest(), 20), []);
 });

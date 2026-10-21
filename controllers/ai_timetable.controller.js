@@ -3,6 +3,7 @@ const Subject = require("../models/Subject.model");
 const ClassSubjectAssignment = require("../models/ClassSubjectAssignment.model");
 const TeacherSubjectAssignment = require("../models/TeacherSubjectAssignment.model");
 const Staff = require("../models/Staff.model");
+const Teacher = require("../models/Teacher.model");
 const TimetableTemplate = require("../models/TimetableTemplate.model");
 const ClassTimetable = require("../models/ClassTimetable.model");
 const AIConfig = require("../models/AIConfig.model");
@@ -20,7 +21,11 @@ const NO_REASONING = {
 };
 
 async function getTimetableConfig() {
-  const config = await AIConfig.findOne({ use: usesForFeature(USE_TIMETABLE), is_active: true });
+  const configs = await AIConfig.find({ use: usesForFeature(USE_TIMETABLE) })
+    .sort({ is_active: -1, created_at: -1 });
+  const config =
+    configs.find((c) => c.is_active && c.api_key?.trim()) ||
+    configs.find((c) => c.api_key?.trim());
   if (!config) throw new Error("No active AI config for timetable generator. Contact support.");
   return config;
 }
@@ -72,18 +77,60 @@ function estimateMaxTokens(classCount, periodTotal = 0) {
   return Math.min(16000, Math.max(6000, fromPeriods + 1024));
 }
 
-function summarizeExistingTimetables(timetables) {
-  return timetables.map((t) => ({
-    class_id: t.class_id,
-    slots: (t.entries || [])
-      .filter((e) => e.day && e.start && e.end)
-      .map((e) => ({
-        day: e.day,
-        start: e.start,
-        end: e.end,
-        teachers: [...new Set((e.subjects || []).map((s) => s.teacher).filter(Boolean))],
-        subjects: [...new Set((e.subjects || []).map((s) => s.name).filter(Boolean))],
-      })),
+/** Groq counts the prompt plus reserved answer tokens. One request must stay under 8000. */
+const GROQ_REQUEST_BUDGET = 7600;
+
+function fitMaxTokens(systemPrompt, userPrompt, desired) {
+  const promptTokens = Math.ceil((String(systemPrompt || "").length + String(userPrompt || "").length) / 3);
+  const room = Math.max(256, GROQ_REQUEST_BUDGET - promptTokens);
+  return Math.min(Math.max(256, Number(desired) || 256), room);
+}
+
+function isRealTeacher(name) {
+  const n = String(name || "").trim();
+  return n && n !== "Not assigned" && n !== "—" && n !== "Multiple Teachers";
+}
+
+function teacherFrom(preferred, fallback) {
+  if (isRealTeacher(preferred)) return String(preferred).trim();
+  if (isRealTeacher(fallback)) return String(fallback).trim();
+  return "Not assigned";
+}
+
+/** Only who is already busy, and when. Pass onlyTeachers to skip staff who do not teach this class. */
+function summarizeTeacherBusy(timetables, onlyTeachers) {
+  const byTeacher = new Map();
+  for (const t of timetables) {
+    for (const e of t.entries || []) {
+      if (e.isBreak || !e.day || !e.start || !e.end) continue;
+      const names = new Set();
+      if (isRealTeacher(e.teacher)) names.add(String(e.teacher).trim());
+      for (const s of e.subjects || []) {
+        if (isRealTeacher(s.teacher)) names.add(String(s.teacher).trim());
+      }
+      const slot = `${e.day} ${e.start}-${e.end}`;
+      for (const name of names) {
+        if (onlyTeachers && !onlyTeachers.has(name)) continue;
+        if (!byTeacher.has(name)) byTeacher.set(name, new Set());
+        byTeacher.get(name).add(slot);
+      }
+    }
+  }
+  return [...byTeacher.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([teacher, slots]) => ({ teacher, busy: [...slots] }));
+}
+
+function classesForPrompt(classesInfo) {
+  return classesInfo.map((cls) => ({
+    class_id: cls.class_id,
+    class_name: cls.class_name,
+    subjects: (cls.subjects || []).map((s) => ({
+      id: s.subject_id,
+      name: s.subject_name,
+      teacher: s.teacher_name,
+      stream: s.stream || "general",
+    })),
   }));
 }
 
@@ -117,7 +164,7 @@ function normalizeSubjectItem(raw, catalog, entryFallback = {}) {
     const stream = String(raw.stream || fromCatalog?.stream || entryFallback.stream || "general").toLowerCase();
     const meta = STREAM_META[stream] || STREAM_META.general;
     const name = raw.name || fromCatalog?.subject_name || "Unknown";
-    const teacher = raw.teacher || fromCatalog?.teacher_name || entryFallback.teacher || "Not assigned";
+    const teacher = teacherFrom(raw.teacher, fromCatalog?.teacher_name || entryFallback.teacher);
     return {
       id: String(raw.id || fromCatalog?.subject_id || name),
       name,
@@ -133,7 +180,7 @@ function normalizeSubjectItem(raw, catalog, entryFallback = {}) {
   const name = fromCatalog?.subject_name || String(raw || "Unknown");
   const stream = String(fromCatalog?.stream || entryFallback.stream || "general").toLowerCase();
   const meta = STREAM_META[stream] || STREAM_META.general;
-  const teacher = fromCatalog?.teacher_name || entryFallback.teacher || "Not assigned";
+  const teacher = teacherFrom(null, fromCatalog?.teacher_name || entryFallback.teacher);
   return {
     id: String(fromCatalog?.subject_id || name),
     name,
@@ -147,8 +194,16 @@ function normalizeSubjectItem(raw, catalog, entryFallback = {}) {
 
 function looksLikeBreak(entry) {
   if (entry?.isBreak === true) return true;
-  const name = String(entry?.name || "").toLowerCase();
+  const name = String(entry?.name || entry?.subject_name || "").toLowerCase();
   return /break|lunch|recess|interval|assembly/.test(name);
+}
+
+function entryClock(raw, keys) {
+  for (const key of keys) {
+    const value = raw?.[key];
+    if (value != null && String(value).trim()) return String(value).trim();
+  }
+  return null;
 }
 
 /**
@@ -172,8 +227,21 @@ function normalizeTimetableEntries(entries, classInfo) {
             .map((s) => normalizeSubjectItem(s, catalog, raw));
         } else if (typeof raw.subjects === "string" || typeof raw.subjects === "number") {
           subjects = [normalizeSubjectItem(raw.subjects, catalog, raw)];
+        } else if (raw.subject_id || raw.subject_name || raw.subjectId || raw.subjectName) {
+          subjects = [
+            normalizeSubjectItem(
+              {
+                id: raw.subject_id || raw.subjectId,
+                name: raw.subject_name || raw.subjectName || raw.name,
+                code: raw.subject_code || raw.code,
+                teacher: raw.teacher,
+                stream: raw.stream,
+              },
+              catalog,
+              raw
+            ),
+          ];
         } else if (raw.name && !isBreak) {
-          // subjects missing — try resolve from entry name
           const match = findSubjectInCatalog(catalog, raw.name);
           if (match) subjects = [normalizeSubjectItem(match.subject_name, catalog, raw)];
         }
@@ -183,7 +251,7 @@ function normalizeTimetableEntries(entries, classInfo) {
       let stream = raw.stream || "general";
       let streamName = raw.streamName || "";
       let streamColor = raw.streamColor || "";
-      let name = raw.name || "";
+      let name = raw.name || raw.subject_name || raw.subjectName || "";
       let teacher = raw.teacher || "";
 
       if (isBreak) {
@@ -198,7 +266,7 @@ function normalizeTimetableEntries(entries, classInfo) {
         streamName = subjects[0].streamName;
         streamColor = (STREAM_META[stream] || STREAM_META.general).color;
         name = name || subjects[0].name;
-        teacher = teacher || subjects[0].teacher;
+        teacher = teacherFrom(teacher, subjects[0].teacher);
       } else if (subjects.length > 1) {
         if (streamIds.length === 1) {
           stream = streamIds[0];
@@ -223,8 +291,8 @@ function normalizeTimetableEntries(entries, classInfo) {
       return {
         id,
         day: raw.day || null,
-        start: raw.start || null,
-        end: raw.end || null,
+        start: entryClock(raw, ["start", "start_time", "startTime"]),
+        end: entryClock(raw, ["end", "end_time", "endTime"]),
         name,
         teacher: teacher || "",
         stream,
@@ -389,6 +457,7 @@ async function callGroqWithJson(opts) {
 }
 
 async function generateTimetableJson({ apiKey, model, maxTokens, systemPrompt, userPrompt }) {
+  maxTokens = fitMaxTokens(systemPrompt, userPrompt, maxTokens);
   console.log(`${TAG} Generating for model=${model}, max_tokens=${maxTokens}`);
 
   const primary = await callGroqWithJson({
@@ -430,7 +499,10 @@ async function generateTimetableJson({ apiKey, model, maxTokens, systemPrompt, u
 
   // Truncated / reasoning-only / empty content → one harder retry (do NOT repair thinking text)
   if (!primaryText || finishReason === "length" || hasReasoningOnly(primaryMessage)) {
-    const retryTokens = Math.min(16000, Math.max(maxTokens * 2, 8000));
+    const retrySystem =
+      "You are a JSON API. Output ONLY valid JSON. Never explain. Never think out loud. " +
+      'Shape: {"timetables":[{"class_id":"...","entries":[...]}]}. First character must be {.';
+    const retryTokens = fitMaxTokens(retrySystem, userPrompt, Math.min(7000, maxTokens + 1500));
     console.warn(`${TAG} Retrying with max_tokens=${retryTokens} (strict JSON, no reasoning)`);
 
     const retry = await callGroqWithJson({
@@ -438,12 +510,7 @@ async function generateTimetableJson({ apiKey, model, maxTokens, systemPrompt, u
       model,
       maxTokens: retryTokens,
       messages: [
-        {
-          role: "system",
-          content:
-            "You are a JSON API. Output ONLY valid JSON. Never explain. Never think out loud. " +
-            'Shape: {"timetables":[{"class_id":"...","entries":[...]}]}. First character must be {.',
-        },
+        { role: "system", content: retrySystem },
         { role: "user", content: userPrompt },
       ],
       tag: TAG,
@@ -540,6 +607,144 @@ async function generateTimetableJson({ apiKey, model, maxTokens, systemPrompt, u
   };
 }
 
+const runningBatches = new Set();
+
+async function generateOneClass({
+  config,
+  classInfo,
+  school_id,
+  subsession_id,
+  notes,
+  selectedDays,
+  dailyPeriods,
+  dailySchedule,
+  breaks,
+  maxPeriodDuration,
+}) {
+  if (!classInfo?.subjects?.length) {
+    console.warn(`${TAG} Skipping ${classInfo?.class_name || classInfo?.class_id} — no subjects`);
+    return;
+  }
+
+  const existingTimetables = await ClassTimetable.find({
+    school_id,
+    subsession_id,
+    class_id: { $ne: classInfo.class_id },
+  }).lean();
+  const classTeachers = new Set(
+    (classInfo.subjects || [])
+      .map((s) => String(s.teacher_name || "").trim())
+      .filter((name) => isRealTeacher(name))
+  );
+  const teacherBusy = summarizeTeacherBusy(existingTimetables, classTeachers);
+  const periodTotal = Object.values(dailyPeriods || {}).reduce(
+    (sum, n) => sum + (Number(n) || 0),
+    0
+  );
+
+  const systemPrompt = `You are a JSON timetable generator API.
+
+OUTPUT RULES (absolute):
+- Reply with ONLY one JSON object. No prose, no markdown, no code fences, no analysis.
+- First character must be "{" and last character must be "}".
+- Exact shape: {"timetables":[{"class_id":"...","entries":[...]}]}
+- Do not write plans, reasoning, or explanations — emit the finished JSON immediately.
+
+SCHEDULING RULES:
+- Generate a complete weekly timetable for this one class.
+- Every selected day must appear in entries.
+- For each day, generate exactly daily_periods[day] SUBJECT periods. Do NOT create break entries — the server inserts those.
+- Period duration = max_period_duration minutes. Stay within daily_schedule start/end for each day.
+- Leave a time gap where breaks belong so a break fits between periods.
+- Each period entry: id (unique int), day, start (HH:MM), end (HH:MM), name, teacher, stream.
+- Use the teacher name given for that subject.
+- TEACHER_BUSY lists times a teacher is already teaching another class. Do not use that teacher at those times.
+- Every subject appears at least once per week.
+- Stream colors: science=#10b981, arts=#3b82f6, commercial=#f59e0b, general=#6b7280.`;
+
+  const userPrompt = `Return ONLY JSON for this one class.
+
+TEMPLATE:
+- selected_days: ${JSON.stringify(selectedDays)}
+- daily_periods: ${JSON.stringify(dailyPeriods)}
+- daily_schedule: ${JSON.stringify(dailySchedule)}
+- max_period_duration: ${maxPeriodDuration}
+- breaks: ${JSON.stringify(breaks)}
+
+CLASS (subject fields are id, name, teacher, stream):
+${JSON.stringify(classesForPrompt([classInfo]))}
+
+${teacherBusy.length > 0 ? `TEACHER_BUSY (teacher and times already taken — do not use that teacher then):\n${JSON.stringify(teacherBusy)}\n` : ""}NOTES: ${notes || "None"}
+
+Output: {"timetables":[{"class_id":"${classInfo.class_id}","entries":[...]}]}`;
+
+  console.log(`${TAG} Next class: ${classInfo.class_name || classInfo.class_id}`);
+  const aiResult = await generateTimetableJson({
+    apiKey: config.api_key,
+    model: config.model,
+    maxTokens: estimateMaxTokens(1, periodTotal),
+    systemPrompt,
+    userPrompt,
+  });
+  if (aiResult.error) {
+    console.error(`${TAG} class ${classInfo.class_id} failed: ${aiResult.error}`);
+    return;
+  }
+
+  const item =
+    (aiResult.timetables || []).find((t) => String(t.class_id) === String(classInfo.class_id)) ||
+    aiResult.timetables?.[0];
+  if (!item || !Array.isArray(item.entries)) {
+    console.warn(`${TAG} class ${classInfo.class_id} — model returned no entries`);
+    return;
+  }
+
+  const entries = finalizeTimetableEntries(item.entries, classInfo, breaks, selectedDays);
+  if (!entries.length) {
+    console.warn(`${TAG} Skipping class ${classInfo.class_id} — no valid entries after normalize`);
+    return;
+  }
+
+  const record = {
+    class_id: classInfo.class_id,
+    subsession_id,
+    school_id,
+    entries,
+    generated_by: "ai",
+    generated_at: new Date(),
+    updated_at: new Date(),
+  };
+  const existing = await ClassTimetable.findOne({ class_id: classInfo.class_id, subsession_id });
+  if (existing) {
+    Object.assign(existing, record);
+    await existing.save();
+  } else {
+    await ClassTimetable.create({
+      timetable_id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
+      ...record,
+    });
+  }
+  console.log(
+    `${TAG} Saved ${classInfo.class_name || classInfo.class_id}: ` +
+      `${entries.filter((e) => !e.isBreak).length} periods`
+  );
+}
+
+async function runClassBatch(opts) {
+  const ordered = [...opts.classesInfo].sort((a, b) =>
+    String(a.class_name || "").localeCompare(String(b.class_name || ""))
+  );
+  console.log(`${TAG} Batch start — ${ordered.length} class(es), one at a time`);
+  for (const classInfo of ordered) {
+    try {
+      await generateOneClass({ ...opts, classInfo });
+    } catch (err) {
+      console.error(`${TAG} class ${classInfo.class_id} error:`, err);
+    }
+  }
+  console.log(`${TAG} Batch finished`);
+}
+
 exports.getAvailableModels = async (req, res) => {
   try {
     const configs = await AIConfig.find({ use: usesForFeature(USE_TIMETABLE) })
@@ -619,21 +824,34 @@ exports.generateTimetables = async (req, res) => {
 
     const subjectIds = [...new Set(classSubjects.map((cs) => cs.subject_id))];
     const teacherIds = [...new Set(teacherSubjects.map((ts) => ts.teacher_id).filter(Boolean))];
+    const teachers = teacherIds.length
+      ? await Teacher.find({ teacher_id: { $in: teacherIds } }).lean()
+      : [];
+    const staffIds = [...new Set(teachers.map((t) => t.staff_id).filter(Boolean))];
 
     const [allSubjects, staff] = await Promise.all([
       subjectIds.length
         ? Subject.find({ school_id, subject_id: { $in: subjectIds } }).lean()
         : [],
-      teacherIds.length
-        ? Staff.find({ staff_id: { $in: teacherIds } }).lean()
+      staffIds.length
+        ? Staff.find({ staff_id: { $in: staffIds } }).lean()
         : [],
     ]);
 
-    // Load existing timetables for OTHER classes (for conflict context)
+    const sameId = (a, b) => String(a) === String(b);
+    const teacherNameFor = (assignment) => {
+      if (!assignment) return "Not assigned";
+      if (isRealTeacher(assignment.teacher_name)) return String(assignment.teacher_name).trim();
+      const teacher = teachers.find((t) => sameId(t.teacher_id, assignment.teacher_id));
+      const person = teacher ? staff.find((s) => sameId(s.staff_id, teacher.staff_id)) : null;
+      return person?.full_name || "Not assigned";
+    };
+
+    // Saved timetables for classes we are about to replace are not constraints.
     const existingTimetables = await ClassTimetable.find({
       school_id,
       subsession_id,
-      ...(class_id ? { class_id: { $ne: class_id } } : {}),
+      class_id: { $nin: [...targetClassIds] },
     }).lean();
 
     // Parse template JSON fields (stored as strings)
@@ -654,17 +872,18 @@ exports.generateTimetables = async (req, res) => {
       );
       const subjects = subjectAssignments.map((cs) => {
         const subject = allSubjects.find((s) => s.subject_id === cs.subject_id);
-        const teacherAssignment = teacherSubjects.find(
-          (ts) => ts.subject_id === cs.subject_id && ts.class_id === cls.class_id
-        );
-        const teacher = teacherAssignment
-          ? staff.find((s) => s.staff_id === teacherAssignment.teacher_id)
-          : null;
+        const teacherAssignment =
+          teacherSubjects.find(
+            (ts) => sameId(ts.subject_id, cs.subject_id) && sameId(ts.class_id, cls.class_id)
+          ) ||
+          teacherSubjects.find(
+            (ts) => sameId(ts.subject_id, cs.subject_id) && !ts.class_id
+          );
         return {
           subject_id: cs.subject_id,
           subject_name: subject?.subject_name || "Unknown",
           subject_code: subject?.subject_code || "",
-          teacher_name: teacher?.full_name || "Not assigned",
+          teacher_name: teacherNameFor(teacherAssignment),
           stream: subject?.stream || "general",
         };
       });
@@ -676,6 +895,42 @@ exports.generateTimetables = async (req, res) => {
         subjects,
       };
     });
+
+    if (!class_id) {
+      const batchKey = `${school_id}:${subsession_id}`;
+      if (runningBatches.has(batchKey)) {
+        return res.status(409).json({
+          success: false,
+          message: "Timetables are already being generated for this term. Come back in a few minutes.",
+        });
+      }
+      runningBatches.add(batchKey);
+      res.json({
+        success: true,
+        background: true,
+        message: "AI is working on the timetables.",
+      });
+      runClassBatch({
+        config,
+        classesInfo,
+        school_id,
+        subsession_id,
+        notes,
+        selectedDays,
+        dailyPeriods,
+        dailySchedule,
+        breaks,
+        maxPeriodDuration: template.max_period_duration,
+      }).finally(() => runningBatches.delete(batchKey));
+      return;
+    }
+
+    const singleClassTeachers = new Set(
+      (classesInfo[0]?.subjects || [])
+        .map((s) => String(s.teacher_name || "").trim())
+        .filter((name) => isRealTeacher(name))
+    );
+    const teacherBusy = summarizeTeacherBusy(existingTimetables, singleClassTeachers);
 
     // ── Build the prompt ─────────────────────────────────────────────────────
     const systemPrompt = `You are a JSON timetable generator API.
@@ -709,10 +964,10 @@ TEMPLATE:
 - max_period_duration: ${template.max_period_duration}
 - breaks: ${JSON.stringify(breaks)}
 
-CLASSES:
-${JSON.stringify(classesInfo)}
+CLASSES (subject fields are id, name, teacher, stream):
+${JSON.stringify(classesForPrompt(classesInfo))}
 
-${existingTimetables.length > 0 ? `EXISTING_OTHER_CLASS_SLOTS (avoid conflicts):\n${JSON.stringify(summarizeExistingTimetables(existingTimetables))}\n` : ""}NOTES: ${notes || "None"}
+${teacherBusy.length > 0 ? `TEACHER_BUSY (teacher and times already taken — do not use that teacher then):\n${JSON.stringify(teacherBusy)}\n` : ""}NOTES: ${notes || "None"}
 
 Output: {"timetables":[{"class_id":"...","entries":[...]}]}`;
 

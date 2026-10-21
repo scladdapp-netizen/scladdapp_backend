@@ -145,7 +145,15 @@ const finalizeAttempt = async (test, attempt, reason, now = new Date()) => {
     { returnDocument: "after" }
   );
   if (!claimed) return CbtAttempt.findOne({ attempt_id: attempt.attempt_id });
-  return autoGradeAttempt(test, claimed);
+  const graded = await autoGradeAttempt(test, claimed);
+  if (graded?.grading_status === "graded") {
+    try {
+      await writeScore(test, graded);
+    } catch (error) {
+      console.error("[CBT] score sync failed:", error.message);
+    }
+  }
+  return graded;
 };
 
 /** Close out attempts whose time has run out and finish any half-done grading. */
@@ -225,6 +233,50 @@ const syncScoreSheet = async (test, attempt) => {
   return { value: Number(value), previous: previous === undefined ? null : Number(previous) };
 };
 
+/** Put a finished mark on the assessment sheet. A later mark replaces the earlier one. */
+const writeScore = async (test, attempt) => {
+  if (!attempt || attempt.grading_status !== "graded") return null;
+  try {
+    const synced = await syncScoreSheet(test, attempt);
+    await CbtAttempt.updateOne(
+      { attempt_id: attempt.attempt_id },
+      { $set: { synced_value: synced.value, score_sync_status: "synced", score_sync_error: null } }
+    );
+    return synced;
+  } catch (error) {
+    await CbtAttempt.updateOne(
+      { attempt_id: attempt.attempt_id },
+      { $set: { score_sync_status: "failed", score_sync_error: error.message } }
+    );
+    throw error;
+  }
+};
+
+/** Write graded CBT marks that have not reached the assessment sheet yet. */
+const syncPendingScores = async (subjectId, subsessionId) => {
+  const tests = await CbtTest.find({
+    subject_id: subjectId,
+    subsession_id: subsessionId,
+    status: { $ne: "archived" },
+    grading_field: { $nin: ["", null] },
+  }).lean();
+  for (const test of tests) {
+    const attempts = await CbtAttempt.find({
+      test_id: test.test_id,
+      status: "submitted",
+      grading_status: "graded",
+      score_sync_status: { $ne: "synced" },
+    });
+    for (const attempt of attempts) {
+      try {
+        await writeScore(test, attempt);
+      } catch (error) {
+        console.error("[CBT] score sync failed:", error.message);
+      }
+    }
+  }
+};
+
 module.exports = {
   audit,
   termContext,
@@ -237,4 +289,6 @@ module.exports = {
   sweepExpired,
   safeFieldName,
   syncScoreSheet,
+  writeScore,
+  syncPendingScores,
 };

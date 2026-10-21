@@ -96,12 +96,21 @@ const getContext = wrap(async (req, res) => {
   const classes = await Class.find({ school_id: req.actor.schoolId, class_id: { $in: classIds }, is_active: true })
     .select("class_id class_name")
     .lean();
+  const used = await CbtTest.find({
+    school_id: req.actor.schoolId,
+    subject_id: String(subjectId),
+    subsession_id: String(subsessionId),
+    status: { $ne: "archived" },
+    grading_field: { $nin: ["", null] },
+    class_id: { $nin: ["", null] },
+  }).select("test_id class_id grading_field").lean();
 
   return ok(res, {
     subject: { subject_id: subject.subject_id, subject_name: subject.subject_name },
     term: { term_id: term.subsession.term_id, term_name: term.subsession.term_name, session_id: term.subsession.session_id },
     fields: term.fields.filter((item) => service.safeFieldName(item.field_name)),
     classes,
+    used_assessments: used.map((row) => ({ test_id: row.test_id, class_id: row.class_id, grading_field: row.grading_field })),
     can_edit: Boolean((await allowedClassIds(req.actor, subjectId, "edit"))?.length !== 0),
   });
 });
@@ -259,6 +268,21 @@ const buildDraftFields = async (req, base) => {
       fields.total_marks = logic.totalMarksOf(cleaned);
     }
   }
+
+  const nextClass = fields.class_id !== undefined ? fields.class_id : base.class_id;
+  const nextField = fields.grading_field !== undefined ? fields.grading_field : base.grading_field;
+  if (nextClass && nextField && !errors.some((item) => item.field === "grading_field" || item.field === "class_id")) {
+    const clash = await CbtTest.exists({
+      school_id: schoolId,
+      subject_id: base.subject_id,
+      subsession_id: base.subsession_id,
+      class_id: nextClass,
+      grading_field: nextField,
+      status: { $ne: "archived" },
+      ...(base.test_id ? { test_id: { $ne: base.test_id } } : {}),
+    });
+    if (clash) errors.push({ field: "grading_field", message: `There is already a CBT for ${nextField} in this class.` });
+  }
   return { fields, errors };
 };
 
@@ -379,11 +403,13 @@ const publishTest = wrap(async (req, res) => {
   if (closesAt === undefined) problems.push({ field: "closes_at", message: "The closing time is not a valid date." });
   else if (closesAt && closesAt.getTime() <= Date.now()) problems.push({ field: "closes_at", message: "The closing time must be in the future." });
 
-  const requested = Array.isArray(req.body?.student_ids) ? [...new Set(req.body.student_ids.map(String))] : [];
-  if (requested.length === 0) problems.push({ field: "student_ids", message: "Select at least one student." });
+  const classList = await classStudents(test, term?.subsession);
+  const sent = Array.isArray(req.body?.student_ids) ? [...new Set(req.body.student_ids.map(String))].filter(Boolean) : [];
+  const requested = sent.length ? sent : classList.map((student) => student.student_id);
+  if (requested.length === 0) problems.push({ field: "student_ids", message: "This class has no students for this term." });
   if (problems.length) return bad(res, 422, problems[0].message, { errors: problems });
 
-  const eligible = new Set((await classStudents(test, term?.subsession)).map((student) => student.student_id));
+  const eligible = new Set(classList.map((student) => student.student_id));
   const outsiders = requested.filter((id) => !eligible.has(id));
   if (outsiders.length) return bad(res, 422, "Some selected students are not in this class.", { errors: [{ field: "student_ids", message: "Some selected students are not in this class." }] });
 
@@ -519,6 +545,50 @@ const closeTest = wrap(async (req, res) => {
   await service.settleTest(fresh);
   await service.audit(req.actor, fresh, "close");
   return ok(res, staffTest(fresh));
+});
+
+/** Drop every sitting, answer and assessment score for this test, then open it as a draft again. */
+const resetForEdit = wrap(async (req, res) => {
+  const test = await loadTest(req, res, "edit");
+  if (!test) return;
+  const attempts = await CbtAttempt.find({ test_id: test.test_id }).lean();
+  const attemptIds = attempts.map((row) => row.attempt_id);
+  if (attemptIds.length) await CbtResponse.deleteMany({ attempt_id: { $in: attemptIds } });
+  if (service.safeFieldName(test.grading_field)) {
+    for (const attempt of attempts) {
+      const value = attempt.synced_value ?? attempt.normalized_score;
+      if (value === null || value === undefined) continue;
+      await StudentScore.updateOne(
+        {
+          school_id: test.school_id,
+          student_id: attempt.student_id,
+          subsession_id: test.subsession_id,
+          subject_id: test.subject_id,
+          [`scores.${test.grading_field}`]: Number(value),
+        },
+        { $unset: { [`scores.${test.grading_field}`]: "" } }
+      );
+    }
+  }
+  if (attemptIds.length) await CbtAttempt.deleteMany({ test_id: test.test_id });
+  const updated = await CbtTest.findOneAndUpdate(
+    { test_id: test.test_id },
+    {
+      $set: {
+        status: "draft",
+        release_state: "none",
+        release_lock_at: null,
+        released_at: null,
+        released_by: null,
+        closed_at: null,
+        updated_by: req.actor.id,
+      },
+      $inc: { version: 1 },
+    },
+    { returnDocument: "after" }
+  );
+  await service.audit(req.actor, test, "reset_for_edit", { previous: { attempts: attempts.length } });
+  return ok(res, staffTest(updated));
 });
 
 const removeTest = wrap(async (req, res) => {
@@ -712,24 +782,19 @@ const gradeAttempt = wrap(async (req, res) => {
   const recomputed = await service.recomputeAttempt(test, attempt.attempt_id);
   await CbtAttempt.updateOne({ attempt_id: attempt.attempt_id }, { $set: { graded_by: req.actor.id, graded_at: new Date() } });
 
-  if (released && recomputed.grading_status === "graded") {
+  if (recomputed.grading_status === "graded") {
     try {
       const before = recomputed.synced_value;
-      const synced = await service.syncScoreSheet(test, recomputed);
-      await CbtAttempt.updateOne(
-        { attempt_id: attempt.attempt_id },
-        { $set: { synced_value: synced.value, score_sync_status: "synced", score_sync_error: null }, $inc: { result_version: 1 } }
-      );
+      const synced = await service.writeScore(test, recomputed);
       await service.audit(req.actor, test, "score_updated", {
         attempt_id: attempt.attempt_id,
         student_id: attempt.student_id,
         previous: { value: before },
-        next: { value: synced.value },
+        next: { value: synced?.value },
         reason,
       });
     } catch (error) {
-      await CbtAttempt.updateOne({ attempt_id: attempt.attempt_id }, { $set: { score_sync_status: "failed", score_sync_error: error.message } });
-      return bad(res, 500, "The marks were saved but the score sheet could not be updated. Try saving again.", { code: "sync_failed" });
+      return bad(res, 500, "The marks were saved but the assessment score could not be updated. Try saving again.", { code: "sync_failed" });
     }
   }
   const final = await CbtAttempt.findOne({ attempt_id: attempt.attempt_id }).lean();
@@ -891,6 +956,28 @@ const testSummary = (test) => ({
   access_code: accessCodeOf(test),
 });
 
+const sittingMinutes = (value) => {
+  const minutes = Number(value);
+  if (!Number.isInteger(minutes) || minutes < 1 || minutes > 600) return null;
+  return minutes;
+};
+
+/** A session code that no sitting has used yet. */
+const freshSessionCode = async () => {
+  for (let i = 0; i < 12; i += 1) {
+    const code = logic.linkCode();
+    const taken = await CbtAttempt.exists({ link_session: code });
+    if (!taken) return code;
+  }
+  return null;
+};
+
+const studentCodesFor = (count) => {
+  const codes = new Set();
+  while (codes.size < count) codes.add(logic.linkCode());
+  return [...codes];
+};
+
 /** Start the countdown for the selected students (kind "start") or give them another go ("rewrite"). */
 const startSessions = wrap(async (req, res) => {
   const test = await loadTest(req, res, "edit");
@@ -901,8 +988,14 @@ const startSessions = wrap(async (req, res) => {
   const kind = req.body?.kind === "rewrite" ? "rewrite" : "start";
   const ids = parseIds(req.body?.student_ids);
   if (ids.length === 0) return bad(res, 422, "Select at least one student.");
+  const minutes = sittingMinutes(req.body?.duration_minutes);
+  if (!minutes) return bad(res, 422, "Set a duration between 1 minute and 10 hours.");
   const reason = String(req.body?.reason || "").trim().slice(0, 500);
   if (kind === "rewrite" && !reason) return bad(res, 422, "Add a reason for the rewrite.", { code: "reason_required" });
+  const sessionCode = await freshSessionCode();
+  if (!sessionCode) return bad(res, 503, "Could not create a session code. Try again.");
+  const codes = studentCodesFor(ids.length);
+  let codeIndex = 0;
 
   const [assignments, attempts, students] = await Promise.all([
     CbtAssignment.find({ test_id: test.test_id, student_id: { $in: ids }, status: "assigned" }).lean(),
@@ -914,6 +1007,7 @@ const startSessions = wrap(async (req, res) => {
   const attemptsOf = groupAttempts(attempts);
 
   const started = [];
+  const links = [];
   const skipped = [];
   const now = new Date();
   for (const studentId of ids) {
@@ -930,6 +1024,8 @@ const startSessions = wrap(async (req, res) => {
       continue;
     }
     const number = (logic.latestAttempt(list)?.attempt_number || 0) + 1;
+    const studentCode = codes[codeIndex];
+    codeIndex += 1;
     try {
       await CbtAttempt.create({
         attempt_id: logic.makeId("att"),
@@ -939,24 +1035,73 @@ const startSessions = wrap(async (req, res) => {
         student_name: name,
         attempt_number: number,
         started_at: now,
-        allowed_end_at: logic.attemptDeadline(now, test.duration_minutes, test.closes_at),
+        allowed_end_at: logic.attemptDeadline(now, minutes, test.closes_at),
         started_by: req.actor.id,
         start_kind: kind,
+        link_student: studentCode,
+        link_session: sessionCode,
         marks_possible: test.total_marks,
         normalized_max: test.assessment_max,
       });
     } catch (error) {
       // A double click: the unique index lets only one sitting exist for this number.
       if (error?.code !== 11000) throw error;
-      skipped.push({ student_id: studentId, full_name: name, message: "Already started." });
+      const linkClash = Object.keys(error.keyPattern || {}).some((key) => key.startsWith("link_"));
+      skipped.push({ student_id: studentId, full_name: name, message: linkClash ? "Could not create an exam link. Try again." : "Already started." });
       continue;
     }
     await CbtAssignment.updateOne({ assignment_id: assignment.assignment_id }, { $set: { absent: false, ...(kind === "rewrite" ? { counted_attempt_id: null } : {}) } });
     await service.audit(req.actor, test, kind === "rewrite" ? "rewrite_started" : "session_started", { student_id: studentId, next: { attempt_number: number }, reason });
     started.push(studentId);
+    links.push({ full_name: name, student_code: studentCode, session_code: sessionCode });
   }
   if (started.length) await CbtTest.updateOne({ test_id: test.test_id, frozen: false }, { $set: { frozen: true } });
-  return ok(res, { started: started.length, skipped });
+  return ok(res, { started: started.length, skipped, session_code: links.length ? sessionCode : null, links });
+});
+
+/** Sittings that are still running, one row per session code. */
+const listSessions = wrap(async (req, res) => {
+  const test = await loadTest(req, res, "view");
+  if (!test) return;
+  await service.settleTest(test);
+  const attempts = await CbtAttempt.find({
+    test_id: test.test_id,
+    status: "in_progress",
+    link_session: { $type: "string" },
+  }).select("link_session student_name started_at allowed_end_at").lean();
+  const groups = new Map();
+  for (const attempt of attempts) {
+    if (!groups.has(attempt.link_session)) groups.set(attempt.link_session, []);
+    groups.get(attempt.link_session).push(attempt);
+  }
+  const sessions = [...groups.entries()].map(([code, rows]) => {
+    const started = Math.min(...rows.map((row) => new Date(row.started_at).getTime()));
+    const ends = Math.max(...rows.map((row) => new Date(row.allowed_end_at).getTime()));
+    return {
+      session_code: code,
+      started_at: new Date(started),
+      ends_at: new Date(ends),
+      students: rows.length,
+      names: rows.map((row) => row.student_name).filter(Boolean).sort((a, b) => a.localeCompare(b)),
+    };
+  });
+  sessions.sort((a, b) => new Date(b.started_at) - new Date(a.started_at));
+  return ok(res, { server_now: new Date(), sessions });
+});
+
+/** Stop a sitting. Answers from students still writing are discarded so they can be started again. */
+const cancelSession = wrap(async (req, res) => {
+  const test = await loadTest(req, res, "edit");
+  if (!test) return;
+  const code = logic.normalizeLinkCode(req.params.sessionCode);
+  if (!code) return bad(res, 404, "That test session was not found.");
+  const attempts = await CbtAttempt.find({ test_id: test.test_id, link_session: code, status: "in_progress" }).select("attempt_id").lean();
+  if (!attempts.length) return bad(res, 409, "That test session is no longer active.");
+  const ids = attempts.map((row) => row.attempt_id);
+  await CbtResponse.deleteMany({ attempt_id: { $in: ids } });
+  await CbtAttempt.deleteMany({ attempt_id: { $in: ids }, status: "in_progress" });
+  await service.audit(req.actor, test, "session_cancelled", { next: { session_code: code, students: ids.length } });
+  return ok(res, { cancelled: ids.length });
 });
 
 const loadAttemptFor = async (req, res, test) => {
@@ -1104,6 +1249,7 @@ const getRoster = wrap(async (req, res) => {
       attempts_count: list.length,
       attempt_number: logic.latestAttempt(list)?.attempt_number || 0,
       writing_attempt_id: writing?.attempt_id || null,
+      exam_path: writing?.link_student && writing?.link_session ? `/exam/${writing.link_student}/${writing.link_session}` : null,
       started_at: writing?.started_at || null,
       ends_at: writing?.allowed_end_at || null,
       answered: writing ? progressMap.get(writing.attempt_id)?.answered || 0 : null,
@@ -1247,6 +1393,7 @@ module.exports = {
   extendDeadline,
   closeTest,
   removeTest,
+  resetForEdit,
   getResults,
   getAttempt,
   gradeAttempt,
@@ -1254,6 +1401,8 @@ module.exports = {
   releaseResults,
   getAudit,
   startSessions,
+  listSessions,
+  cancelSession,
   endSession,
   addTime,
   markAbsent,

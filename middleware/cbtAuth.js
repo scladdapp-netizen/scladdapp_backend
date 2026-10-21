@@ -6,6 +6,7 @@
  * school id is always the one inside the token, never a value sent by the browser.
  */
 const jwt = require("jsonwebtoken");
+const CbtAttempt = require("../models/CbtAttempt.model");
 const User = require("../models/User.model");
 const Admin = require("../models/Admin.model");
 const Staff = require("../models/Staff.model");
@@ -85,6 +86,38 @@ const requireStudent = (req, res, next) => {
   return next();
 };
 
+/**
+ * A sitting link, not a student login. It can only open the one attempt named in the token.
+ */
+const requireExamLink = async (req, res, next) => {
+  const header = req.headers.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : null;
+  if (!token) return fail(res, 401, "This exam link is not valid. Check it with your teacher.", "invalid_link");
+  let payload;
+  try {
+    payload = jwt.verify(token, process.env.JWT_SECRET);
+  } catch {
+    return fail(res, 401, "This exam link has expired. Ask your teacher to start you again.", "invalid_link");
+  }
+  if (payload.purpose !== "cbt_link" || !payload.attempt_id || !payload.student_id || !payload.school_id) {
+    return fail(res, 401, "This exam link is not valid. Check it with your teacher.", "invalid_link");
+  }
+  try {
+    const attempt = await CbtAttempt.findOne({
+      attempt_id: String(payload.attempt_id),
+      student_id: String(payload.student_id),
+      school_id: String(payload.school_id),
+    }).lean();
+    if (!attempt) return fail(res, 404, "This exam link is not valid. Check it with your teacher.", "invalid_link");
+    req.actor = { role: "student", id: attempt.student_id, schoolId: attempt.school_id, via: "link" };
+    req.params.attemptId = attempt.attempt_id;
+    return next();
+  } catch (error) {
+    console.error("[CBT-AUTH]", error);
+    return fail(res, 500, "Could not open this exam link.");
+  }
+};
+
 // ── Subject / class authorization for staff ───────────────────────────────────
 const isFullAdmin = (actor) => {
   const admin = actor?.admin;
@@ -136,6 +169,7 @@ module.exports = {
   authenticate,
   requireStaff,
   requireStudent,
+  requireExamLink,
   isFullAdmin,
   adminCan,
   allowedClassIds,
