@@ -174,6 +174,16 @@ exports.updateAdmin = async (req, res) => {
     // Prevent ID change
     delete updates.admin_id;
 
+    const isSuperAdmin =
+      admin.admin_role === "Super Admin" ||
+      (Array.isArray(admin.permissions) && admin.permissions.includes("ALL"));
+    if (isSuperAdmin && (updates.permissions !== undefined || updates.access_scope !== undefined)) {
+      return res.status(403).json({
+        success: false,
+        message: "Super Admin permissions cannot be changed",
+      });
+    }
+
     // Handle revoked_at based on is_active
     if (updates.is_active === false && !admin.revoked_at) {
       updates.revoked_at = new Date();
