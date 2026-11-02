@@ -41,13 +41,26 @@ const termContext = async (schoolId, subsessionId) => {
   const subsession = await Subsession.findOne({ term_id: String(subsessionId), school_id: schoolId }).lean();
   if (!subsession) return null;
   let fields = [];
+  const fields_by_class = {};
   if (subsession.grading_template_id) {
     const template = await CombinedTemplate.findOne({ template_id: String(subsession.grading_template_id) }).lean();
-    fields = (template?.grading_fields || [])
+    const pack = (list) => (list || [])
       .map((item) => ({ field_name: String(item.field_name), max_score: Number(item.max_score) }))
       .filter((item) => item.field_name && Number.isFinite(item.max_score));
+    fields = pack(template?.grading_fields);
+    (template?.class_overrides || []).forEach((row) => {
+      const packed = pack(row.grading_fields);
+      (row.class_ids || []).forEach((id) => { fields_by_class[String(id)] = packed; });
+    });
   }
-  return { subsession, fields };
+  return { subsession, fields, fields_by_class };
+};
+
+const fieldsFor = (term, classId) => {
+  if (!term) return [];
+  const id = classId == null ? "" : String(classId);
+  if (id && term.fields_by_class && term.fields_by_class[id]) return term.fields_by_class[id];
+  return term.fields || [];
 };
 
 const fieldMaxOf = (fields, name) => {
@@ -280,6 +293,7 @@ const syncPendingScores = async (subjectId, subsessionId) => {
 module.exports = {
   audit,
   termContext,
+  fieldsFor,
   fieldMaxOf,
   autoGradeAttempt,
   recomputeAttempt,

@@ -14,6 +14,7 @@ const planSchema = new mongoose.Schema(
     price: { type: mongoose.Schema.Types.Mixed, default: 0 }, // can be string "₦0" or number
     featured: { type: Boolean, default: false },
     quataly_price: { type: Number, default: 0 },
+    half_year_price: { type: Number, default: 0 },
     yearly_price: { type: Number, default: 0 },
     monthly_price: { type: Number, default: 0 },
     features: { type: [String], default: [] },

@@ -18,7 +18,7 @@ router.put("/:classId/subsession/:subsessionId", (req, res, next) => {
         body.data?.school_id,
         "SAVE_TIMETABLE",
         "Timetable",
-        `Saved timetable for class ${req.params.classId} in subsession ${req.params.subsessionId}`,
+        `Saved timetable${req.body?.name ? ` "${req.body.name}"` : ""} for class ${req.params.classId} in subsession ${req.params.subsessionId}`,
         "success",
         "admin"
       );
@@ -28,23 +28,16 @@ router.put("/:classId/subsession/:subsessionId", (req, res, next) => {
   upsertClassTimetable(req, res, next);
 });
 
-router.delete("/:classId/subsession/:subsessionId", (req, res, next) => {
-  const { readData } = require("../utils/file");
-  const path = require("path");
-  const timetables = readData(path.join(__dirname, "../data/class_timetables.json"));
-  const record = timetables.find(
-    (t) => t.class_id === req.params.classId && t.subsession_id === req.params.subsessionId
-  );
-
+router.delete("/:classId/subsession/:subsessionId/:timetableId", (req, res, next) => {
   const originalJson = res.json.bind(res);
   res.json = (body) => {
     if (body?.success) {
       logActivity(
         req.body?.deleted_by || "system",
-        record?.school_id,
+        body.data?.school_id,
         "DELETE_TIMETABLE",
         "Timetable",
-        `Deleted timetable for class ${req.params.classId} in subsession ${req.params.subsessionId}`,
+        `Deleted timetable "${body.data?.name || req.params.timetableId}" for class ${req.params.classId} in subsession ${req.params.subsessionId}`,
         "success",
         "admin"
       );

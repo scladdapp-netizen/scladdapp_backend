@@ -109,6 +109,7 @@ const getContext = wrap(async (req, res) => {
     subject: { subject_id: subject.subject_id, subject_name: subject.subject_name },
     term: { term_id: term.subsession.term_id, term_name: term.subsession.term_name, session_id: term.subsession.session_id },
     fields: term.fields.filter((item) => service.safeFieldName(item.field_name)),
+    fields_by_class: term.fields_by_class || {},
     classes,
     used_assessments: used.map((row) => ({ test_id: row.test_id, class_id: row.class_id, grading_field: row.grading_field })),
     can_edit: Boolean((await allowedClassIds(req.actor, subjectId, "edit"))?.length !== 0),
@@ -248,7 +249,8 @@ const buildDraftFields = async (req, base) => {
       fields.assessment_max = null;
     } else {
       const term = await service.termContext(schoolId, base.subsession_id);
-      const max = term ? service.fieldMaxOf(term.fields, name) : null;
+      const classForField = fields.class_id !== undefined ? fields.class_id : base.class_id;
+      const max = term ? service.fieldMaxOf(service.fieldsFor(term, classForField), name) : null;
       if (!max || !service.safeFieldName(name)) errors.push({ field: "grading_field", message: "That assessment is not part of this term's grading template." });
       else {
         fields.grading_field = name;
@@ -341,7 +343,7 @@ const getValidation = wrap(async (req, res) => {
   const test = await loadTest(req, res, "view");
   if (!test) return;
   const term = await service.termContext(test.school_id, test.subsession_id);
-  const max = term ? service.fieldMaxOf(term.fields, test.grading_field) : null;
+  const max = term ? service.fieldMaxOf(service.fieldsFor(term, test.class_id), test.grading_field) : null;
   return ok(res, { problems: logic.publishProblems(test, max), assessment_max: max });
 });
 
@@ -390,7 +392,7 @@ const publishTest = wrap(async (req, res) => {
   if (!plan.allowed) return bad(res, 403, plan.message, { code: plan.code, plan_name: plan.plan_name });
 
   const term = await service.termContext(test.school_id, test.subsession_id);
-  const assessmentMax = term ? service.fieldMaxOf(term.fields, test.grading_field) : null;
+  const assessmentMax = term ? service.fieldMaxOf(service.fieldsFor(term, test.class_id), test.grading_field) : null;
   const problems = logic.publishProblems(test, assessmentMax);
   if (test.grading_field && !service.safeFieldName(test.grading_field)) {
     problems.push({ field: "grading_field", message: "This assessment name cannot be written to the score sheet." });

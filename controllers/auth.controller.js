@@ -76,6 +76,7 @@ const signup = async (adminData, schoolData, subscriptionData) => {
       const cycle = subscriptionData.billingCycle;
       if (cycle === "monthly") amountPaid = subscriptionData.plan.monthly_price || 0;
       else if (cycle === "quarterly") amountPaid = subscriptionData.plan.quataly_price || 0;
+      else if (cycle === "half_year") amountPaid = subscriptionData.plan.half_year_price || 0;
       else if (cycle === "yearly") amountPaid = subscriptionData.plan.yearly_price || 0;
     }
     const totalAmount = subscriptionData.totalAmount

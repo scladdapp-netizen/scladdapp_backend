@@ -127,6 +127,7 @@ exports.getPlans = async (req, res) => {
         $id: planId, // legacy clients
         monthly_price: Number(p.monthly_price) || 0,
         quataly_price: Number(p.quataly_price) || 0,
+        half_year_price: Number(p.half_year_price) || 0,
         yearly_price: Number(p.yearly_price) || 0,
         features: Array.isArray(p.features) ? p.features : [],
       };

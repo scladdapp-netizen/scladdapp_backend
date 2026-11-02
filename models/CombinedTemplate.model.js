@@ -20,6 +20,17 @@ const gradingSchemeSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const classOverrideSchema = new mongoose.Schema(
+  {
+    name: { type: String, default: "" },
+    class_ids: { type: [String], default: [] },
+    grading_fields: { type: [gradingFieldSchema], default: [] },
+    grading_scheme: { type: [gradingSchemeSchema], default: [] },
+    behavioral_traits: { type: [String], default: [] },
+  },
+  { _id: false }
+);
+
 const stylingSchema = new mongoose.Schema(
   {
     theme_id: { type: String, default: null },
@@ -43,6 +54,7 @@ const combinedTemplateSchema = new mongoose.Schema(
     layout: { type: String, default: null },
     grade_display: { type: String, default: null },
     behavioral_traits: { type: [String], default: [] },
+    class_overrides: { type: [classOverrideSchema], default: [] },
     styling: { type: stylingSchema, default: null },
     html_template: { type: String, default: null },
     html_template_draft: { type: String, default: null },

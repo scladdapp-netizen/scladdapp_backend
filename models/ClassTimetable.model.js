@@ -33,6 +33,7 @@ const timetableEntrySchema = new mongoose.Schema(
 const classTimetableSchema = new mongoose.Schema(
   {
     timetable_id: { type: String, required: true, unique: true },
+    name: { type: String, default: "Timetable" },
     class_id: { type: String, required: true },
     subsession_id: { type: String, default: null },
     school_id: { type: String, required: true },

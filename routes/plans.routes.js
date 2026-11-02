@@ -60,6 +60,7 @@ function pickPlanBody(body = {}) {
   if (body.featured !== undefined) out.featured = Boolean(body.featured);
   if (body.monthly_price !== undefined) out.monthly_price = toNumber(body.monthly_price, 0);
   if (body.quataly_price !== undefined) out.quataly_price = toNumber(body.quataly_price, 0);
+  if (body.half_year_price !== undefined) out.half_year_price = toNumber(body.half_year_price, 0);
   if (body.yearly_price !== undefined) out.yearly_price = toNumber(body.yearly_price, 0);
   if (body.price !== undefined) out.price = body.price;
   if (body.features !== undefined) out.features = normalizeFeatures(body.features);
@@ -129,6 +130,7 @@ router.post("/", verifyToken, async (req, res) => {
       featured: payload.featured ?? false,
       monthly_price: payload.monthly_price ?? 0,
       quataly_price: payload.quataly_price ?? 0,
+      half_year_price: payload.half_year_price ?? 0,
       yearly_price: payload.yearly_price ?? 0,
       price: payload.price ?? payload.monthly_price ?? 0,
       features: payload.features || [],

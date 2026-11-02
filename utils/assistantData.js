@@ -30,7 +30,7 @@ const HINTS = {
   Payment: "Only the school's own subscription payments to the platform. NOT student fees: for student fee payments use UserBill.",
   StudentReportCard: "One report card per student per term. A row = created. is_published true = released to the student. result_emailed_at/result_email_status are set when the result email is sent (older emails were not recorded; say so if the list looks short).",
   StudentReport: "Generated score report per student per term. Report cards are in StudentReportCard.",
-  ClassTimetable: "One timetable per class per term. Classes without one: query ClassTimetable groupBy class_id, then Class where class_id notIn that result.",
+  ClassTimetable: "A class can have several timetables in one term (name distinguishes them). Classes without one: query ClassTimetable groupBy class_id, then Class where class_id notIn that result.",
   Subsession: "A term. term_id is called subsession_id in other collections.",
   Session: "An academic year. session_id is its id and session_name its name.",
 };

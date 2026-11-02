@@ -391,7 +391,7 @@ router.get("/subscriptions", verifyToken, async (req, res) => {
 
     const [schools, plans] = await Promise.all([
       School.find({ school_id: { $in: schoolIds } }).select("school_id school_name").lean(),
-      Plan.find({}).select("plan_id plan_name plan_type monthly_price yearly_price quataly_price").lean(),
+      Plan.find({}).select("plan_id plan_name plan_type monthly_price yearly_price quataly_price half_year_price").lean(),
     ]);
 
     const schoolMap = Object.fromEntries(schools.map((s) => [s.school_id, s.school_name]));
@@ -403,6 +403,7 @@ router.get("/subscriptions", verifyToken, async (req, res) => {
         monthly_price:  p.monthly_price,
         yearly_price:   p.yearly_price,
         quataly_price:  p.quataly_price,
+        half_year_price: p.half_year_price,
       }])
     );
 
@@ -417,6 +418,7 @@ router.get("/subscriptions", verifyToken, async (req, res) => {
         monthly_price:  plan.monthly_price  ?? null,
         yearly_price:   plan.yearly_price   ?? null,
         quataly_price:  plan.quataly_price  ?? null,
+        half_year_price: plan.half_year_price ?? null,
       };
     });
 

@@ -16,6 +16,7 @@ const StudentGuardian = require("../models/StudentGuardian.model");
 const { queueEmail, getEmailQuota } = require("../utils/emailQueue");
 const jwt = require("jsonwebtoken");
 const { syncPendingScores } = require("../utils/cbtService");
+const { sliceOf, applyClassOverride, unionFields } = require("../utils/templateForClass");
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -48,7 +49,7 @@ const getSubjectPositions = async (studentId, subsessionId, classId) => {
     const template = subsession.grading_template_id
       ? await CombinedTemplate.findOne({ template_id: String(subsession.grading_template_id) }).lean()
       : null;
-    const gradingFields = template?.grading_fields || [];
+    const gradingFields = sliceOf(template, classId).grading_fields;
 
     const classAssignments = await StudentClassAssignment.find({ class_id: classId, session_id: subsession.session_id }).lean();
     const studentIdsInClass = new Set(classAssignments.map((a) => a.student_id));
@@ -85,7 +86,7 @@ const getClassAverage = async (subsessionId, classId) => {
     const template = await CombinedTemplate.findOne({ template_id: String(subsession.grading_template_id) }).lean();
     if (!template) return { success: false, message: "Template not found" };
 
-    const gradingFields = template.grading_fields || [];
+    const gradingFields = sliceOf(template, classId).grading_fields;
     const maxTotal = gradingFields.reduce((s, f) => s + Number(f.max_score), 0);
 
     let records = await StudentScore.find({ subsession_id: subsessionId }).lean();
@@ -132,11 +133,17 @@ const generateReport = async (studentId, subsessionId) => {
     const template = await CombinedTemplate.findOne({ template_id: String(subsession.grading_template_id) }).lean();
     if (!template) return { success: false, message: "Grading template not found" };
 
-    const gradingFields    = template.grading_fields || [];
-    const behavioralTraits = template.behavioral_traits || [];
-
     const studentScores = await StudentScore.find({ student_id: studentId, subsession_id: subsessionId }).lean();
     if (studentScores.length === 0) return { success: false, message: "No scores found for this student in this subsession" };
+
+    let classId = studentScores[0].class_id;
+    if (!classId) {
+      const assignment = await StudentClassAssignment.findOne({ student_id: studentId, session_id: subsession.session_id }).lean();
+      classId = assignment?.class_id || null;
+    }
+    const resolved = applyClassOverride(template, classId);
+    const gradingFields = resolved.grading_fields || [];
+    const behavioralTraits = resolved.behavioral_traits || [];
 
     const subjects = studentScores.map((s) => buildSubjectResult(s, gradingFields));
 
@@ -445,9 +452,6 @@ const getPreviewData = async (studentId, subsessionId) => {
     const template = await CombinedTemplate.findOne({ template_id: String(subsession.grading_template_id) }).lean();
     if (!template) return { success: false, message: "Template not found" };
 
-    const gradingFields = template.grading_fields || [];
-    const gradingScheme = template.grading_scheme || [];
-
     const [session, school, student] = await Promise.all([
       Session.findOne({ session_id: subsession.session_id }).lean(),
       School.findOne({ school_id: subsession.school_id }).lean(),
@@ -458,6 +462,9 @@ const getPreviewData = async (studentId, subsessionId) => {
     const classAssignment = await StudentClassAssignment.findOne({ student_id: studentId, session_id: subsession.session_id }).lean();
     const classId  = classAssignment?.class_id || null;
     const classRec = classId ? await Class.findOne({ class_id: classId }).lean() : null;
+    const resolved = applyClassOverride(template, classId);
+    const gradingFields = resolved.grading_fields || [];
+    const gradingScheme = resolved.grading_scheme || [];
 
     const reportCard = await StudentReportCard.findOne({ student_id: studentId, subsession_id: subsessionId }).lean();
 
@@ -549,7 +556,7 @@ const getPreviewData = async (studentId, subsessionId) => {
       principalRemark: reportCard?.principal_remark || null,
     };
 
-    return { success: true, data: { student: studentData, template } };
+    return { success: true, data: { student: studentData, template: resolved } };
   } catch (err) {
     return { success: false, message: err.message };
   }
@@ -559,10 +566,9 @@ const getPreviewData = async (studentId, subsessionId) => {
 const getScoresBySubjectSubsession = async (subjectId, subsessionId, params = {}) => {
   try {
     const subsession = await Subsession.findOne({ term_id: subsessionId }).lean();
-    let gradingFields = [];
+    let template = null;
     if (subsession?.grading_template_id) {
-      const template = await CombinedTemplate.findOne({ template_id: String(subsession.grading_template_id) }).lean();
-      if (template) gradingFields = template.grading_fields || [];
+      template = await CombinedTemplate.findOne({ template_id: String(subsession.grading_template_id) }).lean();
     }
     const sessionId = subsession?.session_id || null;
 
@@ -598,10 +604,16 @@ const getScoresBySubjectSubsession = async (subjectId, subsessionId, params = {}
     const scoreLookup = {};
     scoreRecords.forEach((s) => { scoreLookup[s.student_id] = s; });
 
+    const presentClassIds = [...new Set(uniqueAssignments.map((a) => String(a.class_id || "")))].filter(Boolean);
+    const gradingFields = params.classId
+      ? sliceOf(template, params.classId).grading_fields
+      : unionFields(template, presentClassIds);
+
     let rows = uniqueAssignments.map((a) => {
       const scoreRec = scoreLookup[a.student_id] || null;
       const scores   = scoreRec?.scores || null;
-      const total    = scores ? gradingFields.reduce((sum, f) => sum + (Number(scores[f.field_name]) || 0), 0) : null;
+      const classFields = sliceOf(template, a.class_id).grading_fields;
+      const total    = scores ? classFields.reduce((sum, f) => sum + (Number(scores[f.field_name]) || 0), 0) : null;
       return {
         student_id:   a.student_id,
         student_name: studentMap[a.student_id]?.full_name || scoreRec?.student_name || "—",
@@ -609,6 +621,7 @@ const getScoresBySubjectSubsession = async (subjectId, subsessionId, params = {}
         class_name:   a.class_name || "—",
         teacher_name: scoreRec?.teacher_name || "—",
         scores,
+        field_names:  classFields.map((f) => f.field_name),
         total,
         has_score:    !!scoreRec,
         score_id:     scoreRec?.score_id || null,

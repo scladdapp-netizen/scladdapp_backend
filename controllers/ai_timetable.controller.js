@@ -6,6 +6,7 @@ const Staff = require("../models/Staff.model");
 const Teacher = require("../models/Teacher.model");
 const TimetableTemplate = require("../models/TimetableTemplate.model");
 const ClassTimetable = require("../models/ClassTimetable.model");
+const { saveClassTimetableRecord } = require("./class_timetable.controller");
 const AIConfig = require("../models/AIConfig.model");
 const { USE_TIMETABLE, usesForFeature } = require("../utils/aiConfigUse");
 const { getMessageText, hasReasoningOnly, parseTimetableAIResponse } = require("../utils/parseAiJson");
@@ -705,25 +706,13 @@ Output: {"timetables":[{"class_id":"${classInfo.class_id}","entries":[...]}]}`;
     return;
   }
 
-  const record = {
+  await saveClassTimetableRecord({
     class_id: classInfo.class_id,
     subsession_id,
     school_id,
     entries,
     generated_by: "ai",
-    generated_at: new Date(),
-    updated_at: new Date(),
-  };
-  const existing = await ClassTimetable.findOne({ class_id: classInfo.class_id, subsession_id });
-  if (existing) {
-    Object.assign(existing, record);
-    await existing.save();
-  } else {
-    await ClassTimetable.create({
-      timetable_id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
-      ...record,
-    });
-  }
+  });
   console.log(
     `${TAG} Saved ${classInfo.class_name || classInfo.class_id}: ` +
       `${entries.filter((e) => !e.isBreak).length} periods`
@@ -1021,32 +1010,23 @@ Output: {"timetables":[{"class_id":"...","entries":[...]}]}`;
           `${entries.filter((e) => e.isBreak).length} breaks`
       );
 
-      const record = {
+      const forThisClass = class_id && String(item.class_id) === String(class_id);
+      const savedDoc = await saveClassTimetableRecord({
         class_id: item.class_id,
         subsession_id,
         school_id,
         entries,
+        timetable_id: forThisClass ? req.body.timetable_id : null,
+        name: forThisClass ? req.body.name : null,
         generated_by: "ai",
-        generated_at: new Date(),
-        updated_at: new Date(),
-      };
-
-      const existing = await ClassTimetable.findOne({
-        class_id: item.class_id,
-        subsession_id,
       });
 
-      if (existing) {
-        Object.assign(existing, record);
-        await existing.save();
-      } else {
-        await ClassTimetable.create({
-          timetable_id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
-          ...record,
-        });
-      }
-
-      saved.push({ class_id: item.class_id, entries_count: entries.length });
+      saved.push({
+        class_id: item.class_id,
+        timetable_id: savedDoc.timetable_id,
+        name: savedDoc.name,
+        entries_count: entries.length,
+      });
     }
 
     if (!saved.length) {
@@ -1060,6 +1040,12 @@ Output: {"timetables":[{"class_id":"...","entries":[...]}]}`;
       success: true,
       message: `Generated and saved timetables for ${saved.length} class(es)`,
       data: saved,
+      timetable_id: class_id
+        ? saved.find((item) => String(item.class_id) === String(class_id))?.timetable_id
+        : undefined,
+      name: class_id
+        ? saved.find((item) => String(item.class_id) === String(class_id))?.name
+        : undefined,
       entries:
         class_id && saved.length > 0
           ? finalizeTimetableEntries(
